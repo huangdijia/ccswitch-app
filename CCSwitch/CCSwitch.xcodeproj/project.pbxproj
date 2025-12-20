@@ -1,0 +1,547 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		01000001 /* CCSwitchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000001 /* CCSwitchApp.swift */; };
+		01000002 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000002 /* MenuBarController.swift */; };
+		01000003 /* Vendor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000003 /* Vendor.swift */; };
+		01000004 /* CCSConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000004 /* CCSConfig.swift */; };
+		01000005 /* ClaudeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000005 /* ClaudeSettings.swift */; };
+		01000006 /* ConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000006 /* ConfigManager.swift */; };
+		01000007 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000007 /* BackupManager.swift */; };
+		01000008 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000008 /* Logger.swift */; };
+		01000009 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000009 /* ErrorHandler.swift */; };
+		01000010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000010 /* SettingsView.swift */; };
+		01000011 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000011 /* GeneralSettingsView.swift */; };
+		01000012 /* VendorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000012 /* VendorManagementView.swift */; };
+		01000013 /* VendorEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000013 /* VendorEditView.swift */; };
+		01000014 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000014 /* AdvancedSettingsView.swift */; };
+		01000015 /* ConfigManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000015 /* ConfigManagerTests.swift */; };
+		01000016 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000016 /* ModelTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02000001 /* CCSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSwitchApp.swift; sourceTree = "<group>"; };
+		02000002 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		02000003 /* Vendor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vendor.swift; sourceTree = "<group>"; };
+		02000004 /* CCSConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSConfig.swift; sourceTree = "<group>"; };
+		02000005 /* ClaudeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeSettings.swift; sourceTree = "<group>"; };
+		02000006 /* ConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManager.swift; sourceTree = "<group>"; };
+		02000007 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		02000008 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		02000009 /* ErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
+		02000010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		02000011 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
+		02000012 /* VendorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorManagementView.swift; sourceTree = "<group>"; };
+		02000013 /* VendorEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorEditView.swift; sourceTree = "<group>"; };
+		02000014 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
+		02000015 /* ConfigManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManagerTests.swift; sourceTree = "<group>"; };
+		02000016 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		03000001 /* CCSwitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		03000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04000001 /* CCSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CCSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		05000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		06000001 = {
+			isa = PBXGroup;
+			children = (
+				06000002 /* CCSwitch */,
+				06000003 /* CCSwitchTests */,
+				06000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		06000002 /* CCSwitch */ = {
+			isa = PBXGroup;
+			children = (
+				06000005 /* App */,
+				06000006 /* Models */,
+				06000007 /* Services */,
+				06000008 /* Views */,
+				06000009 /* Resources */,
+			);
+			path = CCSwitch;
+			sourceTree = "<group>";
+		};
+		06000003 /* CCSwitchTests */ = {
+			isa = PBXGroup;
+			children = (
+				02000015 /* ConfigManagerTests.swift */,
+				02000016 /* ModelTests.swift */,
+			);
+			path = CCSwitchTests;
+			sourceTree = "<group>";
+		};
+		06000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				03000001 /* CCSwitch.app */,
+				04000001 /* CCSwitchTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		06000005 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				02000001 /* CCSwitchApp.swift */,
+				02000002 /* MenuBarController.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		06000006 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				02000003 /* Vendor.swift */,
+				02000004 /* CCSConfig.swift */,
+				02000005 /* ClaudeSettings.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		06000007 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				02000006 /* ConfigManager.swift */,
+				02000007 /* BackupManager.swift */,
+				02000008 /* Logger.swift */,
+				02000009 /* ErrorHandler.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		06000008 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				02000010 /* SettingsView.swift */,
+				02000011 /* GeneralSettingsView.swift */,
+				02000012 /* VendorManagementView.swift */,
+				02000013 /* VendorEditView.swift */,
+				02000014 /* AdvancedSettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		06000009 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				03000002 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		07000001 /* CCSwitch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08000001 /* Build configuration list for PBXNativeTarget "CCSwitch" */;
+			buildPhases = (
+				09000001 /* Sources */,
+				05000001 /* Frameworks */,
+				10000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CCSwitch;
+			productName = CCSwitch;
+			productReference = 03000001 /* CCSwitch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		07000002 /* CCSwitchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08000002 /* Build configuration list for PBXNativeTarget "CCSwitchTests" */;
+			buildPhases = (
+				09000002 /* Sources */,
+				05000002 /* Frameworks */,
+				10000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				11000001 /* Target dependency */,
+			);
+			name = CCSwitchTests;
+			productName = CCSwitchTests;
+			productReference = 04000001 /* CCSwitchTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		12000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					07000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					07000002 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = 07000001;
+					};
+				};
+			};
+			buildConfigurationList = 08000003 /* Build configuration list for PBXProject "CCSwitch" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 06000001;
+			productRefGroup = 06000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				07000001 /* CCSwitch */,
+				07000002 /* CCSwitchTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		10000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		10000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		09000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01000001 /* CCSwitchApp.swift in Sources */,
+				01000002 /* MenuBarController.swift in Sources */,
+				01000003 /* Vendor.swift in Sources */,
+				01000004 /* CCSConfig.swift in Sources */,
+				01000005 /* ClaudeSettings.swift in Sources */,
+				01000006 /* ConfigManager.swift in Sources */,
+				01000007 /* BackupManager.swift in Sources */,
+				01000008 /* Logger.swift in Sources */,
+				01000009 /* ErrorHandler.swift in Sources */,
+				01000010 /* SettingsView.swift in Sources */,
+				01000011 /* GeneralSettingsView.swift in Sources */,
+				01000012 /* VendorManagementView.swift in Sources */,
+				01000013 /* VendorEditView.swift in Sources */,
+				01000014 /* AdvancedSettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		09000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01000015 /* ConfigManagerTests.swift in Sources */,
+				01000016 /* ModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		11000001 /* Target dependency */ = {
+			isa = PBXTargetDependency;
+			target = 07000001 /* CCSwitch */;
+			targetProxy = 13000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		13000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 12000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07000001;
+			remoteInfo = CCSwitch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin XCBuildConfiguration section */
+		14000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		14000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		14000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CCSwitch/CCSwitch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CCSwitch/Resources/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 CCSwitch. All rights reserved.";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cccode.switch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		14000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CCSwitch/CCSwitch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CCSwitch/Resources/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 CCSwitch. All rights reserved.";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cccode.switch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		14000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cccode.switchTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CCSwitch.app/Contents/MacOS/CCSwitch";
+			};
+			name = Debug;
+		};
+		14000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cccode.switchTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CCSwitch.app/Contents/MacOS/CCSwitch";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		08000001 /* Build configuration list for PBXNativeTarget "CCSwitch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14000003 /* Debug */,
+				14000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08000002 /* Build configuration list for PBXNativeTarget "CCSwitchTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14000005 /* Debug */,
+				14000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08000003 /* Build configuration list for PBXProject "CCSwitch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14000001 /* Debug */,
+				14000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 12000001 /* Project object */;
+}

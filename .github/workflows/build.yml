@@ -1,0 +1,40 @@
+name: Build CCSwitch
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project CCSwitch/CCSwitch.xcodeproj \
+            -scheme CCSwitch \
+            -configuration Release \
+            -derivedDataPath build
+
+      - name: Run Tests
+        run: |
+          xcodebuild test \
+            -project CCSwitch/CCSwitch.xcodeproj \
+            -scheme CCSwitch \
+            -destination 'platform=macOS'
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CCSwitch-App
+          path: build/Build/Products/Release/CCSwitch.app
