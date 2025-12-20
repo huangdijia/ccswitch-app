@@ -36,8 +36,15 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
+      - name: Create DMG
+        run: |
+          mkdir -p dmg-source
+          cp -r build/Build/Products/Release/CCSwitch.app dmg-source/
+          ln -s /Applications dmg-source/Applications
+          hdiutil create -volname "CCSwitch" -srcfolder dmg-source -ov -format UDZO CCSwitch.dmg
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CCSwitch-App
-          path: build/Build/Products/Release/CCSwitch.app
+          name: CCSwitch
+          path: CCSwitch.dmg
