@@ -44,7 +44,7 @@ struct SettingsView: View {
             }
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 240)
-            .toolbar(removing: .sidebarToggle)
+            .removeSidebarToggle()
         } detail: {
             ZStack {
                 DesignSystem.Colors.background.ignoresSafeArea()
@@ -106,4 +106,15 @@ enum SettingsTab: Hashable {
     case general
     case vendors
     case advanced
+}
+
+extension View {
+    @ViewBuilder
+    func removeSidebarToggle() -> some View {
+        if #available(macOS 14.0, *) {
+            self.toolbar(removing: .sidebarToggle)
+        } else {
+            self
+        }
+    }
 }
