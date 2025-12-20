@@ -45,7 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 defer: false
             )
 
-            settingsWindow?.title = "CCSwitch Settings"
+            settingsWindow?.title = NSLocalizedString("window_title_settings", comment: "")
             settingsWindow?.contentView = hostingView
             settingsWindow?.center()
             settingsWindow?.setFrameAutosaveName("SettingsWindow")

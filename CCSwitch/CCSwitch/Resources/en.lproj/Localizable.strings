@@ -43,3 +43,4 @@
 "about_message" = "CCSwitch v%@\n\nA macOS status bar tool for quickly switching Claude Code vendors.\n\nConfig Dir: %@\nClaude Config: %@";
 "ok" = "OK";
 "switch_failed" = "Switch Failed";
+"window_title_settings" = "CCSwitch Settings";

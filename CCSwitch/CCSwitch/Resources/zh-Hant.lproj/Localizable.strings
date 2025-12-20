@@ -43,3 +43,4 @@
 "about_message" = "CCSwitch v%@\n\n一個用於快速切換 Claude Code 供應商的 macOS 狀態列工具。\n\n配置目錄：%@\nClaude 配置：%@";
 "ok" = "確定";
 "switch_failed" = "切換失敗";
+"window_title_settings" = "CCSwitch 設定";
