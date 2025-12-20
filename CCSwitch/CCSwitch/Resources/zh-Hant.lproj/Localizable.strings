@@ -51,6 +51,8 @@
 "notifications" = "通知";
 "show_notifications" = "顯示通知";
 "show_notifications_desc" = "切換供應商後顯示系統通知";
+"notifications_disabled_hint" = "通知權限已關閉，點擊前往「系統設定」開啟";
+"notifications_not_determined_hint" = "點擊申請系統通知權限";
 "startup_backup" = "啟動與備份";
 "auto_load_config" = "自動載入配置";
 "auto_load_config_desc" = "應用啟動時自動載入配置";

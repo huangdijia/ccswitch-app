@@ -51,6 +51,8 @@
 "notifications" = "Notifications";
 "show_notifications" = "Show Notifications";
 "show_notifications_desc" = "Show system notification after switching vendor";
+"notifications_disabled_hint" = "Notification permission disabled. Click to open System Settings.";
+"notifications_not_determined_hint" = "Click to request notification permission";
 "startup_backup" = "Startup & Backup";
 "auto_load_config" = "Auto Load Config";
 "auto_load_config_desc" = "Automatically load configuration on app startup";

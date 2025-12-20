@@ -11,7 +11,7 @@ struct CCSwitchApp {
     }
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var statusBarController: MenuBarController?
     var settingsWindow: NSWindow?
 
@@ -35,7 +35,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 清理资源
         ConfigManager.shared.cleanup()
     }
-    
+
+    func windowWillClose(_ notification: Notification) {
+        if notification.object as? NSWindow == settingsWindow {
+            NSApp.setActivationPolicy(.accessory)
+        }
+    }
+
+    @objc func showSettingsWindow() {
+        if settingsWindow == nil {
+            let contentView = SettingsView()
+            let hostingView = NSHostingView(rootView: contentView)
+
+            settingsWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                backing: .buffered,
+                defer: false
+            )
+
+            settingsWindow?.title = NSLocalizedString("window_title_settings", comment: "")
+            settingsWindow?.contentView = hostingView
+            settingsWindow?.center()
+            settingsWindow?.setFrameAutosaveName("SettingsWindow")
+            settingsWindow?.delegate = self
+        }
+
+        NSApp.setActivationPolicy(.regular)
+        settingsWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let menu = NSMenu()
         
@@ -116,28 +146,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let url = URL(string: "https://github.com/huangdijia/ccswitch-mac") {
             NSWorkspace.shared.open(url)
         }
-    }
-
-    @objc func showSettingsWindow() {
-        if settingsWindow == nil {
-            let contentView = SettingsView()
-            let hostingView = NSHostingView(rootView: contentView)
-
-            settingsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered,
-                defer: false
-            )
-
-            settingsWindow?.title = NSLocalizedString("window_title_settings", comment: "")
-            settingsWindow?.contentView = hostingView
-            settingsWindow?.center()
-            settingsWindow?.setFrameAutosaveName("SettingsWindow")
-        }
-
-        settingsWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 }
 

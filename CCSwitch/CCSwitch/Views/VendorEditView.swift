@@ -152,9 +152,9 @@ struct VendorEditView: View {
         .frame(width: 500, height: 550)
         .background(DesignSystem.Colors.background)
         .onAppear { loadData() }
-        .onChange(of: baseURL) { _ in validate() }
-        .onChange(of: timeout) { _ in validate() }
-        .onChange(of: authToken) { _ in validate() }
+        .onChange(of: baseURL) { oldValue, newValue in validate() }
+        .onChange(of: timeout) { oldValue, newValue in validate() }
+        .onChange(of: authToken) { oldValue, newValue in validate() }
     }
 
     // MARK: - Logic
