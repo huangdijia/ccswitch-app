@@ -218,6 +218,7 @@ class ConfigManager {
 
     private func notifyObservers(_ event: ConfigEvent) {
         observers.forEach { $0.configDidChange(event) }
+        NotificationCenter.default.post(name: .configDidChange, object: nil)
     }
 
     // MARK: - Helper Methods
@@ -274,4 +275,8 @@ extension URL {
             withIntermediateDirectories: true
         )
     }
+}
+
+extension Notification.Name {
+    static let configDidChange = Notification.Name("configDidChange")
 }

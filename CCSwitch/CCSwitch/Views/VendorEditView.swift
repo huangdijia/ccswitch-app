@@ -8,17 +8,23 @@ struct VendorEditView: View {
     @State private var id: String = ""
     @State private var displayName: String = ""
     @State private var provider: String = "anthropic"
-    @State private var model: String = ""
-    @State private var apiKeyEnv: String = ""
-    @State private var baseURL: String = ""
     @State private var notes: String = ""
-    @State private var useCustomBaseURL: Bool = false
-    @State private var existingEnv: [String: String] = [:] // Store original env to prevent data loss
+    @State private var env: [String: String] = [:]
 
-    // Constants for autocomplete
+    // Constants
     private let commonProviders = ["anthropic", "deepseek", "openai"]
-    private let commonModels = ["claude-3-5-sonnet", "deepseek-chat", "gpt-4o"]
-    private let commonApiKeys = ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "DEEPSEEK_API_KEY", "OPENAI_API_KEY"]
+    
+    // Explicitly requested keys to show in UI
+    private let envKeys = [
+        "ANTHROPIC_AUTH_TOKEN",
+        "ANTHROPIC_BASE_URL",
+        "ANTHROPIC_MODEL",
+        "ANTHROPIC_SMALL_FAST_MODEL",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+        "API_TIMEOUT_MS"
+    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -26,76 +32,71 @@ struct VendorEditView: View {
                 .font(.headline)
 
             Form {
-                Section(header: Text("基本信息")) {
+                Section(header: Text("Basic Info")) {
                     HStack {
-                        Text("ID：")
-                        TextField("唯一标识", text: $id)
+                        Text("ID:")
+                            .frame(width: 80, alignment: .leading)
+                        TextField("Unique ID", text: $id)
                             .disabled(vendor != nil)
                     }
 
                     HStack {
-                        Text("显示名称：")
-                        TextField("供应商名称", text: $displayName)
+                        Text("Name:")
+                            .frame(width: 80, alignment: .leading)
+                        TextField("Display Name", text: $displayName)
+                    }
+                    
+                    HStack {
+                        Text("Provider:")
+                            .frame(width: 80, alignment: .leading)
+                        Picker("", selection: $provider) {
+                            ForEach(commonProviders, id: \.self) { p in
+                                Text(p).tag(p)
+                            }
+                            Text("Custom").tag("")
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(width: 120)
+                        
+                        if !commonProviders.contains(provider) {
+                            TextField("Custom Provider", text: $provider)
+                        }
                     }
                 }
 
-                Section(header: Text("Claude 配置")) {
-                    Picker("Provider：", selection: $provider) {
-                        ForEach(commonProviders, id: \.self) { p in
-                            Text(p).tag(p)
-                        }
-                        Text("Custom").tag("")
-                    }
-                    .pickerStyle(.menu)
-                    // If user wants custom provider not in list, they can edit text field?
-                    // Picker binds to selection. If selection is not in list, it might be tricky.
-                    // Better pattern: ComboBox or Menu + TextField.
-                    // For simplicity, let's keep TextField but add a Menu for quick selection.
-                    
-                    HStack {
-                        Text("Provider (Custom)：")
-                        TextField("provider", text: $provider)
-                    }
-                    
-                    HStack {
-                        Text("Model：")
-                        TextField("model", text: $model)
-                        Menu {
-                            ForEach(commonModels, id: \.self) { m in
-                                Button(m) { model = m }
-                            }
-                        } label: {
-                            Image(systemName: "chevron.down")
-                        }
-                        .menuStyle(.borderlessButton)
-                        .frame(width: 20)
-                    }
-
-                    HStack {
-                        Text("API Key Env：")
-                        TextField("api_key_env_label", text: $apiKeyEnv)
-                        Menu {
-                            ForEach(commonApiKeys, id: \.self) { key in
-                                Button(key) { apiKeyEnv = key }
-                            }
-                        } label: {
-                            Image(systemName: "chevron.down")
-                        }
-                        .menuStyle(.borderlessButton)
-                        .frame(width: 20)
-                    }
-
-                    Toggle("自定义 Base URL", isOn: $useCustomBaseURL)
-
-                    if useCustomBaseURL {
+                Section(header: Text("Environment Variables")) {
+                    ForEach(envKeys, id: \.self) { key in
                         HStack {
-                            Text("Base URL：")
-                            TextField("base_url_label", text: $baseURL)
+                            Text(key)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .frame(width: 220, alignment: .leading)
+                                .help(key)
+                            TextField("Value", text: Binding(
+                                get: { env[key] ?? "" },
+                                set: { env[key] = $0.isEmpty ? nil : $0 }
+                            ))
+                        }
+                    }
+                    
+                    // Button to add other keys? For now, just the requested ones + what was already there.
+                    // If there are keys in `env` that are NOT in `envKeys`, show them too?
+                    ForEach(env.keys.sorted().filter { !envKeys.contains($0) && $0 != "provider" }, id: \.self) { key in
+                        HStack {
+                            Text(key)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .frame(width: 220, alignment: .leading)
+                            TextField("Value", text: Binding(
+                                get: { env[key] ?? "" },
+                                set: { env[key] = $0.isEmpty ? nil : $0 }
+                            ))
                         }
                     }
                 }
 
-                Section(header: Text("备注")) {
+                Section(header: Text("Notes")) {
                     TextEditor(text: $notes)
                         .frame(minHeight: 60)
                 }
@@ -113,11 +114,11 @@ struct VendorEditView: View {
                     save()
                 }
                 .keyboardShortcut(.return)
-                .disabled(id.isEmpty || displayName.isEmpty || provider.isEmpty || model.isEmpty || apiKeyEnv.isEmpty)
+                .disabled(id.isEmpty || displayName.isEmpty || provider.isEmpty)
             }
         }
         .padding()
-        .frame(width: 500, height: 600)
+        .frame(width: 600, height: 700)
         .onAppear {
             loadVendorData()
         }
@@ -127,49 +128,31 @@ struct VendorEditView: View {
         if let vendor = vendor {
             id = vendor.id
             displayName = vendor.name
-            existingEnv = vendor.env
-            
-            provider = vendor.env["provider"] ?? vendor.env["type"] ?? "anthropic"
-            model = vendor.env["model"] ?? vendor.env["ANTHROPIC_MODEL"] ?? ""
-            apiKeyEnv = vendor.env["apiKeyEnv"] ?? vendor.env["api_key_env"] ?? vendor.env["ANTHROPIC_AUTH_TOKEN"] ?? ""
-            
-            if let url = vendor.env["baseURL"] ?? vendor.env["ANTHROPIC_BASE_URL"] {
-                baseURL = url
-                useCustomBaseURL = true
-            } else {
-                useCustomBaseURL = false
-            }
-            
+            env = vendor.env
+            provider = env["provider"] ?? "anthropic"
             notes = vendor.notes ?? ""
         } else {
             // Defaults for new vendor
             provider = "anthropic"
-            model = "claude-3-5-sonnet"
-            apiKeyEnv = "ANTHROPIC_API_KEY"
+            env["ANTHROPIC_MODEL"] = "claude-3-5-sonnet"
         }
     }
 
     private func save() {
-        var env = existingEnv
-        env["provider"] = provider
-        env["model"] = model
-        env["apiKeyEnv"] = apiKeyEnv
+        var finalEnv = env
+        finalEnv["provider"] = provider
         
-        // Handle common variations for legacy compatibility if needed, 
-        // but new format prefers 'provider', 'model', 'apiKeyEnv', 'baseURL'.
-        // We will stick to the standard keys for new edits.
-        
-        if useCustomBaseURL {
-            env["baseURL"] = baseURL
-        } else {
-            env.removeValue(forKey: "baseURL")
-            env.removeValue(forKey: "ANTHROPIC_BASE_URL")
+        // Clean up empty values
+        for (key, value) in finalEnv {
+            if value.isEmpty {
+                finalEnv.removeValue(forKey: key)
+            }
         }
 
         let newVendor = Vendor(
             id: id,
             name: displayName,
-            env: env,
+            env: finalEnv,
             notes: notes.isEmpty ? nil : notes
         )
 

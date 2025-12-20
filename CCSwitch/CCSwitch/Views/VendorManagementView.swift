@@ -8,8 +8,7 @@ struct VendorManagementView: View {
     @State private var importErrorMessage: String = ""
     @State private var showImportSuccess: Bool = false
     @State private var activeSheet: SheetState?
-    
-    private let currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
+    @State private var currentVendorId: String = ""
     
     enum SheetState: Identifiable {
         case detail(Vendor)
@@ -130,6 +129,9 @@ struct VendorManagementView: View {
         .onAppear {
             loadVendors()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .configDidChange)) { _ in
+            loadVendors()
+        }
         .sheet(item: $activeSheet) { item in
             switch item {
             case .detail(let vendor):
@@ -171,6 +173,7 @@ struct VendorManagementView: View {
 
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
+        currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
         // Only show legacy import if we are running on default config (which implies no user config yet) or if explicitly checking for legacy file existence
         // But logic says: "If ~/.ccswitch/ccs.json exists, show button".
         // Use a simpler check:
