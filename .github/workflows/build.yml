@@ -17,14 +17,46 @@ jobs:
 
       - name: Build
         run: |
-          chmod +x build.sh
-          ./build.sh
+          xcodebuild build \
+            -project CCSwitch/CCSwitch.xcodeproj \
+            -scheme CCSwitch \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+          # Manually copy resources (localization, icon) that might be missing from project file
+          echo "📦 Copying resources..."
+          
+          # Define path
+          APP_PATH="build/Build/Products/Release/CCSwitch.app"
+          APP_RESOURCES_DIR="$APP_PATH/Contents/Resources"
+          
+          echo "  - App Path: $APP_PATH"
+          echo "  - Resources Dir: $APP_RESOURCES_DIR"
+          
+          # Ensure directory structure exists
+          mkdir -p "$APP_RESOURCES_DIR"
+          
+          # Debug: List source files
+          ls -d CCSwitch/CCSwitch/Resources/*.lproj
+          
+          # Copy localization files
+          cp -R CCSwitch/CCSwitch/Resources/*.lproj "$APP_RESOURCES_DIR/"
+          
+          # Ensure icon is copied if missing
+          if [ -f CCSwitch/CCSwitch/Resources/AppIcon.icns ]; then
+             echo "  - Copying AppIcon..."
+             cp CCSwitch/CCSwitch/Resources/AppIcon.icns "$APP_RESOURCES_DIR/"
+          fi
+          
+          echo "✅ Resources copied."
 
       - name: Run Tests
         run: |
-          cd CCSwitch
           xcodebuild test \
-            -project CCSwitch.xcodeproj \
+            -project CCSwitch/CCSwitch.xcodeproj \
             -scheme CCSwitch \
             -destination 'platform=macOS' \
             CODE_SIGN_IDENTITY="" \
@@ -33,9 +65,11 @@ jobs:
 
       - name: Create DMG
         run: |
-          # 注意：build.sh 已经执行了签名，这里直接打包
+          # Ad-hoc sign the app (required for Apple Silicon)
+          codesign --force --deep --sign - build/Build/Products/Release/CCSwitch.app
+
           mkdir -p dmg-source
-          cp -r CCSwitch/CCSwitch.app dmg-source/
+          cp -r build/Build/Products/Release/CCSwitch.app dmg-source/
           ln -s /Applications dmg-source/Applications
           hdiutil create -volname "CCSwitch" -srcfolder dmg-source -ov -format UDZO CCSwitch.dmg
 

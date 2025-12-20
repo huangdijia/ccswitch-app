@@ -37,16 +37,16 @@ if [ -n "$APP_PATH" ]; then
     echo "✅ 构建成功！"
     echo "📁 应用路径: $APP_PATH"
 
-    # 3. 复制到项目根目录
+    # 复制到更简单的位置
     cp -R "$APP_PATH" "$PROJECT_DIR/"
-    echo "📁 应用已同步至: $PROJECT_DIR/CCSwitch.app"
+    echo "✅ 已复制到项目目录: $PROJECT_DIR/CCSwitch.app"
 
-    # 自动运行（仅在非 CI 环境下）
-    if [ "$GITHUB_ACTIONS" != "true" ]; then
+    # 询问是否运行
+    read -p "🚀 是否立即运行应用？ (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
         open "$PROJECT_DIR/CCSwitch.app"
         echo "✨ 应用已启动！"
-    else
-        echo "⏭️  CI 环境，跳过自动运行。"
     fi
 else
     echo "❌ 构建失败：未找到应用程序"
@@ -54,16 +54,14 @@ else
 fi
 
 # 运行测试
-if [ "$GITHUB_ACTIONS" != "true" ]; then
-    echo ""
-    read -p "🧪 是否运行单元测试？ (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "🔍 运行测试..."
-        xcodebuild test \
-            -project CCSwitch.xcodeproj \
-            -scheme "$SCHEME" \
-            -destination 'platform=macOS'
-        echo "✅ 测试完成！"
-    fi
+echo ""
+read -p "🧪 是否运行单元测试？ (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "🔍 运行测试..."
+    xcodebuild test \
+        -project CCSwitch.xcodeproj \
+        -scheme "$SCHEME" \
+        -destination 'platform=macOS'
+    echo "✅ 测试完成！"
 fi
