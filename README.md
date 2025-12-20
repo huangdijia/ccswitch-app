@@ -38,7 +38,18 @@
 
 ## 安装使用
 
-### 构建要求
+### 下载安装
+
+1. 从 GitHub Releases 下载最新的 `CCSwitch.dmg`。
+2. 将 `CCSwitch.app` 拖入 `Applications` 文件夹。
+3. **重要提示**：由于应用未进行 Apple 开发者签名，首次安装后需在终端执行以下命令以解决“应用已损坏”或“无法验证开发者”的问题：
+   ```bash
+   xattr -rd com.apple.quarantine /Applications/CCSwitch.app/
+   ```
+
+### 源码构建 (开发用)
+
+#### 构建要求
 
 - macOS 11.0+
 - Xcode 12.0+
