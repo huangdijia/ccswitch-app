@@ -238,7 +238,7 @@ struct VendorCard: View {
 struct VendorDetailView: View {
     let vendor: Vendor
     let isCurrent: Bool
-    @Environment(\\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(spacing: 20) {
