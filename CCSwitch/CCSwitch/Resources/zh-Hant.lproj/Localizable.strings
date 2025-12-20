@@ -37,3 +37,9 @@
 "general_settings" = "一般設定";
 "advanced_options" = "進階選項";
 "fast_switching" = "快速切換 Claude";
+"open_config_dir" = "打開配置目錄";
+"show_logs" = "查看日誌";
+"about_title" = "關於 CCSwitch";
+"about_message" = "CCSwitch v%@\n\n一個用於快速切換 Claude Code 供應商的 macOS 狀態列工具。\n\n配置目錄：%@\nClaude 配置：%@";
+"ok" = "確定";
+"switch_failed" = "切換失敗";

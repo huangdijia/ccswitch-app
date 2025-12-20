@@ -36,7 +36,7 @@ struct SettingsView: View {
                 VStack(spacing: 4) {
                     SidebarItem(
                         icon: "gear",
-                        title: "General",
+                        title: "general",
                         isActive: selectedTab == .general
                     ) {
                         selectedTab = .general
@@ -44,7 +44,7 @@ struct SettingsView: View {
 
                     SidebarItem(
                         icon: "server.rack",
-                        title: "Vendors",
+                        title: "vendors",
                         isActive: selectedTab == .vendors
                     ) {
                         selectedTab = .vendors
@@ -52,7 +52,7 @@ struct SettingsView: View {
 
                     SidebarItem(
                         icon: "gearshape.2",
-                        title: "Advanced",
+                        title: "advanced",
                         isActive: selectedTab == .advanced
                     ) {
                         selectedTab = .advanced
@@ -63,11 +63,11 @@ struct SettingsView: View {
 
                 // Footer
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("CCSwitch")
+                    Text("app_name")
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundColor(DesignSystem.Colors.textSecondary)
-                    Text("Fast Claude Switching")
+                    Text("fast_switching")
                         .font(.caption2)
                         .foregroundColor(DesignSystem.Colors.textSecondary.opacity(0.8))
                 }
@@ -90,7 +90,7 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text(tabTitle(for: selectedTab))
+                    Text(LocalizedStringKey(tabTitle(for: selectedTab)))
                         .font(DesignSystem.Fonts.title)
                         .foregroundColor(DesignSystem.Colors.textPrimary)
 
@@ -126,9 +126,9 @@ struct SettingsView: View {
 
     private func tabTitle(for tab: SettingsTab) -> String {
         switch tab {
-        case .general: return "General Settings"
-        case .vendors: return "Vendor Management"
-        case .advanced: return "Advanced Options"
+        case .general: return "general_settings"
+        case .vendors: return "vendor_management_title"
+        case .advanced: return "advanced_options"
         }
     }
 }
@@ -148,7 +148,7 @@ struct SidebarItem: View {
                     .font(.system(size: 16, weight: .medium))
                     .frame(width: 24)
 
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.system(size: 14, weight: .medium))
 
                 Spacer()

@@ -37,3 +37,9 @@
 "general_settings" = "General Settings";
 "advanced_options" = "Advanced Options";
 "fast_switching" = "Fast Claude Switching";
+"open_config_dir" = "Open Config Directory";
+"show_logs" = "View Logs";
+"about_title" = "About CCSwitch";
+"about_message" = "CCSwitch v%@\n\nA macOS status bar tool for quickly switching Claude Code vendors.\n\nConfig Dir: %@\nClaude Config: %@";
+"ok" = "OK";
+"switch_failed" = "Switch Failed";
