@@ -28,10 +28,16 @@ jobs:
 
           # Manually copy resources (localization, icon) that might be missing from project file
           echo "📦 Copying resources..."
-          cp -R CCSwitch/CCSwitch/Resources/*.lproj build/Build/Products/Release/CCSwitch.app/Contents/Resources/
+          APP_RESOURCES_DIR="build/Build/Products/Release/CCSwitch.app/Contents/Resources"
+          
+          # Create directory if it doesn't exist (fixes 'not a directory' error)
+          mkdir -p "$APP_RESOURCES_DIR"
+          
+          cp -R CCSwitch/CCSwitch/Resources/*.lproj "$APP_RESOURCES_DIR/"
+          
           # Ensure icon is copied if missing
           if [ -f CCSwitch/CCSwitch/Resources/AppIcon.icns ]; then
-             cp CCSwitch/CCSwitch/Resources/AppIcon.icns build/Build/Products/Release/CCSwitch.app/Contents/Resources/
+             cp CCSwitch/CCSwitch/Resources/AppIcon.icns "$APP_RESOURCES_DIR/"
           fi
 
       - name: Run Tests
