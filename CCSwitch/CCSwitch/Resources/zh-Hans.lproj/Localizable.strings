@@ -52,6 +52,7 @@
 "show_notifications" = "显示通知";
 "show_notifications_desc" = "切换供应商后显示系统通知";
 "notifications_disabled_hint" = "通知权限已关闭，点击前往「系统设置」开启";
+"notifications_not_determined_hint" = "点击申请系统通知权限";
 "startup_backup" = "启动与备份";
 "auto_load_config" = "自动加载配置";
 "auto_load_config_desc" = "应用启动时自动加载配置";

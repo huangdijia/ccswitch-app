@@ -10,11 +10,11 @@ class ConfigManager {
     private var observers: [ConfigObserver] = []
 
     private init() {
-        requestNotificationPermission()
     }
 
     // MARK: - Initialization
     func initialize() {
+        requestNotificationPermission()
         loadOrCreateConfig()
     }
 

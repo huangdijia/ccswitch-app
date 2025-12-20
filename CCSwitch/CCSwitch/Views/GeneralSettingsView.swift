@@ -5,12 +5,17 @@ struct GeneralSettingsView: View {
     @State private var showSwitchNotification = true
     @State private var autoLoadConfig = true
     @State private var autoBackup = true
-    @State private var hasNotificationPermission = false
+    @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+
+    private var hasNotificationPermission: Bool {
+        notificationStatus == .authorized
+    }
 
     private let currentVendor = ConfigManager.shared.currentVendor
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            // ... (current status section remains same)
             ModernSection(title: "current_status") {
                 ModernRow(
                     icon: "checkmark.circle.fill",
@@ -43,7 +48,7 @@ struct GeneralSettingsView: View {
                     icon: "bell.fill",
                     iconColor: .orange,
                     title: "show_notifications",
-                    subtitle: hasNotificationPermission ? "show_notifications_desc" : "notifications_disabled_hint",
+                    subtitle: subtitleForKey,
                     isOn: Binding(
                         get: { hasNotificationPermission ? showSwitchNotification : false },
                         set: { showSwitchNotification = $0 }
@@ -51,9 +56,7 @@ struct GeneralSettingsView: View {
                     key: "showSwitchNotification",
                     isDisabled: !hasNotificationPermission,
                     subtitleAction: hasNotificationPermission ? nil : {
-                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
-                            NSWorkspace.shared.open(url)
-                        }
+                        handleNotificationAction()
                     }
                 )
             }
@@ -82,6 +85,46 @@ struct GeneralSettingsView: View {
             loadSettings()
             checkNotificationPermission()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            checkNotificationPermission()
+        }
+    }
+
+    private var subtitleForKey: String {
+        switch notificationStatus {
+        case .authorized: return "show_notifications_desc"
+        case .notDetermined: return "notifications_not_determined_hint"
+        default: return "notifications_disabled_hint"
+        }
+    }
+
+    private func handleNotificationAction() {
+        print("DEBUG: handleNotificationAction - status: \(notificationStatus.rawValue)")
+        
+        if notificationStatus == .notDetermined {
+            print("DEBUG: Status is .notDetermined, requesting authorization...")
+            DispatchQueue.main.async {
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    print("DEBUG: Request result - granted: \(granted), error: \(String(describing: error))")
+                    self.checkNotificationPermission()
+                }
+            }
+        } else {
+            print("DEBUG: Status is \(notificationStatus.rawValue), opening settings...")
+            let urls = [
+                "x-apple.systempreferences:com.apple.NotificationsSettingsExtension",
+                "x-apple.systempreferences:com.apple.preference.notifications"
+            ]
+            
+            for urlString in urls {
+                if let url = URL(string: urlString) {
+                    if NSWorkspace.shared.open(url) {
+                        print("DEBUG: Successfully opened \(urlString)")
+                        return
+                    }
+                }
+            }
+        }
     }
 
     private func openFile(_ path: String) {
@@ -90,8 +133,9 @@ struct GeneralSettingsView: View {
 
     private func checkNotificationPermission() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
+            print("DEBUG: getNotificationSettings: \(settings.authorizationStatus.rawValue)")
             DispatchQueue.main.async {
-                self.hasNotificationPermission = (settings.authorizationStatus == .authorized)
+                self.notificationStatus = settings.authorizationStatus
             }
         }
     }
@@ -144,12 +188,19 @@ struct ToggleRow: View {
                     .foregroundColor(isDisabled ? DesignSystem.Colors.textPrimary.opacity(0.5) : DesignSystem.Colors.textPrimary)
                 
                 if let action = subtitleAction {
-                    Button(action: action) {
+                    Button(action: {
+                        print("DEBUG: Subtitle button clicked")
+                        action()
+                    }) {
                         Text(LocalizedStringKey(subtitle))
                             .font(DesignSystem.Fonts.caption)
                             .foregroundColor(.blue)
+                            .underline()
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .onHover { inside in
+                        if inside { NSCursor.pointingHand.set() } else { NSCursor.arrow.set() }
+                    }
                 } else {
                     Text(LocalizedStringKey(subtitle))
                         .font(DesignSystem.Fonts.caption)
