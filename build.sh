@@ -4,7 +4,7 @@
 
 set -e
 
-PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-mac/CCSwitch"
+PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-app/CCSwitch"
 BUILD_DIR="$PROJECT_DIR/build"
 SCHEME="CCSwitch"
 

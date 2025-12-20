@@ -4,7 +4,7 @@
 
 set -e
 
-PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-mac/CCSwitch"
+PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-app/CCSwitch"
 OUTPUT_DIR="$PROJECT_DIR/DerivedData"
 APP_NAME="CCSwitch"
 

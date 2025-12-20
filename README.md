@@ -48,8 +48,8 @@
 
 1. 克隆项目：
 ```bash
-git clone https://github.com/yourusername/ccswitch-mac.git
-cd ccswitch-mac/CCSwitch
+git clone https://github.com/yourusername/ccswitch-app.git
+cd ccswitch-app/CCSwitch
 ```
 
 2. 使用 Xcode 打开项目：

@@ -24,7 +24,7 @@ open CCSwitch.xcodeproj
 
 ```bash
 # 进入项目目录
-cd /Users/hdj/github/huangdijia/ccswitch-mac/CCSwitch
+cd /Users/hdj/github/huangdijia/ccswitch-app/CCSwitch
 
 # 编译项目
 xcodebuild -project CCSwitch.xcodeproj -scheme CCSwitch -configuration Debug build

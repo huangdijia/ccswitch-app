@@ -7,7 +7,7 @@ set -e
 echo "🔧 修复并运行 CCSwitch..."
 echo ""
 
-PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-mac/CCSwitch"
+PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-app/CCSwitch"
 APP_BUNDLE="$PROJECT_DIR/CCSwitch.app"
 
 # 1. 检查编译
