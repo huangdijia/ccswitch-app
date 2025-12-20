@@ -53,6 +53,14 @@ if [ -f "$PROJECT_DIR/CCSwitch/Resources/AppIcon.icns" ]; then
     cp "$PROJECT_DIR/CCSwitch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
 fi
 
+# 复制本地化资源
+echo "🌍 复制本地化文件..."
+for lproj in "$PROJECT_DIR/CCSwitch/Resources"/*.lproj; do
+    if [ -d "$lproj" ]; then
+        cp -R "$lproj" "$APP_BUNDLE/Contents/Resources/"
+    fi
+done
+
 # 编译主程序
 swiftc $SWIFT_FLAGS $LINK_FLAGS -o "$APP_BUNDLE/Contents/MacOS/$APP_NAME" $SWIFT_FILES
 

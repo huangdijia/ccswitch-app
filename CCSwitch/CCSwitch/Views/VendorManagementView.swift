@@ -14,21 +14,21 @@ struct VendorManagementView: View {
                         .foregroundColor(DesignSystem.Colors.accent)
                         .font(.system(size: 20, weight: .semibold))
 
-                    Text("Vendor Management")
+                    Text("vendor_management_title")
                         .font(DesignSystem.Fonts.title)
                         .foregroundColor(DesignSystem.Colors.textPrimary)
 
                     Spacer()
                 }
 
-                Text("Manage your available Claude Code vendors. Switch between them instantly.")
+                Text("vendor_management_subtitle")
                     .font(DesignSystem.Fonts.body)
                     .foregroundColor(DesignSystem.Colors.textSecondary)
                 
                 HStack(spacing: 6) {
                     Image(systemName: "doc.text")
                         .font(.caption)
-                    Text("Config: ~/.ccswitch/ccs.json")
+                    Text("config_path_label")
                         .font(.caption)
                         .monospaced()
                 }
@@ -89,11 +89,11 @@ struct EmptyStateView: View {
                     .foregroundColor(DesignSystem.Colors.warning)
             }
 
-            Text("No Vendors Found")
+            Text("no_vendors_found")
                 .font(DesignSystem.Fonts.headline)
                 .foregroundColor(DesignSystem.Colors.textPrimary)
 
-            Text("Please check your configuration file at ~/.ccswitch/ccs.json")
+            Text("check_config_msg")
                 .font(DesignSystem.Fonts.body)
                 .foregroundColor(DesignSystem.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -139,7 +139,7 @@ struct VendorCard: View {
                         .foregroundColor(DesignSystem.Colors.textPrimary)
 
                     if isCurrent {
-                        Text("Active")
+                        Text("active_badge")
                             .font(.caption2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
@@ -173,11 +173,11 @@ struct VendorCard: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .foregroundColor(DesignSystem.Colors.textSecondary)
-                .help("Details")
+                .help("details_tooltip")
 
                 if !isCurrent {
                     Button(action: onSwitch) {
-                        Text("Switch")
+                        Text("switch_button")
                     }
                     .buttonStyle(PrimaryButtonStyle())
                 }
@@ -224,7 +224,7 @@ struct VendorDetailView: View {
                         .foregroundColor(DesignSystem.Colors.textPrimary)
                     
                     if isCurrent {
-                        Text("Currently Active")
+                        Text("currently_active")
                             .font(DesignSystem.Fonts.caption)
                             .fontWeight(.bold)
                             .foregroundColor(DesignSystem.Colors.success)
@@ -240,17 +240,17 @@ struct VendorDetailView: View {
             // Content
             ScrollView {
                 VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
-                    DetailSection(title: "Configuration") {
-                        DetailRow(label: "Provider", value: vendor.claudeSettingsPatch.provider)
-                        DetailRow(label: "Model", value: vendor.claudeSettingsPatch.model)
-                        DetailRow(label: "API Key Env", value: vendor.claudeSettingsPatch.apiKeyEnv)
+                    DetailSection(title: NSLocalizedString("configuration", comment: "")) {
+                        DetailRow(label: NSLocalizedString("provider_label", comment: ""), value: vendor.claudeSettingsPatch.provider)
+                        DetailRow(label: NSLocalizedString("model_label", comment: ""), value: vendor.claudeSettingsPatch.model)
+                        DetailRow(label: NSLocalizedString("api_key_env_label", comment: ""), value: vendor.claudeSettingsPatch.apiKeyEnv)
                         if let baseURL = vendor.claudeSettingsPatch.baseURL {
-                            DetailRow(label: "Base URL", value: baseURL)
+                            DetailRow(label: NSLocalizedString("base_url_label", comment: ""), value: baseURL)
                         }
                     }
                     
                     if let notes = vendor.notes, !notes.isEmpty {
-                        DetailSection(title: "Notes") {
+                        DetailSection(title: NSLocalizedString("notes_label", comment: "")) {
                             Text(notes)
                                 .font(DesignSystem.Fonts.body)
                                 .foregroundColor(DesignSystem.Colors.textSecondary)
@@ -268,14 +268,14 @@ struct VendorDetailView: View {
 
             // Footer Actions
             HStack(spacing: DesignSystem.Spacing.medium) {
-                Button("Close") {
+                Button("close_button") {
                     presentationMode.wrappedValue.dismiss()
                 }
                 .buttonStyle(SecondaryButtonStyle())
                 .keyboardShortcut(.escape, modifiers: [])
 
                 if !isCurrent {
-                    Button("Switch to Vendor") {
+                    Button("switch_to_vendor_button") {
                         try? ConfigManager.shared.switchToVendor(with: vendor.id)
                         presentationMode.wrappedValue.dismiss()
                     }
