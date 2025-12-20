@@ -11,7 +11,7 @@ struct GeneralSettingsView: View {
         VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
             // Current Status
             SettingsCard(
-                title: "Current Status",
+                title: "current_status",
                 icon: "info.circle.fill",
                 iconColor: .blue
             ) {
@@ -19,19 +19,19 @@ struct GeneralSettingsView: View {
                     StatusCard(
                         icon: "checkmark.circle.fill",
                         iconColor: DesignSystem.Colors.success,
-                        title: "Current Vendor",
-                        value: currentVendor?.displayName ?? "Unknown"
+                        title: "current_vendor",
+                        value: currentVendor?.displayName ?? NSLocalizedString("unknown", comment: "")
                     )
 
                     PathButton(
                         icon: "folder.fill",
-                        title: "Claude Config",
+                        title: "claude_config",
                         path: ClaudeSettings.configFile.path
                     )
 
                     PathButton(
                         icon: "folder.fill",
-                        title: "Vendor Config",
+                        title: "vendor_config",
                         path: CCSConfig.configFile.path
                     )
                 }
@@ -39,13 +39,13 @@ struct GeneralSettingsView: View {
 
             // Notification Settings
             SettingsCard(
-                title: "Notifications",
+                title: "notifications",
                 icon: "bell.fill",
                 iconColor: .orange
             ) {
                 ToggleCard(
-                    title: "Show Notifications",
-                    subtitle: "Show system notification after switching vendor",
+                    title: "show_notifications",
+                    subtitle: "show_notifications_desc",
                     isOn: $showSwitchNotification,
                     key: "showSwitchNotification"
                 )
@@ -53,14 +53,14 @@ struct GeneralSettingsView: View {
 
             // Startup Settings
             SettingsCard(
-                title: "Startup & Backup",
+                title: "startup_backup",
                 icon: "gear.badge.checkmark",
                 iconColor: .purple
             ) {
                 VStack(spacing: 0) {
                     ToggleCard(
-                        title: "Auto Load Config",
-                        subtitle: "Automatically load configuration on app startup",
+                        title: "auto_load_config",
+                        subtitle: "auto_load_config_desc",
                         isOn: $autoLoadConfig,
                         key: "autoLoadConfig"
                     )
@@ -68,8 +68,8 @@ struct GeneralSettingsView: View {
                     Divider().padding(.vertical, 8)
 
                     ToggleCard(
-                        title: "Auto Backup",
-                        subtitle: "Backup current config before switching",
+                        title: "auto_backup",
+                        subtitle: "auto_backup_desc",
                         isOn: $autoBackup,
                         key: "autoBackup"
                     )
@@ -116,7 +116,7 @@ struct SettingsCard<Content: View>: View {
                     .foregroundColor(iconColor)
                     .font(.system(size: 18, weight: .semibold))
 
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(DesignSystem.Fonts.headline)
                     .foregroundColor(DesignSystem.Colors.textPrimary)
 
@@ -149,7 +149,7 @@ struct StatusCard: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(DesignSystem.Fonts.caption)
                     .foregroundColor(DesignSystem.Colors.textSecondary)
 
@@ -189,7 +189,7 @@ struct PathButton: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
+                    Text(LocalizedStringKey(title))
                         .font(DesignSystem.Fonts.body)
                         .fontWeight(.medium)
                         .foregroundColor(DesignSystem.Colors.textPrimary)
@@ -232,12 +232,12 @@ struct ToggleCard: View {
     var body: some View {
         HStack(spacing: DesignSystem.Spacing.medium) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(DesignSystem.Fonts.body)
                     .fontWeight(.medium)
                     .foregroundColor(DesignSystem.Colors.textPrimary)
 
-                Text(subtitle)
+                Text(LocalizedStringKey(subtitle))
                     .font(DesignSystem.Fonts.caption)
                     .foregroundColor(DesignSystem.Colors.textSecondary)
             }

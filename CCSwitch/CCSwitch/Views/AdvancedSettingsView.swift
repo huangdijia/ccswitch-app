@@ -10,7 +10,7 @@ struct AdvancedSettingsView: View {
         VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
             // Backups Section
             SettingsCard(
-                title: "Backups",
+                title: "backups",
                 icon: "clock.arrow.circlepath",
                 iconColor: .blue
             ) {
@@ -26,11 +26,11 @@ struct AdvancedSettingsView: View {
                                 .foregroundColor(.secondary)
                         }
 
-                        Text("No backups found")
+                        Text("no_backups")
                             .font(DesignSystem.Fonts.headline)
                             .foregroundColor(DesignSystem.Colors.textPrimary)
 
-                        Text("Backups are created automatically when switching vendors")
+                        Text("no_backups_desc")
                             .font(DesignSystem.Fonts.body)
                             .foregroundColor(DesignSystem.Colors.textSecondary)
                     }
@@ -58,29 +58,29 @@ struct AdvancedSettingsView: View {
 
             // Maintenance Section
             SettingsCard(
-                title: "Maintenance",
+                title: "maintenance",
                 icon: "wrench.and.screwdriver.fill",
                 iconColor: .orange
             ) {
                 VStack(spacing: DesignSystem.Spacing.small) {
                     ActionButton(
                         icon: "arrow.clockwise",
-                        title: "Reload Configuration",
-                        subtitle: "Reloads configuration from disk",
+                        title: "reload_config",
+                        subtitle: "reload_config_desc",
                         action: reloadConfiguration
                     )
 
                     ActionButton(
                         icon: "folder",
-                        title: "Open Claude Config",
-                        subtitle: "Reveal configuration file in Finder",
+                        title: "open_claude_config",
+                        subtitle: "open_claude_config_desc",
                         action: openClaudeConfig
                     )
 
                     ActionButton(
                         icon: "trash",
-                        title: "Reset App State",
-                        subtitle: "Clear cache and restore defaults",
+                        title: "reset_app_state",
+                        subtitle: "reset_app_state_desc",
                         action: { showingResetAlert = true },
                         isDestructive: true
                     )
@@ -92,9 +92,9 @@ struct AdvancedSettingsView: View {
         }
         .alert(isPresented: $showingRestoreAlert) {
             Alert(
-                title: Text("Confirm Restore"),
-                message: Text("Are you sure you want to restore this backup? The current configuration will be backed up automatically."),
-                primaryButton: .default(Text("Restore")) {
+                title: Text("confirm_restore_title"),
+                message: Text("confirm_restore_msg"),
+                primaryButton: .default(Text("restore_button")) {
                     if let backup = backupToRestore {
                         restoreBackup(backup)
                     }
@@ -104,9 +104,9 @@ struct AdvancedSettingsView: View {
         }
         .alert(isPresented: $showingResetAlert) {
             Alert(
-                title: Text("Confirm Reset"),
-                message: Text("This will clear the app's cached state but will NOT delete your configuration files. Continue?"),
-                primaryButton: .destructive(Text("Reset")) {
+                title: Text("confirm_reset_title"),
+                message: Text("confirm_reset_msg"),
+                primaryButton: .destructive(Text("reset_button")) {
                     resetAppState()
                 },
                 secondaryButton: .cancel()
@@ -125,10 +125,10 @@ struct AdvancedSettingsView: View {
     private func restoreBackup(_ backup: URL) {
         do {
             try BackupManager.shared.restoreFromBackup(backupURL: backup)
-            showAlert(title: "Success", message: "Configuration restored successfully.")
+            showAlert(title: NSLocalizedString("success", comment: ""), message: NSLocalizedString("restore_success_msg", comment: ""))
             loadBackups()
         } catch {
-            showAlert(title: "Error", message: error.localizedDescription)
+            showAlert(title: NSLocalizedString("error", comment: ""), message: error.localizedDescription)
         }
     }
 
@@ -137,13 +137,13 @@ struct AdvancedSettingsView: View {
             try BackupManager.shared.deleteBackup(backupURL: backup)
             loadBackups()
         } catch {
-            showAlert(title: "Error", message: error.localizedDescription)
+            showAlert(title: NSLocalizedString("error", comment: ""), message: error.localizedDescription)
         }
     }
 
     private func reloadConfiguration() {
         ConfigManager.shared.initialize()
-        showAlert(title: "Reloaded", message: "Configuration reloaded.")
+        showAlert(title: NSLocalizedString("reloaded", comment: ""), message: NSLocalizedString("reload_success_msg", comment: ""))
     }
 
     private func openClaudeConfig() {
@@ -167,7 +167,7 @@ struct AdvancedSettingsView: View {
     }
 }
 
-// MARK: - Backup Card
+// MARK: - BackupCard
 struct BackupCard: View {
     let backup: URL
     let onRestore: () -> Void
@@ -231,7 +231,7 @@ struct BackupCard: View {
             // Actions
             HStack(spacing: DesignSystem.Spacing.small) {
                 Button(action: onRestore) {
-                    Text("Restore")
+                    Text("restore_button")
                         .font(.caption)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -298,12 +298,12 @@ struct ActionButton: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
+                    Text(LocalizedStringKey(title))
                         .font(DesignSystem.Fonts.body)
                         .fontWeight(.medium)
                         .foregroundColor(isDestructive ? DesignSystem.Colors.error : DesignSystem.Colors.textPrimary)
 
-                    Text(subtitle)
+                    Text(LocalizedStringKey(subtitle))
                         .font(DesignSystem.Fonts.caption)
                         .foregroundColor(DesignSystem.Colors.textSecondary)
                 }
