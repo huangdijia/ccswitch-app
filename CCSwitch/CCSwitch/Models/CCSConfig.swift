@@ -1,47 +1,109 @@
 import Foundation
 
-// MARK: - CCSwitch Configuration (适配现有格式)
+// MARK: - CCSwitch Configuration (Matches new format)
 struct CCSConfig: Codable {
-    let settingsPath: String
-    var `default`: String
-    let profiles: [String: [String: String]]
-    let descriptions: [String: String]?
+    var current: String?
+    var vendors: [Vendor]
 
-    var current: String {
-        get { return `default` }
-        set { `default` = newValue }
-    }
-
-    var vendors: [Vendor] {
-        return profiles.map { (id, config) in
-            Vendor(
-                id: id,
-                displayName: descriptions?[id] ?? id,
-                claudeSettingsPatch: ClaudeSettingsPatch(
-                    provider: "anthropic",
-                    model: config["ANTHROPIC_MODEL"] ?? "claude-3-5-sonnet",
-                    apiKeyEnv: "ANTHROPIC_AUTH_TOKEN",
-                    baseURL: config["ANTHROPIC_BASE_URL"]
+    // Default configuration
+    static func createDefault() -> CCSConfig {
+        return CCSConfig(
+            current: "default",
+            vendors: [
+                Vendor(
+                    id: "default",
+                    name: "Default",
+                    env: [:]
+                ),
+                Vendor(
+                    id: "anyrouter",
+                    name: "AnyRouter",
+                    env: [
+                        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
+                        "ANTHROPIC_BASE_URL": "https://anyrouter.top"
+                    ]
+                ),
+                Vendor(
+                    id: "deepseek",
+                    name: "DeepSeek",
+                    env: [
+                        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
+                        "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+                        "ANTHROPIC_MODEL": "deepseek-chat",
+                        "ANTHROPIC_SMALL_FAST_MODEL": "deepseek-chat"
+                    ]
                 )
-            )
-        }
+            ]
+        )
     }
 
     // 从现有配置转换
-    static func loadFromFile() -> CCSConfig? {
-        let url = configDirectory.appendingPathComponent("ccs.json")
+    static func loadFromFile(url: URL = CCSConfig.configFile) -> CCSConfig? {
         guard FileManager.default.fileExists(atPath: url.path) else {
             return nil
         }
 
         do {
             let data = try Data(contentsOf: url)
-            let config = try JSONDecoder().decode(CCSConfig.self, from: data)
-            return config
+            
+            // Try loading new format first
+            if let config = try? JSONDecoder().decode(CCSConfig.self, from: data) {
+                return config
+            }
+            
+            // Fallback to legacy format
+            let legacy = try JSONDecoder().decode(LegacyCCSConfig.self, from: data)
+            return legacy.toNewConfig()
         } catch {
-            print("Failed to load CCS config: \(error)")
+            print("Failed to load CCS config from \(url.path): \(error)")
             return nil
         }
+    }
+}
+
+// MARK: - Legacy Configuration (For migration)
+struct LegacyCCSConfig: Codable {
+    let settingsPath: String?
+    var `default`: String?
+    var version: Int?
+    var current: String?
+    let profiles: [String: [String: String]]?
+    let descriptions: [String: String]?
+    let vendors: [LegacyVendor]?
+
+    struct LegacyVendor: Codable {
+        let id: String
+        let displayName: String?
+        let name: String?
+        let env: [String: String]?
+        let claudeSettingsPatch: [String: String]?
+    }
+
+    func toNewConfig() -> CCSConfig {
+        var newVendors: [Vendor] = []
+        
+        if let vendors = vendors {
+            newVendors = vendors.map { v in
+                Vendor(
+                    id: v.id,
+                    name: v.name ?? v.displayName ?? v.id,
+                    env: v.env ?? [:]
+                )
+            }
+        } else if let profiles = profiles {
+            newVendors = profiles.map { (id, config) in
+                Vendor(
+                    id: id,
+                    name: descriptions?[id] ?? id,
+                    env: config
+                )
+            }
+        }
+        
+        return CCSConfig(
+            current: current ?? `default`,
+            vendors: newVendors
+        )
     }
 }
 
@@ -49,7 +111,8 @@ struct CCSConfig: Codable {
 extension CCSConfig {
     static let configDirectory = URL(fileURLWithPath: FileManager.default.homeDirectoryForCurrentUser.path)
         .appendingPathComponent(".ccswitch")
-    static let configFile = configDirectory.appendingPathComponent("ccs.json")
+    static let configFile = configDirectory.appendingPathComponent("ccswitch.json")
+    static let legacyConfigFile = configDirectory.appendingPathComponent("ccs.json")
 
     static func ensureConfigDirectoryExists() throws {
         try FileManager.default.createDirectory(

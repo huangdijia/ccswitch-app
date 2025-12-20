@@ -97,7 +97,7 @@ struct VendorRow: View {
                     }
                 }
                 
-                Text(vendor.claudeSettingsPatch.model)
+                Text(vendor.env["ANTHROPIC_MODEL"] ?? vendor.env["model"] ?? "default")
                     .font(DesignSystem.Fonts.caption)
                     .foregroundColor(DesignSystem.Colors.textSecondary)
             }
@@ -164,15 +164,21 @@ struct VendorDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
-                    ModernSection(title: nil) {
-                        DetailRowItem(label: "provider_label", value: vendor.claudeSettingsPatch.provider)
-                        ModernDivider()
-                        DetailRowItem(label: "model_label", value: vendor.claudeSettingsPatch.model)
-                        ModernDivider()
-                        DetailRowItem(label: "api_key_env_label", value: vendor.claudeSettingsPatch.apiKeyEnv)
-                        if let baseURL = vendor.claudeSettingsPatch.baseURL {
-                            ModernDivider()
-                            DetailRowItem(label: "base_url_label", value: baseURL)
+                    ModernSection(title: "environment_variables") {
+                        let sortedKeys = vendor.env.keys.sorted()
+                        if sortedKeys.isEmpty {
+                            Text("No environment variables")
+                                .font(DesignSystem.Fonts.body)
+                                .foregroundColor(DesignSystem.Colors.textTertiary)
+                                .padding(DesignSystem.Spacing.medium)
+                        } else {
+                            ForEach(0..<sortedKeys.count, id: \.self) { index in
+                                let key = sortedKeys[index]
+                                DetailRowItem(label: key, value: vendor.env[key] ?? "")
+                                if index < sortedKeys.count - 1 {
+                                    ModernDivider()
+                                }
+                            }
                         }
                     }
                     

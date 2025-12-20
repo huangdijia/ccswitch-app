@@ -89,28 +89,29 @@ struct VendorEditView: View {
     private func loadVendorData() {
         if let vendor = vendor {
             id = vendor.id
-            displayName = vendor.displayName
-            provider = vendor.claudeSettingsPatch.provider
-            model = vendor.claudeSettingsPatch.model
-            apiKeyEnv = vendor.claudeSettingsPatch.apiKeyEnv
-            baseURL = vendor.claudeSettingsPatch.baseURL ?? ""
+            displayName = vendor.name
+            provider = vendor.env["provider"] ?? vendor.env["type"] ?? ""
+            model = vendor.env["model"] ?? vendor.env["ANTHROPIC_MODEL"] ?? ""
+            apiKeyEnv = vendor.env["apiKeyEnv"] ?? vendor.env["api_key_env"] ?? vendor.env["ANTHROPIC_AUTH_TOKEN"] ?? ""
+            baseURL = vendor.env["baseURL"] ?? vendor.env["ANTHROPIC_BASE_URL"] ?? ""
             notes = vendor.notes ?? ""
-            useCustomBaseURL = vendor.claudeSettingsPatch.baseURL != nil
+            useCustomBaseURL = vendor.env["baseURL"] != nil || vendor.env["ANTHROPIC_BASE_URL"] != nil
         }
     }
 
     private func save() {
-        let patch = ClaudeSettingsPatch(
-            provider: provider,
-            model: model,
-            apiKeyEnv: apiKeyEnv,
-            baseURL: useCustomBaseURL ? baseURL : nil
-        )
+        var env: [String: String] = [:]
+        env["provider"] = provider
+        env["model"] = model
+        env["apiKeyEnv"] = apiKeyEnv
+        if useCustomBaseURL {
+            env["baseURL"] = baseURL
+        }
 
         let newVendor = Vendor(
             id: id,
-            displayName: displayName,
-            claudeSettingsPatch: patch,
+            name: displayName,
+            env: env,
             notes: notes.isEmpty ? nil : notes
         )
 

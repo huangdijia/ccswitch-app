@@ -19,12 +19,46 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 初始化配置管理器
         ConfigManager.shared.initialize()
 
+        // Check for migration
+        if !ConfigManager.shared.isConfigLoaded && ConfigManager.shared.hasLegacyConfig {
+            showMigrationAlert()
+        }
+
         // 创建状态栏控制器
         statusBarController = MenuBarController()
 
         // 设置应用图标（如果有）
         if let iconPath = Bundle.main.path(forResource: "AppIcon", ofType: "icns") {
             NSApplication.shared.applicationIconImage = NSImage(contentsOfFile: iconPath)
+        }
+    }
+
+    private func showMigrationAlert() {
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("config_migration_title", value: "Configuration Migration", comment: "")
+        alert.informativeText = NSLocalizedString("config_migration_message", value: "Found legacy configuration (ccs.json). Do you want to import it to the new format (ccswitch.json)?", comment: "")
+        alert.addButton(withTitle: NSLocalizedString("import", value: "Import", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("cancel", value: "Cancel", comment: ""))
+        alert.alertStyle = .informational
+
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            do {
+                try ConfigManager.shared.migrateFromLegacy()
+                
+                let successAlert = NSAlert()
+                successAlert.messageText = NSLocalizedString("success", value: "Success", comment: "")
+                successAlert.informativeText = NSLocalizedString("migration_success", value: "Configuration imported successfully.", comment: "")
+                successAlert.addButton(withTitle: "OK")
+                successAlert.runModal()
+            } catch {
+                let errorAlert = NSAlert()
+                errorAlert.messageText = NSLocalizedString("error", value: "Error", comment: "")
+                errorAlert.informativeText = String(format: NSLocalizedString("migration_failed", value: "Migration failed: %@", comment: ""), error.localizedDescription)
+                errorAlert.alertStyle = .critical
+                errorAlert.addButton(withTitle: "OK")
+                errorAlert.runModal()
+            }
         }
     }
 

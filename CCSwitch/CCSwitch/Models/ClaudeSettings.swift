@@ -37,14 +37,6 @@ struct ClaudeSettings: Codable {
         try container.encodeIfPresent(baseURL, forKey: .baseURL)
     }
 
-    // 合并 patch
-    mutating func merge(patch: ClaudeSettingsPatch) {
-        provider = patch.provider
-        model = patch.model
-        apiKeyEnv = patch.apiKeyEnv
-        baseURL = patch.baseURL
-    }
-
     enum CodingKeys: String, CodingKey {
         case provider, model, apiKeyEnv, baseURL
     }
