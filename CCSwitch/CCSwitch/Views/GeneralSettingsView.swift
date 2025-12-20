@@ -8,74 +8,73 @@ struct GeneralSettingsView: View {
     private let currentVendor = ConfigManager.shared.currentVendor
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // 当前状态卡片
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
+            // Current Status
             SettingsCard(
-                title: "当前状态",
+                title: "Current Status",
                 icon: "info.circle.fill",
-                iconColor: .blue,
-                content: {
-                    VStack(spacing: 12) {
-                        StatusCard(
-                            icon: "checkmark.circle.fill",
-                            iconColor: .green,
-                            title: "当前供应商",
-                            value: currentVendor?.displayName ?? "未知"
-                        )
+                iconColor: .blue
+            ) {
+                VStack(spacing: DesignSystem.Spacing.medium) {
+                    StatusCard(
+                        icon: "checkmark.circle.fill",
+                        iconColor: DesignSystem.Colors.success,
+                        title: "Current Vendor",
+                        value: currentVendor?.displayName ?? "Unknown"
+                    )
 
-                        PathButton(
-                            icon: "folder",
-                            title: "Claude 配置",
-                            path: ClaudeSettings.configFile.path
-                        )
+                    PathButton(
+                        icon: "folder.fill",
+                        title: "Claude Config",
+                        path: ClaudeSettings.configFile.path
+                    )
 
-                        PathButton(
-                            icon: "folder",
-                            title: "供应商配置",
-                            path: CCSConfig.configFile.path
-                        )
-                    }
-                }
-            )
-
-            // 通知设置卡片
-            SettingsCard(
-                title: "通知设置",
-                icon: "bell.fill",
-                iconColor: .orange,
-                content: {
-                    ToggleCard(
-                        title: "切换后显示通知",
-                        subtitle: "供应商切换成功时显示系统通知",
-                        isOn: $showSwitchNotification,
-                        key: "showSwitchNotification"
+                    PathButton(
+                        icon: "folder.fill",
+                        title: "Vendor Config",
+                        path: CCSConfig.configFile.path
                     )
                 }
-            )
+            }
 
-            // 启动设置卡片
+            // Notification Settings
             SettingsCard(
-                title: "启动设置",
-                icon: "gear.badge.checkmark",
-                iconColor: .purple,
-                content: {
-                    VStack(spacing: 12) {
-                        ToggleCard(
-                            title: "启动时自动加载配置",
-                            subtitle: "应用启动时自动读取配置文件",
-                            isOn: $autoLoadConfig,
-                            key: "autoLoadConfig"
-                        )
+                title: "Notifications",
+                icon: "bell.fill",
+                iconColor: .orange
+            ) {
+                ToggleCard(
+                    title: "Show Notifications",
+                    subtitle: "Show system notification after switching vendor",
+                    isOn: $showSwitchNotification,
+                    key: "showSwitchNotification"
+                )
+            }
 
-                        ToggleCard(
-                            title: "自动备份 Claude 配置",
-                            subtitle: "切换前自动备份当前配置",
-                            isOn: $autoBackup,
-                            key: "autoBackup"
-                        )
-                    }
+            // Startup Settings
+            SettingsCard(
+                title: "Startup & Backup",
+                icon: "gear.badge.checkmark",
+                iconColor: .purple
+            ) {
+                VStack(spacing: 0) {
+                    ToggleCard(
+                        title: "Auto Load Config",
+                        subtitle: "Automatically load configuration on app startup",
+                        isOn: $autoLoadConfig,
+                        key: "autoLoadConfig"
+                    )
+                    
+                    Divider().padding(.vertical, 8)
+
+                    ToggleCard(
+                        title: "Auto Backup",
+                        subtitle: "Backup current config before switching",
+                        isOn: $autoBackup,
+                        key: "autoBackup"
+                    )
                 }
-            )
+            }
         }
         .onAppear {
             loadSettings()
@@ -86,17 +85,17 @@ struct GeneralSettingsView: View {
         showSwitchNotification = UserDefaults.standard.bool(forKey: "showSwitchNotification")
         autoLoadConfig = UserDefaults.standard.bool(forKey: "autoLoadConfig")
         autoBackup = UserDefaults.standard.bool(forKey: "autoBackup")
-
-        // 设置默认值
-        if !UserDefaults.standard.object(forKey: "showSwitchNotification").isSome {
+        
+        // Set defaults if not present
+        if UserDefaults.standard.object(forKey: "showSwitchNotification") == nil {
             showSwitchNotification = true
             UserDefaults.standard.set(true, forKey: "showSwitchNotification")
         }
-        if !UserDefaults.standard.object(forKey: "autoLoadConfig").isSome {
+        if UserDefaults.standard.object(forKey: "autoLoadConfig") == nil {
             autoLoadConfig = true
             UserDefaults.standard.set(true, forKey: "autoLoadConfig")
         }
-        if !UserDefaults.standard.object(forKey: "autoBackup").isSome {
+        if UserDefaults.standard.object(forKey: "autoBackup") == nil {
             autoBackup = true
             UserDefaults.standard.set(true, forKey: "autoBackup")
         }
@@ -111,27 +110,22 @@ struct SettingsCard<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.medium) {
+            HStack(spacing: DesignSystem.Spacing.small) {
                 Image(systemName: icon)
                     .foregroundColor(iconColor)
                     .font(.system(size: 18, weight: .semibold))
 
                 Text(title)
-                    .font(.headline)
-                    .foregroundColor(.primary)
+                    .font(DesignSystem.Fonts.headline)
+                    .foregroundColor(DesignSystem.Colors.textPrimary)
 
                 Spacer()
             }
 
             content()
         }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
-                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-        )
+        .modernCardStyle()
     }
 }
 
@@ -143,38 +137,32 @@ struct StatusCard: View {
     let value: String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DesignSystem.Spacing.medium) {
             ZStack {
                 Circle()
                     .fill(iconColor.opacity(0.15))
-                    .frame(width: 36, height: 36)
+                    .frame(width: 40, height: 40)
 
                 Image(systemName: icon)
                     .foregroundColor(iconColor)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .fontWeight(.medium)
+                    .font(DesignSystem.Fonts.caption)
+                    .foregroundColor(DesignSystem.Colors.textSecondary)
 
                 Text(value)
-                    .font(.body)
+                    .font(DesignSystem.Fonts.body)
                     .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+                    .foregroundColor(DesignSystem.Colors.textPrimary)
             }
 
             Spacer()
         }
-        .padding(12)
-        .background(Color(NSColor.textBackgroundColor))
-        .cornerRadius(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-        )
+        .padding(DesignSystem.Spacing.small)
+        .background(Color.clear) // cleaner look without inner background
     }
 }
 
@@ -183,56 +171,54 @@ struct PathButton: View {
     let icon: String
     let title: String
     let path: String
+    @State private var isHovered = false
 
     var body: some View {
         Button(action: {
             NSWorkspace.shared.selectFile(path, inFileViewerRootedAtPath: "")
         }) {
-            HStack(spacing: 12) {
+            HStack(spacing: DesignSystem.Spacing.medium) {
                 ZStack {
-                    Circle()
+                    RoundedRectangle(cornerRadius: 8)
                         .fill(Color.blue.opacity(0.1))
-                        .frame(width: 32, height: 32)
+                        .frame(width: 36, height: 36)
 
                     Image(systemName: icon)
                         .foregroundColor(.blue)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: 14, weight: .medium))
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.body)
+                        .font(DesignSystem.Fonts.body)
                         .fontWeight(.medium)
-                        .foregroundColor(.primary)
+                        .foregroundColor(DesignSystem.Colors.textPrimary)
 
                     Text(path)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(DesignSystem.Fonts.caption)
+                        .foregroundColor(DesignSystem.Colors.textSecondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
 
                 Spacer()
 
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                Image(systemName: "arrow.right.circle.fill")
+                    .foregroundColor(isHovered ? .blue : .gray.opacity(0.5))
+                    .font(.system(size: 16))
             }
-            .padding(12)
-            .background(Color(NSColor.textBackgroundColor))
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+            .padding(DesignSystem.Spacing.small)
+            .background(
+                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                    .fill(isHovered ? Color.gray.opacity(0.05) : Color.clear)
             )
         }
         .buttonStyle(PlainButtonStyle())
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(NSColor.textBackgroundColor))
-                .shadow(color: .black.opacity(0.02), radius: 1, x: 0, y: 1)
-        )
+        .onHover { hover in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isHovered = hover
+            }
+        }
     }
 }
 
@@ -244,16 +230,16 @@ struct ToggleCard: View {
     let key: String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: DesignSystem.Spacing.medium) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.body)
+                    .font(DesignSystem.Fonts.body)
                     .fontWeight(.medium)
-                    .foregroundColor(.primary)
+                    .foregroundColor(DesignSystem.Colors.textPrimary)
 
                 Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(DesignSystem.Fonts.caption)
+                    .foregroundColor(DesignSystem.Colors.textSecondary)
             }
 
             Spacer()
@@ -265,24 +251,6 @@ struct ToggleCard: View {
                     UserDefaults.standard.set(newValue, forKey: key)
                 }
         }
-        .padding(12)
-        .background(Color(NSColor.textBackgroundColor))
-        .cornerRadius(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-        )
-    }
-}
-
-// Helper extension to check if optional has a value
-extension Optional {
-    var isSome: Bool {
-        switch self {
-        case .none:
-            return false
-        case .some:
-            return true
-        }
+        .padding(DesignSystem.Spacing.small)
     }
 }

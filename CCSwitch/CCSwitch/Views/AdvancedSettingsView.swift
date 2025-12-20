@@ -7,96 +7,94 @@ struct AdvancedSettingsView: View {
     @State private var showingResetAlert = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // 备份管理卡片
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
+            // Backups Section
             SettingsCard(
-                title: "备份管理",
+                title: "Backups",
                 icon: "clock.arrow.circlepath",
-                iconColor: .blue,
-                content: {
-                    if backups.isEmpty {
-                        VStack(spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.1))
-                                    .frame(width: 56, height: 56)
+                iconColor: .blue
+            ) {
+                if backups.isEmpty {
+                    VStack(spacing: DesignSystem.Spacing.medium) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.gray.opacity(0.1))
+                                .frame(width: 56, height: 56)
 
-                                Image(systemName: "doc.text.magnifyingglass")
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundColor(.secondary)
-                            }
-
-                            Text("暂无备份文件")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-
-                            Text("切换供应商时会自动创建备份")
-                                .font(.body)
+                            Image(systemName: "doc.text.magnifyingglass")
+                                .font(.system(size: 24, weight: .semibold))
                                 .foregroundColor(.secondary)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(24)
-                        .background(Color(NSColor.textBackgroundColor))
-                        .cornerRadius(8)
-                    } else {
-                        LazyVStack(spacing: 8) {
-                            ForEach(backups, id: \.self) { backup in
-                                BackupCard(
-                                    backup: backup,
-                                    onRestore: {
-                                        backupToRestore = backup
-                                        showingRestoreAlert = true
-                                    },
-                                    onDelete: {
-                                        deleteBackup(backup)
-                                    }
-                                )
-                            }
+
+                        Text("No backups found")
+                            .font(DesignSystem.Fonts.headline)
+                            .foregroundColor(DesignSystem.Colors.textPrimary)
+
+                        Text("Backups are created automatically when switching vendors")
+                            .font(DesignSystem.Fonts.body)
+                            .foregroundColor(DesignSystem.Colors.textSecondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(DesignSystem.Spacing.large)
+                    .background(DesignSystem.Colors.secondarySurface)
+                    .cornerRadius(DesignSystem.CornerRadius.medium)
+                } else {
+                    LazyVStack(spacing: DesignSystem.Spacing.small) {
+                        ForEach(backups, id: \.self) { backup in
+                            BackupCard(
+                                backup: backup,
+                                onRestore: {
+                                    backupToRestore = backup
+                                    showingRestoreAlert = true
+                                },
+                                onDelete: {
+                                    deleteBackup(backup)
+                                }
+                            )
                         }
                     }
                 }
-            )
+            }
 
-            // 操作卡片
+            // Maintenance Section
             SettingsCard(
-                title: "维护操作",
-                icon: "wrench.and.screwdriver",
-                iconColor: .orange,
-                content: {
-                    VStack(spacing: 12) {
-                        ActionButton(
-                            icon: "arrow.clockwise",
-                            title: "重载配置",
-                            subtitle: "重新读取配置文件",
-                            action: reloadConfiguration
-                        )
+                title: "Maintenance",
+                icon: "wrench.and.screwdriver.fill",
+                iconColor: .orange
+            ) {
+                VStack(spacing: DesignSystem.Spacing.small) {
+                    ActionButton(
+                        icon: "arrow.clockwise",
+                        title: "Reload Configuration",
+                        subtitle: "Reloads configuration from disk",
+                        action: reloadConfiguration
+                    )
 
-                        ActionButton(
-                            icon: "folder",
-                            title: "打开 Claude 配置",
-                            subtitle: "在 Finder 中显示配置文件",
-                            action: openClaudeConfig
-                        )
+                    ActionButton(
+                        icon: "folder",
+                        title: "Open Claude Config",
+                        subtitle: "Reveal configuration file in Finder",
+                        action: openClaudeConfig
+                    )
 
-                        ActionButton(
-                            icon: "arrow.triangle.2.circlepath",
-                            title: "重置应用状态",
-                            subtitle: "清除缓存并恢复默认设置",
-                            action: { showingResetAlert = true },
-                            isDestructive: true
-                        )
-                    }
+                    ActionButton(
+                        icon: "trash",
+                        title: "Reset App State",
+                        subtitle: "Clear cache and restore defaults",
+                        action: { showingResetAlert = true },
+                        isDestructive: true
+                    )
                 }
-            )
+            }
         }
         .onAppear {
             loadBackups()
         }
         .alert(isPresented: $showingRestoreAlert) {
             Alert(
-                title: Text("确认恢复"),
-                message: Text("确定要恢复到此备份吗？当前配置将被自动备份。"),
-                primaryButton: .default(Text("恢复")) {
+                title: Text("Confirm Restore"),
+                message: Text("Are you sure you want to restore this backup? The current configuration will be backed up automatically."),
+                primaryButton: .default(Text("Restore")) {
                     if let backup = backupToRestore {
                         restoreBackup(backup)
                     }
@@ -106,9 +104,9 @@ struct AdvancedSettingsView: View {
         }
         .alert(isPresented: $showingResetAlert) {
             Alert(
-                title: Text("确认重置"),
-                message: Text("这将清除应用的缓存状态，但不会删除配置文件。确定要继续吗？"),
-                primaryButton: .destructive(Text("重置")) {
+                title: Text("Confirm Reset"),
+                message: Text("This will clear the app's cached state but will NOT delete your configuration files. Continue?"),
+                primaryButton: .destructive(Text("Reset")) {
                     resetAppState()
                 },
                 secondaryButton: .cancel()
@@ -127,10 +125,10 @@ struct AdvancedSettingsView: View {
     private func restoreBackup(_ backup: URL) {
         do {
             try BackupManager.shared.restoreFromBackup(backupURL: backup)
-            showAlert(title: "恢复成功", message: "配置已恢复")
+            showAlert(title: "Success", message: "Configuration restored successfully.")
             loadBackups()
         } catch {
-            showAlert(title: "恢复失败", message: error.localizedDescription)
+            showAlert(title: "Error", message: error.localizedDescription)
         }
     }
 
@@ -139,13 +137,13 @@ struct AdvancedSettingsView: View {
             try BackupManager.shared.deleteBackup(backupURL: backup)
             loadBackups()
         } catch {
-            showAlert(title: "删除失败", message: error.localizedDescription)
+            showAlert(title: "Error", message: error.localizedDescription)
         }
     }
 
     private func reloadConfiguration() {
         ConfigManager.shared.initialize()
-        showAlert(title: "重载完成", message: "配置已重新加载")
+        showAlert(title: "Reloaded", message: "Configuration reloaded.")
     }
 
     private func openClaudeConfig() {
@@ -153,24 +151,11 @@ struct AdvancedSettingsView: View {
     }
 
     private func resetAppState() {
-        let alert = NSAlert()
-        alert.messageText = "确认重置"
-        alert.informativeText = "这将清除应用的缓存状态，但不会删除配置文件。确定要继续吗？"
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "确定")
-        alert.addButton(withTitle: "取消")
-
-        if alert.runModal() == .alertFirstButtonReturn {
-            // 清理 UserDefaults
-            let domain = Bundle.main.bundleIdentifier!
-            UserDefaults.standard.removePersistentDomain(forName: domain)
-
-            // 重新初始化
-            ConfigManager.shared.cleanup()
-            ConfigManager.shared.initialize()
-
-            showAlert(title: "重置完成", message: "应用状态已重置")
-        }
+        // Logic remains the same, just keeping it cleaner
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        ConfigManager.shared.cleanup()
+        ConfigManager.shared.initialize()
     }
 
     private func showAlert(title: String, message: String) {
@@ -187,6 +172,7 @@ struct BackupCard: View {
     let backup: URL
     let onRestore: () -> Void
     let onDelete: () -> Void
+    @State private var isHovered = false
 
     private var fileName: String {
         backup.lastPathComponent
@@ -195,6 +181,7 @@ struct BackupCard: View {
     private var displayName: String {
         if let range = fileName.range(of: "bak-") {
             let timestamp = String(fileName[range.upperBound...])
+            // Optional: format timestamp nicely if needed
             return timestamp
         }
         return fileName
@@ -213,68 +200,66 @@ struct BackupCard: View {
     }
 
     var body: some View {
-        HStack(spacing: 16) {
-            // 备份图标
+        HStack(spacing: DesignSystem.Spacing.medium) {
+            // Icon
             ZStack {
-                Circle()
+                RoundedRectangle(cornerRadius: 8)
                     .fill(Color.blue.opacity(0.1))
-                    .frame(width: 40, height: 40)
+                    .frame(width: 36, height: 36)
 
                 Image(systemName: "doc.on.doc.fill")
                     .foregroundColor(.blue)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 14))
             }
 
-            // 备份信息
-            VStack(alignment: .leading, spacing: 4) {
+            // Info
+            VStack(alignment: .leading, spacing: 2) {
                 Text(displayName)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.primary)
+                    .font(DesignSystem.Fonts.body)
+                    .fontWeight(.medium)
+                    .foregroundColor(DesignSystem.Colors.textPrimary)
 
                 if let date = creationDate {
                     Text(date)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(DesignSystem.Fonts.caption)
+                        .foregroundColor(DesignSystem.Colors.textSecondary)
                 }
             }
 
             Spacer()
 
-            // 操作按钮
-            HStack(spacing: 8) {
+            // Actions
+            HStack(spacing: DesignSystem.Spacing.small) {
                 Button(action: onRestore) {
-                    Text("恢复")
+                    Text("Restore")
                         .font(.caption)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 5)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                         .background(Color.blue.opacity(0.1))
                         .foregroundColor(.blue)
-                        .cornerRadius(5)
+                        .cornerRadius(4)
                 }
                 .buttonStyle(PlainButtonStyle())
 
                 Button(action: onDelete) {
                     Image(systemName: "trash")
-                        .font(.system(size: 14, weight: .medium))
-                        .frame(width: 32, height: 32)
+                        .font(.system(size: 14))
+                        .foregroundColor(.red.opacity(0.8))
+                        .frame(width: 28, height: 28)
                         .background(Color.red.opacity(0.1))
-                        .foregroundColor(.red)
                         .clipShape(Circle())
                 }
                 .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(12)
+        .padding(DesignSystem.Spacing.small)
         .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(NSColor.textBackgroundColor))
-                .shadow(color: .black.opacity(0.02), radius: 1, x: 0, y: 1)
+            RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                .fill(isHovered ? DesignSystem.Colors.secondarySurface : Color.clear)
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-        )
+        .onHover { hover in
+            isHovered = hover
+        }
     }
 }
 
@@ -285,6 +270,7 @@ struct ActionButton: View {
     let subtitle: String
     let action: () -> Void
     let isDestructive: Bool
+    @State private var isHovered = false
 
     init(icon: String, title: String, subtitle: String, action: @escaping () -> Void, isDestructive: Bool = false) {
         self.icon = icon
@@ -296,53 +282,47 @@ struct ActionButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 14) {
+            HStack(spacing: DesignSystem.Spacing.medium) {
                 ZStack {
                     Circle()
                         .fill(
                             isDestructive
-                                ? Color.red.opacity(0.1)
-                                : Color.orange.opacity(0.1)
+                                ? DesignSystem.Colors.error.opacity(0.1)
+                                : DesignSystem.Colors.warning.opacity(0.1)
                         )
-                        .frame(width: 40, height: 40)
+                        .frame(width: 36, height: 36)
 
                     Image(systemName: icon)
-                        .foregroundColor(isDestructive ? .red : .orange)
-                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(isDestructive ? DesignSystem.Colors.error : DesignSystem.Colors.warning)
+                        .font(.system(size: 14, weight: .semibold))
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.body)
+                        .font(DesignSystem.Fonts.body)
                         .fontWeight(.medium)
-                        .foregroundColor(isDestructive ? .red : .primary)
+                        .foregroundColor(isDestructive ? DesignSystem.Colors.error : DesignSystem.Colors.textPrimary)
 
                     Text(subtitle)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(DesignSystem.Fonts.caption)
+                        .foregroundColor(DesignSystem.Colors.textSecondary)
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(DesignSystem.Colors.textSecondary.opacity(0.5))
                     .font(.caption)
-                    .fontWeight(.semibold)
             }
-            .padding(14)
+            .padding(DesignSystem.Spacing.small)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(NSColor.textBackgroundColor))
-                    .shadow(color: .black.opacity(0.02), radius: 1, x: 0, y: 1)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(
-                        isDestructive ? Color.red.opacity(0.3) : Color.gray.opacity(0.1),
-                        lineWidth: 1
-                    )
+                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                    .fill(isHovered ? DesignSystem.Colors.secondarySurface : Color.clear)
             )
         }
         .buttonStyle(PlainButtonStyle())
+        .onHover { hover in
+            isHovered = hover
+        }
     }
 }

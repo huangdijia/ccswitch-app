@@ -6,99 +6,105 @@ struct SettingsView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            // 侧边栏
-            VStack(alignment: .leading, spacing: 8) {
-                // Logo
+            // Sidebar
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.medium) {
+                // App Info / Header
                 HStack(spacing: 12) {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.blue)
-                            .frame(width: 40, height: 40)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .frame(width: 44, height: 44)
+                            .shadow(color: Color.blue.opacity(0.3), radius: 4, x: 0, y: 2)
 
                         Text("CC")
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(size: 18, weight: .bold))
                             .foregroundColor(.white)
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("CCSwitch")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(DesignSystem.Fonts.headline)
                         Text("v1.0.0")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            .font(DesignSystem.Fonts.caption)
+                            .foregroundColor(DesignSystem.Colors.textSecondary)
                     }
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, DesignSystem.Spacing.large)
+                .padding(.horizontal, DesignSystem.Spacing.small)
 
-                // 菜单项
-                SidebarItem(
-                    icon: "gear",
-                    title: "通用设置",
-                    isActive: selectedTab == .general
-                ) {
-                    selectedTab = .general
-                }
+                // Navigation Items
+                VStack(spacing: 4) {
+                    SidebarItem(
+                        icon: "gear",
+                        title: "General",
+                        isActive: selectedTab == .general
+                    ) {
+                        selectedTab = .general
+                    }
 
-                SidebarItem(
-                    icon: "server.rack",
-                    title: "供应商管理",
-                    isActive: selectedTab == .vendors
-                ) {
-                    selectedTab = .vendors
-                }
+                    SidebarItem(
+                        icon: "server.rack",
+                        title: "Vendors",
+                        isActive: selectedTab == .vendors
+                    ) {
+                        selectedTab = .vendors
+                    }
 
-                SidebarItem(
-                    icon: "gearshape.2",
-                    title: "高级选项",
-                    isActive: selectedTab == .advanced
-                ) {
-                    selectedTab = .advanced
+                    SidebarItem(
+                        icon: "gearshape.2",
+                        title: "Advanced",
+                        isActive: selectedTab == .advanced
+                    ) {
+                        selectedTab = .advanced
+                    }
                 }
 
                 Spacer()
 
-                // 底部信息
-                VStack(alignment: .leading, spacing: 6) {
+                // Footer
+                VStack(alignment: .leading, spacing: 4) {
                     Text("CCSwitch")
                         .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("快速切换 Claude 供应商")
+                        .fontWeight(.semibold)
+                        .foregroundColor(DesignSystem.Colors.textSecondary)
+                    Text("Fast Claude Switching")
                         .font(.caption2)
-                        .foregroundColor(Color.secondary)
+                        .foregroundColor(DesignSystem.Colors.textSecondary.opacity(0.8))
                 }
-                .padding(.bottom, 8)
+                .padding(.horizontal, DesignSystem.Spacing.small)
+                .padding(.bottom, DesignSystem.Spacing.medium)
             }
-            .frame(width: 200)
-            .padding(20)
-            .background(Color(NSColor.controlBackgroundColor))
+            .padding(DesignSystem.Spacing.medium)
+            .frame(width: 240)
+            .background(Color(NSColor.controlBackgroundColor)) // Slightly different background for sidebar
+            .overlay(
+                HStack {
+                    Spacer()
+                    Rectangle()
+                        .fill(Color(NSColor.separatorColor))
+                        .frame(width: 1)
+                }
+            )
 
-            // 主内容区域
+            // Main Content
             VStack(spacing: 0) {
-                // 标题栏
+                // Header
                 HStack {
                     Text(tabTitle(for: selectedTab))
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                        .font(DesignSystem.Fonts.title)
+                        .foregroundColor(DesignSystem.Colors.textPrimary)
 
                     Spacer()
-
-                    Button(action: {
-                        if let window = NSApp.keyWindow {
-                            window.close()
-                        }
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .medium))
-                            .frame(width: 28, height: 28)
-                            .background(Color(NSColor.controlBackgroundColor))
-                            .clipShape(Circle())
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    
+                    // Close button (optional, as window usually has one, but kept for consistency with old design if desired)
+                    // Removing the custom close button to rely on native window controls which is more mac-like.
                 }
-                .padding(20)
-                .background(Color(NSColor.textBackgroundColor))
+                .padding(DesignSystem.Spacing.large)
+                .background(DesignSystem.Colors.surface.opacity(0.5)) // Translucent header effect
+                
+                Divider()
 
-                // 内容视图
+                // Content
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         switch selectedTab {
@@ -110,20 +116,19 @@ struct SettingsView: View {
                             AdvancedSettingsView()
                         }
                     }
-                    .padding(24)
+                    .padding(DesignSystem.Spacing.large)
                 }
-                .background(Color(NSColor.textBackgroundColor))
             }
+            .background(DesignSystem.Colors.secondarySurface)
         }
-        .frame(width: 900, height: 650)
-        .background(Color(NSColor.textBackgroundColor))
+        .frame(minWidth: 800, minHeight: 600)
     }
 
     private func tabTitle(for tab: SettingsTab) -> String {
         switch tab {
-        case .general: return "通用设置"
-        case .vendors: return "供应商管理"
-        case .advanced: return "高级选项"
+        case .general: return "General Settings"
+        case .vendors: return "Vendor Management"
+        case .advanced: return "Advanced Options"
         }
     }
 }
@@ -134,28 +139,38 @@ struct SidebarItem: View {
     let title: String
     let isActive: Bool
     let action: () -> Void
+    @State private var isHovered = false
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .medium))
-                    .frame(width: 20)
+                    .frame(width: 24)
 
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
 
                 Spacer()
+                
+                if isActive {
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                }
             }
-            .padding(.vertical, 10)
+            .padding(.vertical, 8)
             .padding(.horizontal, 12)
             .background(
-                isActive ? Color.blue.opacity(0.15) : Color.clear
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isActive ? Color.blue.opacity(0.1) : (isHovered ? Color.gray.opacity(0.05) : Color.clear))
             )
             .foregroundColor(isActive ? .blue : .primary)
-            .cornerRadius(8)
         }
         .buttonStyle(PlainButtonStyle())
+        .onHover { hover in
+            isHovered = hover
+        }
     }
 }
 

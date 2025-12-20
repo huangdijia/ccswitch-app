@@ -6,73 +6,43 @@ struct VendorManagementView: View {
     private let currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // 标题和说明
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
+            // Header Section
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
+                HStack(spacing: DesignSystem.Spacing.small) {
                     Image(systemName: "server.rack")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(DesignSystem.Colors.accent)
+                        .font(.system(size: 20, weight: .semibold))
 
-                    Text("供应商管理")
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                    Text("Vendor Management")
+                        .font(DesignSystem.Fonts.title)
+                        .foregroundColor(DesignSystem.Colors.textPrimary)
 
                     Spacer()
                 }
 
-                Text("显示所有可用的 Claude Code 供应商。点击可查看详情或切换供应商。")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                // 配置文件位置
+                Text("Manage your available Claude Code vendors. Switch between them instantly.")
+                    .font(DesignSystem.Fonts.body)
+                    .foregroundColor(DesignSystem.Colors.textSecondary)
+                
                 HStack(spacing: 6) {
-                    Image(systemName: "folder")
-                        .foregroundColor(.secondary)
+                    Image(systemName: "doc.text")
                         .font(.caption)
-
-                    Text("配置文件: ~/.ccswitch/ccs.json")
+                    Text("Config: ~/.ccswitch/ccs.json")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .monospaced()
                 }
+                .foregroundColor(DesignSystem.Colors.textSecondary)
                 .padding(.top, 4)
             }
             .padding(.horizontal, 4)
 
-            // 供应商列表
+            // Vendor List
             if vendors.isEmpty {
-                VStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.orange.opacity(0.1))
-                            .frame(width: 64, height: 64)
-
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundColor(.orange)
-                    }
-
-                    Text("未找到供应商配置")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-
-                    Text("请检查 ~/.ccswitch/ccs.json 文件是否存在且格式正确")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(2)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(40)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(NSColor.controlBackgroundColor))
-                        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-                )
+                EmptyStateView()
             } else {
                 ScrollView {
-                    LazyVStack(spacing: 12) {
+                    LazyVStack(spacing: DesignSystem.Spacing.medium) {
                         ForEach(vendors) { vendor in
                             VendorCard(
                                 vendor: vendor,
@@ -88,6 +58,7 @@ struct VendorManagementView: View {
                         }
                     }
                     .padding(.horizontal, 4)
+                    .padding(.bottom, 20)
                 }
             }
         }
@@ -104,133 +75,129 @@ struct VendorManagementView: View {
     }
 }
 
+// MARK: - Empty State
+struct EmptyStateView: View {
+    var body: some View {
+        VStack(spacing: DesignSystem.Spacing.medium) {
+            ZStack {
+                Circle()
+                    .fill(DesignSystem.Colors.warning.opacity(0.1))
+                    .frame(width: 80, height: 80)
+
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(DesignSystem.Colors.warning)
+            }
+
+            Text("No Vendors Found")
+                .font(DesignSystem.Fonts.headline)
+                .foregroundColor(DesignSystem.Colors.textPrimary)
+
+            Text("Please check your configuration file at ~/.ccswitch/ccs.json")
+                .font(DesignSystem.Fonts.body)
+                .foregroundColor(DesignSystem.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(DesignSystem.Colors.surface)
+        .cornerRadius(DesignSystem.CornerRadius.medium)
+    }
+}
+
 // MARK: - Vendor Card
 struct VendorCard: View {
     let vendor: Vendor
     let isCurrent: Bool
     let onSwitch: () -> Void
     let onDetail: () -> Void
+    @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: 16) {
-            // 供应商图标
+        HStack(spacing: DesignSystem.Spacing.medium) {
+            // Icon
             ZStack {
                 Circle()
-                    .fill(
-                        isCurrent
-                            ? Color.green.opacity(0.15)
-                            : Color.gray.opacity(0.1)
-                    )
-                    .frame(width: 48, height: 48)
-
-                Circle()
-                    .stroke(
-                        isCurrent ? Color.green : Color.gray.opacity(0.3),
-                        lineWidth: 2
-                    )
-                    .frame(width: 48, height: 48)
+                    .fill(isCurrent ? DesignSystem.Colors.success.opacity(0.1) : Color.gray.opacity(0.1))
+                    .frame(width: 50, height: 50)
 
                 if isCurrent {
                     Image(systemName: "checkmark")
-                        .foregroundColor(.green)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(DesignSystem.Colors.success)
                 } else {
-                    Image(systemName: "server.rack")
+                    Text(String(vendor.displayName.prefix(1)).uppercased())
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.gray)
-                        .font(.system(size: 16, weight: .medium))
                 }
             }
 
-            // 供应商信息
-            VStack(alignment: .leading, spacing: 6) {
+            // Info
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Text(vendor.displayName)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.primary)
+                        .font(DesignSystem.Fonts.headline)
+                        .foregroundColor(DesignSystem.Colors.textPrimary)
 
                     if isCurrent {
-                        Text("当前使用")
+                        Text("Active")
                             .font(.caption2)
-                            .fontWeight(.medium)
+                            .fontWeight(.bold)
                             .foregroundColor(.white)
-                            .padding(.horizontal, 6)
+                            .padding(.horizontal, 8)
                             .padding(.vertical, 2)
-                            .background(Color.green)
-                            .cornerRadius(4)
+                            .background(Capsule().fill(DesignSystem.Colors.success))
                     }
                 }
 
-                HStack(spacing: 6) {
-                    Image(systemName: "cpu")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    Text(vendor.claudeSettingsPatch.model)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                if let baseURL = vendor.claudeSettingsPatch.baseURL {
-                    HStack(spacing: 6) {
-                        Image(systemName: "link")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        Text(baseURL)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                HStack(spacing: 12) {
+                    Label(vendor.claudeSettingsPatch.model, systemImage: "cpu")
+                    if let baseURL = vendor.claudeSettingsPatch.baseURL {
+                         Label(baseURL, systemImage: "link")
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }
                 }
+                .font(DesignSystem.Fonts.caption)
+                .foregroundColor(DesignSystem.Colors.textSecondary)
             }
 
             Spacer()
 
-            // 操作按钮组
-            HStack(spacing: 8) {
-                // 详情按钮
+            // Actions
+            HStack(spacing: DesignSystem.Spacing.small) {
                 Button(action: onDetail) {
                     Image(systemName: "info.circle")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 16))
                         .frame(width: 32, height: 32)
-                        .background(Color.gray.opacity(0.1))
-                        .foregroundColor(.primary)
-                        .clipShape(Circle())
+                        .contentShape(Circle())
                 }
                 .buttonStyle(PlainButtonStyle())
+                .foregroundColor(DesignSystem.Colors.textSecondary)
+                .help("Details")
 
-                // 切换按钮
                 if !isCurrent {
                     Button(action: onSwitch) {
-                        Text("切换")
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 6)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(6)
+                        Text("Switch")
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(PrimaryButtonStyle())
                 }
             }
         }
-        .padding(16)
+        .padding(DesignSystem.Spacing.medium)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(NSColor.controlBackgroundColor))
-                .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+            RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium)
+                .fill(DesignSystem.Colors.surface)
+                .shadow(color: isHovered ? Color.black.opacity(0.1) : Color.black.opacity(0.05), radius: isHovered ? 8 : 4, x: 0, y: 2)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    isCurrent ? Color.green.opacity(0.5) : Color.gray.opacity(0.1),
-                    lineWidth: isCurrent ? 2 : 1
-                )
+            RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium)
+                .stroke(isCurrent ? DesignSystem.Colors.success.opacity(0.5) : Color.clear, lineWidth: 2)
         )
-        .scaleEffect(isCurrent ? 1.02 : 1.0)
-        .animation(.easeOut(duration: 0.2), value: isCurrent)
+        .scaleEffect(isHovered ? 1.01 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovered)
+        .onHover { hover in
+            isHovered = hover
+        }
     }
 }
 
@@ -241,140 +208,135 @@ struct VendorDetailView: View {
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        VStack(spacing: 20) {
-            // 标题区域
-            VStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(Color.blue.opacity(0.1))
-                        .frame(width: 64, height: 64)
-
+        VStack(spacing: 0) {
+            // Header
+            ZStack {
+                Color(NSColor.windowBackgroundColor)
+                
+                VStack(spacing: DesignSystem.Spacing.medium) {
                     Image(systemName: "server.rack")
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundColor(.blue)
-                }
-
-                HStack(spacing: 10) {
+                        .font(.system(size: 40))
+                        .foregroundColor(DesignSystem.Colors.accent)
+                        .padding(.top, 20)
+                    
                     Text(vendor.displayName)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.primary)
-
+                        .font(DesignSystem.Fonts.title)
+                        .foregroundColor(DesignSystem.Colors.textPrimary)
+                    
                     if isCurrent {
-                        Text("当前使用")
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Color.green)
-                            .cornerRadius(5)
+                        Text("Currently Active")
+                            .font(DesignSystem.Fonts.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(DesignSystem.Colors.success)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 4)
+                            .background(Capsule().fill(DesignSystem.Colors.success.opacity(0.1)))
                     }
                 }
+                .padding(.bottom, 20)
             }
-            .padding(.top, 8)
+            .frame(height: 180)
 
-            // 配置详情卡片
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(spacing: 8) {
-                    Image(systemName: "doc.text.fill")
-                        .foregroundColor(.purple)
-                        .font(.system(size: 16, weight: .semibold))
-
-                    Text("配置详情")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-
-                    Spacer()
-                }
-                .padding(.bottom, 4)
-
-                VStack(alignment: .leading, spacing: 12) {
-                    DetailRow(label: "Provider", value: vendor.claudeSettingsPatch.provider)
-                    DetailRow(label: "Model", value: vendor.claudeSettingsPatch.model)
-                    DetailRow(label: "API Key Env", value: vendor.claudeSettingsPatch.apiKeyEnv)
-                    if let baseURL = vendor.claudeSettingsPatch.baseURL {
-                        DetailRow(label: "Base URL", value: baseURL)
+            // Content
+            ScrollView {
+                VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
+                    DetailSection(title: "Configuration") {
+                        DetailRow(label: "Provider", value: vendor.claudeSettingsPatch.provider)
+                        DetailRow(label: "Model", value: vendor.claudeSettingsPatch.model)
+                        DetailRow(label: "API Key Env", value: vendor.claudeSettingsPatch.apiKeyEnv)
+                        if let baseURL = vendor.claudeSettingsPatch.baseURL {
+                            DetailRow(label: "Base URL", value: baseURL)
+                        }
+                    }
+                    
+                    if let notes = vendor.notes, !notes.isEmpty {
+                        DetailSection(title: "Notes") {
+                            Text(notes)
+                                .font(DesignSystem.Fonts.body)
+                                .foregroundColor(DesignSystem.Colors.textSecondary)
+                                .padding(DesignSystem.Spacing.small)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(DesignSystem.Colors.secondarySurface)
+                                .cornerRadius(DesignSystem.CornerRadius.small)
+                        }
                     }
                 }
+                .padding(DesignSystem.Spacing.large)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(NSColor.controlBackgroundColor))
-                    .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-            )
 
-            Spacer()
+            Divider()
 
-            // 操作按钮
-            HStack(spacing: 12) {
-                Button(action: {
+            // Footer Actions
+            HStack(spacing: DesignSystem.Spacing.medium) {
+                Button("Close") {
                     presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("关闭")
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(Color.gray.opacity(0.15))
-                        .foregroundColor(.primary)
-                        .cornerRadius(8)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(SecondaryButtonStyle())
+                .keyboardShortcut(.escape, modifiers: [])
 
                 if !isCurrent {
-                    Button(action: {
+                    Button("Switch to Vendor") {
                         try? ConfigManager.shared.switchToVendor(with: vendor.id)
                         presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Text("切换到此供应商")
-                            .font(.body)
-                            .fontWeight(.semibold)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
                     }
-                    .buttonStyle(PlainButtonStyle())
+                    .buttonStyle(PrimaryButtonStyle())
                 }
             }
+            .padding(DesignSystem.Spacing.medium)
+            .background(DesignSystem.Colors.surface)
         }
-        .padding(20)
-        .frame(width: 520, height: 420)
-        .background(Color(NSColor.textBackgroundColor))
-        .cornerRadius(16)
+        .frame(width: 500, height: 600)
+        .background(DesignSystem.Colors.surface)
     }
 }
 
-// MARK: - Detail Row
+struct DetailSection<Content: View>: View {
+    let title: String
+    let content: () -> Content
+    
+    init(title: String, @ViewBuilder content: @escaping () -> Content) {
+        self.title = title
+        self.content = content
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: DesignSystem.Spacing.medium) {
+            Text(title)
+                .font(DesignSystem.Fonts.headline)
+                .foregroundColor(DesignSystem.Colors.textPrimary)
+            
+            VStack(spacing: 1) {
+                content()
+            }
+            .background(DesignSystem.Colors.secondarySurface)
+            .cornerRadius(DesignSystem.CornerRadius.small)
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                    .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+            )
+        }
+    }
+}
+
 struct DetailRow: View {
     let label: String
     let value: String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack {
             Text(label)
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-                .frame(width: 100, alignment: .leading)
+                .font(DesignSystem.Fonts.body)
+                .foregroundColor(DesignSystem.Colors.textSecondary)
+                .frame(width: 120, alignment: .leading)
 
             Text(value)
-                .font(.body)
+                .font(DesignSystem.Fonts.body)
+                .foregroundColor(DesignSystem.Colors.textPrimary)
                 .fontWeight(.medium)
-                .foregroundColor(.primary)
-                .lineLimit(1)
-
+            
             Spacer()
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 10)
-        .background(Color(NSColor.textBackgroundColor))
-        .cornerRadius(6)
-        .overlay(
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-        )
+        .padding(DesignSystem.Spacing.medium)
+        .background(DesignSystem.Colors.surface)
     }
 }
