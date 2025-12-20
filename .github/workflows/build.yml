@@ -26,6 +26,14 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
+          # Manually copy resources (localization, icon) that might be missing from project file
+          echo "📦 Copying resources..."
+          cp -R CCSwitch/CCSwitch/Resources/*.lproj build/Build/Products/Release/CCSwitch.app/Contents/Resources/
+          # Ensure icon is copied if missing
+          if [ -f CCSwitch/CCSwitch/Resources/AppIcon.icns ]; then
+             cp CCSwitch/CCSwitch/Resources/AppIcon.icns build/Build/Products/Release/CCSwitch.app/Contents/Resources/
+          fi
+
       - name: Run Tests
         run: |
           xcodebuild test \
