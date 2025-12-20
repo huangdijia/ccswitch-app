@@ -25,6 +25,16 @@
 		01000016 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000016 /* ModelTests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		13000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 12000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07000001;
+			remoteInfo = CCSwitch;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		02000001 /* CCSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSwitchApp.swift; sourceTree = "<group>"; };
 		02000002 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
@@ -185,7 +195,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				11000001 /* Target dependency */,
+				11000001 /* PBXTargetDependency */,
 			);
 			name = CCSwitchTests;
 			productName = CCSwitchTests;
@@ -281,22 +291,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		11000001 /* Target dependency */ = {
+		11000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 07000001 /* CCSwitch */;
 			targetProxy = 13000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXContainerItemProxy section */
-		13000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 12000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 07000001;
-			remoteInfo = CCSwitch;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin XCBuildConfiguration section */
 		14000001 /* Debug */ = {
@@ -438,6 +438,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cccode.switch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -467,6 +468,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cccode.switch;
 				PRODUCT_NAME = "$(TARGET_NAME)";

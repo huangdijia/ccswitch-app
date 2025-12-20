@@ -44,6 +44,7 @@ struct SettingsView: View {
             }
             .listStyle(.sidebar)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 240)
+            .toolbar(removing: .sidebarToggle)
         } detail: {
             ZStack {
                 DesignSystem.Colors.background.ignoresSafeArea()
