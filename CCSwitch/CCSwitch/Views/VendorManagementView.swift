@@ -231,18 +231,18 @@ struct VendorRow: View {
 
             Spacer()
 
-            if !isCurrent {
-                Button(action: onSwitch) {
-                    Text("switch_button")
-                        .font(DesignSystem.Fonts.caption.weight(.medium))
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(DesignSystem.CornerRadius.small)
+            Toggle("", isOn: Binding(
+                get: { isCurrent },
+                set: { newValue in
+                    if newValue {
+                        onSwitch()
+                    }
                 }
-                .buttonStyle(PlainButtonStyle())
-            }
+            ))
+            .toggleStyle(.switch)
+            .labelsHidden()
+            .disabled(isCurrent)
+            .padding(.trailing, 8)
             
             Button(action: onEdit) {
                 Image(systemName: "info.circle")

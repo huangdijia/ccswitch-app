@@ -74,7 +74,7 @@ class ConfigManager {
     private func saveConfig(_ config: CCSConfig) throws {
         try CCSConfig.ensureConfigDirectoryExists()
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
+        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
         let data = try encoder.encode(config)
         try data.write(to: CCSConfig.configFile)
     }
@@ -141,7 +141,7 @@ class ConfigManager {
 
         // 写入配置
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
+        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
         let data = try encoder.encode(claudeSettings)
         try data.write(to: claudeConfigUrl)
     }

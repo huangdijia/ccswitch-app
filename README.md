@@ -18,12 +18,12 @@
 
 3. **配置管理**
    - 自动读取和写入 `~/.claude/settings.json`
-   - 集中管理供应商配置（`~/.ccswitch/ccs.json`）
+   - 集中管理供应商配置（`~/.ccswitch/ccswitch.json`）
    - 配置自动备份机制
 
 4. **设置界面**
    - General：通用设置、路径显示
-   - 供应商管理：增删改查供应商
+   - 供应商管理：增删改查供应商，支持从旧配置导入
    - Advanced：备份管理、高级操作
 
 5. **安全特性**
@@ -32,6 +32,7 @@
    - 权限检查和错误处理
 
 6. **用户体验**
+   - 状态栏联动切换
    - 切换成功通知
    - 详细的错误提示
    - 日志记录和问题报告
@@ -43,6 +44,7 @@
 1. 从 GitHub Releases 下载最新的 `CCSwitch.dmg`。
 2. 将 `CCSwitch.app` 拖入 `Applications` 文件夹。
 3. **重要提示**：由于应用未进行 Apple 开发者签名，首次安装后需在终端执行以下命令以解决“应用已损坏”或“无法验证开发者”的问题：
+
    ```bash
    xattr -rd com.apple.quarantine /Applications/CCSwitch.app/
    ```
@@ -58,55 +60,53 @@
 ### 构建步骤
 
 1. 克隆项目：
+
 ```bash
-git clone https://github.com/yourusername/ccswitch-app.git
-cd ccswitch-app/CCSwitch
+git clone https://github.com/huangdijia/ccswitch-mac.git
+cd ccswitch-mac
 ```
 
-2. 使用 Xcode 打开项目：
-```bash
-open CCSwitch.xcodeproj
-```
+1. 运行构建脚本：
 
-3. 选择目标设备并运行
+```bash
+./build.sh
+```
 
 ### 配置供应商
 
 1. 在状态栏点击 CCSwitch 图标
 2. 选择"设置..."
-3. 在"供应商管理"标签页添加或编辑供应商
+3. 在"供应商管理"标签页添加、编辑或导入供应商
 
 ### 切换供应商
 
 1. 点击状态栏图标
-2. 选择要切换到的供应商
+2. 选择要切换到的供应商，或者在设置界面的供应商列表中切换开关
 3. 配置将自动更新
 
 ## 配置文件格式
 
-### CCSwitch 配置 (~/.ccswitch/ccs.json)
+### CCSwitch 配置 (~/.ccswitch/ccswitch.json)
 
 ```json
 {
-  "version": 1,
   "current": "anthropic",
   "vendors": [
     {
       "id": "anthropic",
-      "displayName": "Anthropic",
-      "claudeSettingsPatch": {
-        "provider": "anthropic",
-        "model": "claude-3-5-sonnet",
-        "apiKeyEnv": "ANTHROPIC_API_KEY"
+      "name": "Anthropic",
+      "env": {
+        "ANTHROPIC_MODEL": "claude-3-5-sonnet",
+        "ANTHROPIC_API_KEY": "sk-xxxxxx"
       }
     },
     {
       "id": "deepseek",
-      "displayName": "DeepSeek",
-      "claudeSettingsPatch": {
-        "provider": "deepseek",
-        "model": "deepseek-chat",
-        "apiKeyEnv": "DEEPSEEK_API_KEY"
+      "name": "DeepSeek",
+      "env": {
+        "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+        "ANTHROPIC_MODEL": "deepseek-chat",
+        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx"
       }
     }
   ]
@@ -115,11 +115,7 @@ open CCSwitch.xcodeproj
 
 ### Claude 配置 (~/.claude/settings.json)
 
-应用会自动更新此文件的以下字段：
-- provider
-- model
-- apiKeyEnv
-- baseURL（可选）
+应用会自动更新此文件的 `env` 字段，保留其他现有字段。
 
 ## 项目结构
 
@@ -172,6 +168,7 @@ MIT License
 ## 更新日志
 
 ### v1.0.0 (2025-12-20)
+
 - 初始版本发布
 - 实现所有核心功能
 - 支持供应商切换和配置管理
