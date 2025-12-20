@@ -33,71 +33,96 @@ class MenuBarController: NSObject, ConfigObserver {
     private func buildMenu() {
         menu = NSMenu()
 
-        // A 区：关于
-        menu.addItem(NSMenuItem.separator())
-
+        // 1. About
         let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
-
-        menu.addItem(withTitle: String(format: NSLocalizedString("version", comment: ""), getVersion()), action: nil, keyEquivalent: "")
-
-        let configDirItem = NSMenuItem(title: NSLocalizedString("open_config_dir", comment: ""), action: #selector(openConfigDirectory), keyEquivalent: "")
-        configDirItem.target = self
-        menu.addItem(configDirItem)
-
-        let logsItem = NSMenuItem(title: NSLocalizedString("show_logs", comment: ""), action: #selector(showLogs), keyEquivalent: "")
-        logsItem.target = self
-        menu.addItem(logsItem)
+        
         menu.addItem(NSMenuItem.separator())
 
-        // B 区：可用供应商（动态）
-        updateVendorMenuItems()
+        // 2. Vendors (Dynamic) - Placeholder for vendors
+        // The logic in updateVendorMenuItems relies on finding separators.
+        // We need a separator before vendors (already added above) and one after.
+        
         menu.addItem(NSMenuItem.separator())
 
-        // C 区：设置
-        let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettings), keyEquivalent: "")
+        // 3. Settings
+        let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+        
         menu.addItem(NSMenuItem.separator())
 
-        // D 区：退出
+        // 4. Quit
         let quitItem = NSMenuItem(title: NSLocalizedString("quit", comment: ""), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
         statusItem.menu = menu
+        
+        // Initial population
+        updateVendorMenuItems()
     }
 
     private func updateVendorMenuItems() {
-        // 移除旧的供应商菜单项
-        let initialSeparatorIndex = menu.items.firstIndex(where: { $0.isSeparatorItem }) ?? 0
-        let settingSeparatorIndex = menu.items.lastIndex(where: { $0.isSeparatorItem }) ?? menu.items.count
-
-        // 移除中间的供应商菜单项
-        if initialSeparatorIndex < settingSeparatorIndex {
-            let range = (initialSeparatorIndex + 1)..<(settingSeparatorIndex)
-            let vendorItems = Array(menu.items[range])
-            for item in vendorItems {
-                if item.action != #selector(showSettings) {
-                    menu.removeItem(item)
-                }
-            }
+        // Find the separators that bound the vendor list
+        // Structure: About, Separator (0), [Vendors], Separator (1), Settings...
+        
+        guard let initialSeparator = menu.items.first(where: { $0.isSeparatorItem }) else { return }
+        let initialIndex = menu.index(of: initialSeparator)
+              
+        // Find the separator before Settings
+        // We look for the Settings item
+        let settingsItemIndex = menu.items.firstIndex(where: { $0.action == #selector(showSettings) }) ?? menu.items.count
+        // The separator should be before Settings
+        let endSeparatorIndex = settingsItemIndex - 1
+        
+        // Safety check
+        guard initialIndex < endSeparatorIndex else {
+            // If they are adjacent (no vendors yet), we insert between them
+            // Actually, if they are adjacent, initialIndex = endSeparatorIndex - 1?
+            // If menu is: About, Sep(1), Sep(2), Settings(3)...
+            // initialIndex = 1
+            // settingsIndex = 3
+            // endIndex = 2
+            // Range to clear is (1+1)..<2 => 2..<2 (Empty). Correct.
+            insertVendors(at: initialIndex + 1)
+            return
         }
 
-        // 添加供应商菜单项
+        // Remove existing vendor items
+        let range = (initialIndex + 1)..<endSeparatorIndex
+        if !range.isEmpty {
+            // We need to remove items in reverse order or careful with indices shifting?
+            // Safer to just remove items that are NOT separators and NOT standard items if logic was loose
+            // But here we know the range.
+             for _ in range {
+                 menu.removeItem(at: initialIndex + 1)
+             }
+        }
+        
+        insertVendors(at: initialIndex + 1)
+    }
+    
+    private func insertVendors(at index: Int) {
         let vendors = ConfigManager.shared.allVendors
         let currentVendor = ConfigManager.shared.currentVendor
 
-        for vendor in vendors {
+        for (offset, vendor) in vendors.enumerated() {
             let menuItem = NSMenuItem(
                 title: vendor.id == currentVendor?.id ? "✓ \(vendor.displayName)" : vendor.displayName,
                 action: #selector(switchVendor(_:)),
                 keyEquivalent: ""
             )
             menuItem.target = self
-            menuItem.tag = vendor.id.hashValue // 使用 hashValue 作为 tag 来标识
-            menu.insertItem(menuItem, at: initialSeparatorIndex + 1)
+            menuItem.tag = vendor.id.hashValue
+            menu.insertItem(menuItem, at: index + offset)
+        }
+        
+        if vendors.isEmpty {
+             let noVendorsItem = NSMenuItem(title: NSLocalizedString("no_vendors", comment: ""), action: nil, keyEquivalent: "")
+             noVendorsItem.isEnabled = false
+             menu.insertItem(noVendorsItem, at: index)
         }
     }
 

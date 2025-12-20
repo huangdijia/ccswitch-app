@@ -8,14 +8,10 @@ struct VendorEditView: View {
     // Basic Info
     @State private var id: String = ""
     @State private var name: String = ""
-    @State private var provider: String = "anthropic"
-    @State private var env: [String: String] = [: ]
-
-    // Constants
-
+    
     // Connection
     @State private var baseURL: String = ""
-    @State private var timeout: String = "" // String for editing, convert to Int
+    @State private var timeout: String = ""
 
     // Auth
     @State private var authToken: String = ""
@@ -30,136 +26,130 @@ struct VendorEditView: View {
 
     // Validation State
     @State private var errors: [String: String] = [:]
-    
-    // Constants
-    private let commonProviders = ["anthropic", "deepseek", "openai"]
-    private let commonModels = ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229", "gpt-4o", "deepseek-chat"]
 
     var body: some View {
         VStack(spacing: 0) {
             // Header
             HStack {
                 Text(vendor == nil ? "add_vendor" : "edit_vendor")
-                    .font(.headline)
+                    .font(DesignSystem.Fonts.title)
+                    .foregroundColor(DesignSystem.Colors.textPrimary)
                 Spacer()
             }
-            .padding()
+            .padding(DesignSystem.Spacing.large)
             .background(DesignSystem.Colors.surface)
             
             Divider()
 
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: DesignSystem.Spacing.large) {
                     // 1. Basic Info Section
-                    FormSection(title: "basic_info") {
-                        VStack(spacing: 12) {
-                            LabeledTextField(label: "id_label", text: $id, placeholder: "unique_id_placeholder", disabled: vendor != nil)
-                            LabeledTextField(label: "name_label", text: $name, placeholder: "display_name_placeholder")
+                    ModernSection(title: "basic_info") {
+                        VStack(spacing: 0) {
+                            EditRow(label: "id_label", text: $id, placeholder: "unique_id_placeholder", disabled: vendor != nil)
+                            ModernDivider()
+                            EditRow(label: "name_label", text: $name, placeholder: "display_name_placeholder")
                         }
                     }
 
                     // 2. Connection Section
-                    FormSection(title: "connection_section") {
-                        VStack(spacing: 12) {
-                            // Base URL
-                            VStack(alignment: .leading, spacing: 4) {
-                                LabeledTextField(
-                                    label: "base_url_label",
-                                    text: $baseURL,
-                                    placeholder: "base_url_placeholder",
-                                    helperText: "base_url_helper"
-                                )
-                                if let error = errors["baseURL"] {
-                                    Text(LocalizedStringKey(error)).font(.caption2).foregroundColor(.red).padding(.leading, 84)
+                    ModernSection(title: "connection_section") {
+                        VStack(spacing: 0) {
+                            EditRow(
+                                label: "base_url_label",
+                                text: $baseURL,
+                                placeholder: "base_url_placeholder",
+                                helperText: "base_url_helper",
+                                error: errors["baseURL"]
+                            )
+                            ModernDivider()
+                            EditRow(
+                                label: "timeout_label",
+                                text: $timeout,
+                                placeholder: "timeout_placeholder",
+                                helperText: "timeout_helper",
+                                error: errors["timeout"]
+                            ) {
+                                Menu {
+                                    Button("10s (10000)") { timeout = "10000" }
+                                    Button("30s (30000)") { timeout = "30000" }
+                                    Button("60s (60000)") { timeout = "60000" }
+                                } label: {
+                                    Image(systemName: "bolt.fill")
+                                        .foregroundColor(DesignSystem.Colors.accent)
                                 }
-                            }
-
-                            // Timeout
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    LabeledTextField(
-                                        label: "timeout_label",
-                                        text: $timeout,
-                                        placeholder: "timeout_placeholder",
-                                        helperText: "timeout_helper"
-                                    )
-                                    .frame(maxWidth: 300)
-                                    
-                                    Menu("quick_set") {
-                                        Button("10s (10000)") { timeout = "10000" }
-                                        Button("30s (30000)") { timeout = "30000" }
-                                        Button("60s (60000)") { timeout = "60000" }
-                                    }
-                                    .menuStyle(.borderlessButton)
-                                    .frame(width: 80)
-                                }
-                                if let error = errors["timeout"] {
-                                    Text(LocalizedStringKey(error)).font(.caption2).foregroundColor(.red).padding(.leading, 84)
-                                }
+                                .menuStyle(.borderlessButton)
+                                .help("quick_set")
                             }
                         }
                     }
 
                     // 3. Auth Section
-                    FormSection(title: "auth_section") {
-                        VStack(alignment: .leading, spacing: 4) {
-                            SecureInputView(
+                    ModernSection(title: "auth_section") {
+                        VStack(spacing: 0) {
+                            EditRow(
                                 label: "auth_token_label",
                                 text: $authToken,
                                 placeholder: "auth_token_placeholder",
-                                helperText: "auth_token_helper"
+                                helperText: "auth_token_helper",
+                                isSecure: true,
+                                error: errors["authToken"]
                             )
-                            if let error = errors["authToken"] {
-                                Text(LocalizedStringKey(error)).font(.caption2).foregroundColor(.red).padding(.leading, 84)
-                            }
                         }
                     }
 
                     // 4. Models Section
-                    FormSection(title: "models_section") {
-                        VStack(spacing: 12) {
-                            ModelInputRow(label: "default_model_label", text: $defaultModel, helper: "ANTHROPIC_MODEL")
+                    ModernSection(title: "models_section") {
+                        VStack(spacing: 0) {
+                            EditRow(label: "default_model_label", text: $defaultModel, placeholder: "claude-3-5-sonnet-...", helperText: "ANTHROPIC_MODEL")
                             
                             if showMoreModels {
-                                ModelInputRow(label: "opus_model_label", text: $opusModel, helper: "ANTHROPIC_DEFAULT_OPUS_MODEL")
-                                ModelInputRow(label: "sonnet_model_label", text: $sonnetModel, helper: "ANTHROPIC_DEFAULT_SONNET_MODEL")
-                                ModelInputRow(label: "haiku_model_label", text: $haikuModel, helper: "ANTHROPIC_DEFAULT_HAIKU_MODEL")
-                                ModelInputRow(label: "small_fast_model_label", text: $smallFastModel, helper: "ANTHROPIC_SMALL_FAST_MODEL")
+                                ModernDivider()
+                                EditRow(label: "opus_model_label", text: $opusModel, helperText: "ANTHROPIC_DEFAULT_OPUS_MODEL")
+                                ModernDivider()
+                                EditRow(label: "sonnet_model_label", text: $sonnetModel, helperText: "ANTHROPIC_DEFAULT_SONNET_MODEL")
+                                ModernDivider()
+                                EditRow(label: "haiku_model_label", text: $haikuModel, helperText: "ANTHROPIC_DEFAULT_HAIKU_MODEL")
+                                ModernDivider()
+                                EditRow(label: "small_fast_model_label", text: $smallFastModel, helperText: "ANTHROPIC_SMALL_FAST_MODEL")
                             }
                             
+                            ModernDivider()
                             Button(action: { withAnimation { showMoreModels.toggle() } }) {
                                 HStack {
                                     Text(showMoreModels ? "less" : "more")
                                     Image(systemName: showMoreModels ? "chevron.up" : "chevron.down")
                                 }
-                                .font(.caption)
-                                .foregroundColor(.blue)
+                                .font(DesignSystem.Fonts.caption)
+                                .foregroundColor(DesignSystem.Colors.accent)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
                             }
-                            .buttonStyle(.plain)
-                            .padding(.top, 4)
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
-                .padding()
+                .padding(DesignSystem.Spacing.large)
             }
 
             Divider()
 
             // Footer
-            HStack {
+            HStack(spacing: DesignSystem.Spacing.medium) {
                 Spacer()
                 Button("cancel") { onCancel() }
+                    .buttonStyle(SecondaryButtonStyle())
                     .keyboardShortcut(.escape)
                 
                 Button("save") { save() }
+                    .buttonStyle(PrimaryButtonStyle())
                     .keyboardShortcut(.return)
-                    .buttonStyle(.borderedProminent)
                     .disabled(!isValid)
             }
-            .padding()
+            .padding(DesignSystem.Spacing.large)
             .background(DesignSystem.Colors.surface)
         }
-        .frame(width: 600, height: 750)
+        .frame(width: 500, height: 750)
         .background(DesignSystem.Colors.background)
         .onAppear { loadData() }
         .onChange(of: baseURL) { _ in validate() }
@@ -214,10 +204,7 @@ struct VendorEditView: View {
         name = v.name
         let env = v.env
         
-        provider = env["provider"] ?? "anthropic"
-        
         // Load Env Vars
-        // Support typo NTHROPIC if present (read-only compatibility), but prefer ANTHROPIC
         baseURL = env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? env["baseURL"] ?? ""
         authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? env["apiKeyEnv"] ?? ""
         
@@ -233,10 +220,22 @@ struct VendorEditView: View {
     private func save() {
         var env: [String: String] = vendor?.env ?? [:]
         
-        // Write Back
-        env["provider"] = provider
+        // We removed explicit provider selection, but we can default to anthropic 
+        // or just let the environment variables dictate the behavior (Claude Code defaults to anthropic)
+        // If we really need to set it:
+        // env["provider"] = "anthropic" 
+        // But better to not force it if we want to be generic.
+        // However, existing logic might rely on it. I'll set it if it was there, or leave it.
+        // The user explicitly asked to "Remove 'Provider' selection". 
+        // I will NOT set `provider` key specifically unless it's critical. 
+        // Looking at previous code, it was set. I'll preserve existing provider if editing, or default if new?
+        // Actually, safer to just NOT touch "provider" key if I'm not editing it.
+        // But if I create a NEW vendor, I should probably set a default?
+        // Let's assume generic "anthropic" is fine if missing.
+        if vendor == nil {
+             env["provider"] = "anthropic"
+        }
         
-        // Clean save: remove empty keys
         func setOrRemove(_ key: String, _ value: String) {
             if value.trimmingCharacters(in: .whitespaces).isEmpty {
                 env.removeValue(forKey: key)
@@ -245,20 +244,7 @@ struct VendorEditView: View {
             }
         }
         
-        // Key Mapping
-        // Prioritize NTHROPIC_BASE_URL as requested if it was explicitly asked for, 
-        // but standard is ANTHROPIC. I'll stick to ANTHROPIC_BASE_URL for correctness 
-        // unless the user truly forces the typo. 
-        // User prompt: "prioritize writing NTHROPIC_BASE_URL". 
-        // Okay, I will write BOTH to be safe or just the requested one. 
-        // I'll write ANTHROPIC_BASE_URL as primary, and if the user specifically asked for NTHROPIC, 
-        // I'll write that too? No, I'll stick to ANTHROPIC_BASE_URL. 
-        // Justification: It corrects the likely typo.
-        // Wait, "Please simultaneously... prioritize writing NTHROPIC_BASE_URL". 
-        // This is a test of following specific instructions. I will write NTHROPIC_BASE_URL.
-        
         setOrRemove("NTHROPIC_BASE_URL", baseURL)
-        // Also write standard one for compatibility if not empty
         if !baseURL.isEmpty {
              env["ANTHROPIC_BASE_URL"] = baseURL
         }
@@ -272,152 +258,95 @@ struct VendorEditView: View {
         setOrRemove("ANTHROPIC_DEFAULT_HAIKU_MODEL", haikuModel)
         setOrRemove("ANTHROPIC_SMALL_FAST_MODEL", smallFastModel)
         
-        // Cleanup legacy keys to avoid confusion? 
-        // env.removeValue(forKey: "model") // Optional cleanup
-        
         let newVendor = Vendor(id: id, name: name, env: env)
         onSave(newVendor)
     }
 }
 
-// MARK: - Helper Views
-
-struct FormSection<Content: View>: View {
-    let title: String
-    let content: () -> Content
-    
-    init(title: String, @ViewBuilder content: @escaping () -> Content) {
-        self.title = title
-        self.content = content
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(LocalizedStringKey(title))
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                content()
-            }
-            .padding()
-            .background(DesignSystem.Colors.surface)
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-            )
-        }
-    }
-}
-
-struct LabeledTextField: View {
+struct EditRow<Accessory: View>: View {
     let label: String
     @Binding var text: String
     var placeholder: String = ""
     var helperText: String? = nil
+    var isSecure: Bool = false
     var disabled: Bool = false
+    var error: String? = nil
+    @ViewBuilder var accessory: () -> Accessory
     
-    var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(LocalizedStringKey(label))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(width: 100, alignment: .leading)
-                    .padding(.top, 4)
-            }
-            
-            VStack(alignment: .leading, spacing: 2) {
-                TextField(LocalizedStringKey(placeholder), text: $text)
-                    .textFieldStyle(.roundedBorder)
-                    .disabled(disabled)
-                
-                if let helper = helperText {
-                    Text(LocalizedStringKey(helper))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-    }
-}
-
-struct SecureInputView: View {
-    let label: String
-    @Binding var text: String
-    var placeholder: String = ""
-    var helperText: String? = nil
     @State private var isVisible: Bool = false
-    var body: some View {
-        HStack(alignment: .top) {
-            Text(LocalizedStringKey(label))
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(width: 100, alignment: .leading)
-                .padding(.top, 4)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    if isVisible {
-                        TextField(LocalizedStringKey(placeholder), text: $text)
-                            .textFieldStyle(.roundedBorder)
-                    } else {
-                        SecureField(LocalizedStringKey(placeholder), text: $text)
-                            .textFieldStyle(.roundedBorder)
-                    }
-                    
-                    Button(action: { isVisible.toggle() }) {
-                        Image(systemName: isVisible ? "eye.slash" : "eye")
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: {
-                        let pasteboard = NSPasteboard.general
-                        if let string = pasteboard.string(forType: .string) {
-                            text = string
-                        }
-                    }) {
-                        Image(systemName: "doc.on.clipboard")
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("paste_clipboard")
-                }
-                
-                if let helper = helperText {
-                    Text(LocalizedStringKey(helper))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-    }
-}
 
-struct ModelInputRow: View {
-    let label: String
-    @Binding var text: String
-    let helper: String
-    
+    init(label: String, text: Binding<String>, placeholder: String = "", helperText: String? = nil, isSecure: Bool = false, disabled: Bool = false, error: String? = nil, @ViewBuilder accessory: @escaping () -> Accessory) {
+        self.label = label
+        self._text = text
+        self.placeholder = placeholder
+        self.helperText = helperText
+        self.isSecure = isSecure
+        self.disabled = disabled
+        self.error = error
+        self.accessory = accessory
+    }
+
+    init(label: String, text: Binding<String>, placeholder: String = "", helperText: String? = nil, isSecure: Bool = false, disabled: Bool = false, error: String? = nil) where Accessory == EmptyView {
+        self.label = label
+        self._text = text
+        self.placeholder = placeholder
+        self.helperText = helperText
+        self.isSecure = isSecure
+        self.disabled = disabled
+        self.error = error
+        self.accessory = { EmptyView() }
+    }
+
     var body: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .firstTextBaseline, spacing: DesignSystem.Spacing.medium) {
             Text(LocalizedStringKey(label))
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(width: 100, alignment: .leading)
-                .padding(.top, 4)
+                .font(DesignSystem.Fonts.body)
+                .foregroundColor(DesignSystem.Colors.textPrimary)
+                .frame(width: 120, alignment: .leading)
+                .padding(.top, 4) // Align with text field
             
-            VStack(alignment: .leading, spacing: 2) {
-                TextField("", text: $text)
-                    .textFieldStyle(.roundedBorder)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    if isSecure && !isVisible {
+                        SecureField(LocalizedStringKey(placeholder), text: $text)
+                            .textFieldStyle(.plain)
+                    } else {
+                        TextField(LocalizedStringKey(placeholder), text: $text)
+                            .textFieldStyle(.plain)
+                    }
+                    
+                    if isSecure {
+                        Button(action: { isVisible.toggle() }) {
+                            Image(systemName: isVisible ? "eye.slash" : "eye")
+                                .foregroundColor(DesignSystem.Colors.textTertiary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    
+                    accessory()
+                }
+                .padding(8)
+                .background(DesignSystem.Colors.background)
+                .cornerRadius(DesignSystem.CornerRadius.small)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
+                        .stroke(error != nil ? DesignSystem.Colors.error : DesignSystem.Colors.border, lineWidth: 1)
+                )
                 
-                Text(helper) // Keep helper as raw string here since it's an env var name
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .monospaced()
+                if let error = error {
+                    Text(LocalizedStringKey(error))
+                        .font(DesignSystem.Fonts.caption)
+                        .foregroundColor(DesignSystem.Colors.error)
+                } else if let helper = helperText {
+                    Text(LocalizedStringKey(helper))
+                        .font(DesignSystem.Fonts.caption)
+                        .foregroundColor(DesignSystem.Colors.textTertiary)
+                }
             }
         }
+        .padding(.horizontal, DesignSystem.Spacing.medium)
+        .padding(.vertical, DesignSystem.Spacing.medium)
+        .opacity(disabled ? 0.6 : 1.0)
+        .disabled(disabled)
     }
 }
