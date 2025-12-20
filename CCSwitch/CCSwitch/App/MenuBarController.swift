@@ -36,17 +36,17 @@ class MenuBarController: NSObject, ConfigObserver {
         // A 区：关于
         menu.addItem(NSMenuItem.separator())
 
-        let aboutItem = NSMenuItem(title: "关于 CCSwitch…", action: #selector(showAbout), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
 
-        menu.addItem(withTitle: "版本：\(getVersion())", action: nil, keyEquivalent: "")
+        menu.addItem(withTitle: String(format: NSLocalizedString("version", comment: ""), getVersion()), action: nil, keyEquivalent: "")
 
-        let configDirItem = NSMenuItem(title: "打开配置目录", action: #selector(openConfigDirectory), keyEquivalent: "")
+        let configDirItem = NSMenuItem(title: NSLocalizedString("open_config_dir", comment: ""), action: #selector(openConfigDirectory), keyEquivalent: "")
         configDirItem.target = self
         menu.addItem(configDirItem)
 
-        let logsItem = NSMenuItem(title: "查看日志", action: #selector(showLogs), keyEquivalent: "")
+        let logsItem = NSMenuItem(title: NSLocalizedString("show_logs", comment: ""), action: #selector(showLogs), keyEquivalent: "")
         logsItem.target = self
         menu.addItem(logsItem)
         menu.addItem(NSMenuItem.separator())
@@ -56,13 +56,13 @@ class MenuBarController: NSObject, ConfigObserver {
         menu.addItem(NSMenuItem.separator())
 
         // C 区：设置
-        let settingsItem = NSMenuItem(title: "设置…", action: #selector(showSettings), keyEquivalent: "")
+        let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettings), keyEquivalent: "")
         settingsItem.target = self
         menu.addItem(settingsItem)
         menu.addItem(NSMenuItem.separator())
 
         // D 区：退出
-        let quitItem = NSMenuItem(title: "退出", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: NSLocalizedString("quit", comment: ""), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -104,18 +104,16 @@ class MenuBarController: NSObject, ConfigObserver {
     // MARK: - Menu Actions
     @objc private func showAbout() {
         let alert = NSAlert()
-        alert.messageText = "关于 CCSwitch"
-        alert.informativeText = """
-        CCSwitch v\(getVersion())
-
-        一个用于快速切换 Claude Code 供应商的 macOS 状态栏工具。
-
-        配置目录：\(CCSConfig.configFile.path)
-        Claude 配置：\(ClaudeSettings.configFile.path)
-        """
+        alert.messageText = NSLocalizedString("about_title", comment: "")
+        alert.informativeText = String(
+            format: NSLocalizedString("about_message", comment: ""),
+            getVersion(),
+            CCSConfig.configFile.path,
+            ClaudeSettings.configFile.path
+        )
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "确定")
-        alert.addButton(withTitle: "打开配置目录")
+        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("open_config_dir", comment: ""))
 
         let response = alert.runModal()
         if response == .alertSecondButtonReturn {
@@ -130,8 +128,8 @@ class MenuBarController: NSObject, ConfigObserver {
     @objc private func showLogs() {
         // TODO: 实现日志查看功能
         let alert = NSAlert()
-        alert.messageText = "日志"
-        alert.informativeText = "日志功能尚未实现"
+        alert.messageText = NSLocalizedString("show_logs", comment: "")
+        alert.informativeText = "Log viewing is not yet implemented."
         alert.alertStyle = .informational
         alert.runModal()
     }
@@ -153,7 +151,7 @@ class MenuBarController: NSObject, ConfigObserver {
             updateVendorMenuItems()
             updateStatusBarTitle()
         } catch {
-            showErrorAlert(title: "切换失败", message: error.localizedDescription)
+            showErrorAlert(title: NSLocalizedString("switch_failed", comment: ""), message: error.localizedDescription)
         }
     }
 
