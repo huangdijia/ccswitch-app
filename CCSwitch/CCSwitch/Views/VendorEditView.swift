@@ -26,6 +26,7 @@ struct VendorEditView: View {
     @State private var sonnetModel: String = ""
     @State private var haikuModel: String = ""
     @State private var smallFastModel: String = ""
+    @State private var showMoreModels: Bool = false
 
     // Validation State
     @State private var errors: [String: String] = [:]
@@ -54,28 +55,6 @@ struct VendorEditView: View {
                         VStack(spacing: 12) {
                             LabeledTextField(label: "id_label", text: $id, placeholder: "unique_id_placeholder", disabled: vendor != nil)
                             LabeledTextField(label: "name_label", text: $name, placeholder: "display_name_placeholder")
-                            
-                            HStack {
-                                Text("provider_label")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .frame(width: 100, alignment: .leading)
-                                
-                                Picker("", selection: $provider) {
-                                    ForEach(commonProviders, id: \.self) { p in
-                                        Text(p).tag(p)
-                                    }
-                                    Text("Custom").tag("custom")
-                                }
-                                .labelsHidden()
-                                .fixedSize()
-                                
-                                if !commonProviders.contains(provider) {
-                                    TextField("custom_provider_label", text: $provider)
-                                        .textFieldStyle(.roundedBorder)
-                                }
-                                Spacer()
-                            }
                         }
                     }
 
@@ -139,11 +118,25 @@ struct VendorEditView: View {
                     // 4. Models Section
                     FormSection(title: "models_section") {
                         VStack(spacing: 12) {
-                            ModelInputRow(label: "default_model_label", text: $defaultModel, suggestions: commonModels, helper: "ANTHROPIC_MODEL")
-                            ModelInputRow(label: "opus_model_label", text: $opusModel, suggestions: commonModels, helper: "ANTHROPIC_DEFAULT_OPUS_MODEL")
-                            ModelInputRow(label: "sonnet_model_label", text: $sonnetModel, suggestions: commonModels, helper: "ANTHROPIC_DEFAULT_SONNET_MODEL")
-                            ModelInputRow(label: "haiku_model_label", text: $haikuModel, suggestions: commonModels, helper: "ANTHROPIC_DEFAULT_HAIKU_MODEL")
-                            ModelInputRow(label: "small_fast_model_label", text: $smallFastModel, suggestions: commonModels, helper: "ANTHROPIC_SMALL_FAST_MODEL")
+                            ModelInputRow(label: "default_model_label", text: $defaultModel, helper: "ANTHROPIC_MODEL")
+                            
+                            if showMoreModels {
+                                ModelInputRow(label: "opus_model_label", text: $opusModel, helper: "ANTHROPIC_DEFAULT_OPUS_MODEL")
+                                ModelInputRow(label: "sonnet_model_label", text: $sonnetModel, helper: "ANTHROPIC_DEFAULT_SONNET_MODEL")
+                                ModelInputRow(label: "haiku_model_label", text: $haikuModel, helper: "ANTHROPIC_DEFAULT_HAIKU_MODEL")
+                                ModelInputRow(label: "small_fast_model_label", text: $smallFastModel, helper: "ANTHROPIC_SMALL_FAST_MODEL")
+                            }
+                            
+                            Button(action: { withAnimation { showMoreModels.toggle() } }) {
+                                HStack {
+                                    Text(showMoreModels ? "less" : "more")
+                                    Image(systemName: showMoreModels ? "chevron.up" : "chevron.down")
+                                }
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 4)
                         }
                     }
                 }
@@ -178,7 +171,7 @@ struct VendorEditView: View {
 
     private var isValid: Bool {
         validate()
-        return errors.isEmpty && !id.isEmpty && !name.isEmpty && !provider.isEmpty
+        return errors.isEmpty && !id.isEmpty && !name.isEmpty
     }
 
     private func validate() {
@@ -406,7 +399,6 @@ struct SecureInputView: View {
 struct ModelInputRow: View {
     let label: String
     @Binding var text: String
-    let suggestions: [String]
     let helper: String
     
     var body: some View {
@@ -418,20 +410,9 @@ struct ModelInputRow: View {
                 .padding(.top, 4)
             
             VStack(alignment: .leading, spacing: 2) {
-                HStack {
-                    TextField("e.g. \(suggestions.first ?? "")", text: $text)
-                        .textFieldStyle(.roundedBorder)
-                    
-                    Menu {
-                        ForEach(suggestions, id: \.self) { model in
-                            Button(model) { text = model }
-                        }
-                    } label: {
-                        Image(systemName: "chevron.down")
-                    }
-                    .menuStyle(.borderlessButton)
-                    .frame(width: 20)
-                }
+                TextField("", text: $text)
+                    .textFieldStyle(.roundedBorder)
+                
                 Text(helper) // Keep helper as raw string here since it's an env var name
                     .font(.caption2)
                     .foregroundColor(.secondary)

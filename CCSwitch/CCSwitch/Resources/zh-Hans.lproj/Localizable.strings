@@ -121,3 +121,5 @@
 "validation_timeout_number" = "超时时间必须是数字";
 "validation_token_length" = "Token 长度至少为 10 个字符";
 "paste_clipboard" = "从剪贴板粘贴";
+"more" = "更多";
+"less" = "折叠";

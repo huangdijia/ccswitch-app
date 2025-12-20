@@ -121,3 +121,5 @@
 "validation_timeout_number" = "Timeout must be a number";
 "validation_token_length" = "Token must be at least 10 characters";
 "paste_clipboard" = "Paste from Clipboard";
+"more" = "More";
+"less" = "Less";
