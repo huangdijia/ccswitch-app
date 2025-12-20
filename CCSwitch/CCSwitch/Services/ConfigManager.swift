@@ -1,5 +1,6 @@
 import Foundation
 import Cocoa
+import UserNotifications
 
 // MARK: - Configuration Manager
 class ConfigManager {
@@ -8,11 +9,21 @@ class ConfigManager {
     private var currentConfig: CCSConfig?
     private var observers: [ConfigObserver] = []
 
-    private init() {}
+    private init() {
+        requestNotificationPermission()
+    }
 
     // MARK: - Initialization
     func initialize() {
         loadOrCreateConfig()
+    }
+
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if let error = error {
+                Logger.shared.error("Failed to request notification permission: \(error)")
+            }
+        }
     }
 
     func cleanup() {
@@ -223,10 +234,22 @@ class ConfigManager {
 
     // MARK: - Helper Methods
     private func showNotification(title: String, message: String) {
-        let notification = NSUserNotification()
-        notification.title = title
-        notification.informativeText = message
-        NSUserNotificationCenter.default.deliver(notification)
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = message
+        content.sound = .default
+        
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: nil
+        )
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                Logger.shared.error("Failed to show notification: \(error)")
+            }
+        }
     }
 }
 

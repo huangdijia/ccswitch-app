@@ -206,7 +206,7 @@ struct ModernSection<Content: View>: View {
                     .stroke(DesignSystem.Colors.border, lineWidth: 0.5)
             )
         }
-        .padding(.bottom, DesignSystem.Spacing.large)
+        .padding(.bottom, DesignSystem.Spacing.small)
     }
 }
 

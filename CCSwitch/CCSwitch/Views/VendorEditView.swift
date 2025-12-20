@@ -42,7 +42,7 @@ struct VendorEditView: View {
             Divider()
 
             ScrollView {
-                VStack(spacing: DesignSystem.Spacing.large) {
+                VStack(spacing: DesignSystem.Spacing.medium) {
                     // 1. Basic Info Section
                     ModernSection(title: "basic_info") {
                         VStack(spacing: 0) {
@@ -149,7 +149,7 @@ struct VendorEditView: View {
             .padding(DesignSystem.Spacing.large)
             .background(DesignSystem.Colors.surface)
         }
-        .frame(width: 500, height: 750)
+        .frame(width: 500, height: 550)
         .background(DesignSystem.Colors.background)
         .onAppear { loadData() }
         .onChange(of: baseURL) { _ in validate() }
@@ -331,7 +331,7 @@ struct EditRow<Accessory: View>: View {
             }
         }
         .padding(.horizontal, DesignSystem.Spacing.medium)
-        .padding(.vertical, DesignSystem.Spacing.medium)
+        .padding(.vertical, DesignSystem.Spacing.small)
         .opacity(disabled ? 0.6 : 1.0)
         .disabled(disabled)
     }

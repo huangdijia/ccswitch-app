@@ -5,7 +5,7 @@ import os
 class Logger {
     static let shared = Logger()
 
-    private let osLog = OSLog(subsystem: "com.cccode.switch", category: "CCSwitch")
+    private let logger = os.Logger(subsystem: "com.cccode.switch", category: "CCSwitch")
     private let logFileURL: URL
 
     private init() {
@@ -16,25 +16,25 @@ class Logger {
 
     // MARK: - Logging Methods
     func info(_ message: String) {
-        os_log("%{public}@", log: osLog, type: .info, message)
+        logger.info("\(message, privacy: .public)")
         writeToFile(level: "INFO", message: message)
     }
 
     func debug(_ message: String) {
         #if DEBUG
-        os_log("%{public}@", log: osLog, type: .debug, message)
+        logger.debug("\(message, privacy: .public)")
         writeToFile(level: "DEBUG", message: message)
         #endif
     }
 
     func error(_ message: String, error: Error? = nil) {
         let fullMessage = error != nil ? "\(message): \(error!)" : message
-        os_log("%{public}@", log: osLog, type: .error, fullMessage)
+        logger.error("\(fullMessage, privacy: .public)")
         writeToFile(level: "ERROR", message: fullMessage)
     }
 
     func warn(_ message: String) {
-        os_log("%{public}@", log: osLog, type: .default, message)
+        logger.warning("\(message, privacy: .public)")
         writeToFile(level: "WARN", message: message)
     }
 
@@ -45,10 +45,13 @@ class Logger {
 
         if let data = logEntry.data(using: .utf8) {
             if FileManager.default.fileExists(atPath: logFileURL.path) {
-                if let fileHandle = try? FileHandle(forWritingTo: logFileURL) {
-                    fileHandle.seekToEndOfFile()
-                    fileHandle.write(data)
-                    fileHandle.closeFile()
+                do {
+                    let fileHandle = try FileHandle(forWritingTo: logFileURL)
+                    try fileHandle.seekToEnd()
+                    try fileHandle.write(contentsOf: data)
+                    try fileHandle.close()
+                } catch {
+                    print("Failed to write to log file: \(error)")
                 }
             } else {
                 try? data.write(to: logFileURL)
