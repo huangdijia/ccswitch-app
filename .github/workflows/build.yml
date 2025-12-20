@@ -38,6 +38,9 @@ jobs:
 
       - name: Create DMG
         run: |
+          # Ad-hoc sign the app (required for Apple Silicon)
+          codesign --force --deep --sign - build/Build/Products/Release/CCSwitch.app
+
           mkdir -p dmg-source
           cp -r build/Build/Products/Release/CCSwitch.app dmg-source/
           ln -s /Applications dmg-source/Applications
