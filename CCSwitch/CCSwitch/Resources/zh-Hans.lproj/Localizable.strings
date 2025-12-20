@@ -1,0 +1,36 @@
+/* General */
+"app_name" = "CCSwitch";
+"settings" = "设置";
+"quit" = "退出";
+"about" = "关于";
+"version" = "版本 %@";
+
+/* Menu Bar */
+"vendor_management" = "供应商管理";
+"switch_to" = "切换至 %@";
+"current" = "当前";
+"no_vendors" = "无供应商";
+
+/* Settings Window */
+"general" = "通用";
+"vendors" = "供应商";
+"advanced" = "高级";
+
+/* Vendor Management */
+"vendor_management_title" = "供应商管理";
+"vendor_management_subtitle" = "管理您的 Claude Code 供应商。在它们之间即时切换。";
+"config_path_label" = "配置: ~/.ccswitch/ccs.json";
+"switch_button" = "切换";
+"active_badge" = "当前使用";
+"currently_active" = "当前使用中";
+"provider_label" = "提供商";
+"model_label" = "模型";
+"api_key_env_label" = "API Key 环境变量";
+"base_url_label" = "Base URL";
+"notes_label" = "备注";
+"close_button" = "关闭";
+"switch_to_vendor_button" = "切换至该供应商";
+"details_tooltip" = "详情";
+"no_vendors_found" = "未找到供应商";
+"check_config_msg" = "请检查您的配置文件 ~/.ccswitch/ccs.json";
+"configuration" = "配置信息";

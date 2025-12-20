@@ -1,0 +1,36 @@
+/* General */
+"app_name" = "CCSwitch";
+"settings" = "Settings";
+"quit" = "Quit";
+"about" = "About";
+"version" = "Version %@";
+
+/* Menu Bar */
+"vendor_management" = "Vendor Management";
+"switch_to" = "Switch to %@";
+"current" = "Current";
+"no_vendors" = "No Vendors";
+
+/* Settings Window */
+"general" = "General";
+"vendors" = "Vendors";
+"advanced" = "Advanced";
+
+/* Vendor Management */
+"vendor_management_title" = "Vendor Management";
+"vendor_management_subtitle" = "Manage your available Claude Code vendors. Switch between them instantly.";
+"config_path_label" = "Config: ~/.ccswitch/ccs.json";
+"switch_button" = "Switch";
+"active_badge" = "Active";
+"currently_active" = "Currently Active";
+"provider_label" = "Provider";
+"model_label" = "Model";
+"api_key_env_label" = "API Key Env";
+"base_url_label" = "Base URL";
+"notes_label" = "Notes";
+"close_button" = "Close";
+"switch_to_vendor_button" = "Switch to Vendor";
+"details_tooltip" = "Details";
+"no_vendors_found" = "No Vendors Found";
+"check_config_msg" = "Please check your configuration file at ~/.ccswitch/ccs.json";
+"configuration" = "Configuration";
