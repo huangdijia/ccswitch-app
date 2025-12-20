@@ -36,6 +36,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ConfigManager.shared.cleanup()
     }
     
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        let menu = NSMenu()
+        
+        let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "i")
+        menu.addItem(aboutItem)
+        
+        let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        
+        let quitItem = NSMenuItem(title: NSLocalizedString("quit", comment: ""), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        menu.addItem(quitItem)
+        
+        return menu
+    }
+    
     private func setupMainMenu() {
         let mainMenu = NSMenu()
         let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "CCSwitch"

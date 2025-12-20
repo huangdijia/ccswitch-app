@@ -59,7 +59,7 @@ struct VendorEditView: View {
                                 Text("provider_label")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
-                                    .frame(width: 80, alignment: .leading)
+                                    .frame(width: 100, alignment: .leading)
                                 
                                 Picker("", selection: $provider) {
                                     ForEach(commonProviders, id: \.self) { p in
@@ -331,7 +331,7 @@ struct LabeledTextField: View {
                 Text(LocalizedStringKey(label))
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .frame(width: 80, alignment: .leading)
+                    .frame(width: 100, alignment: .leading)
                     .padding(.top, 4)
             }
             
@@ -356,13 +356,12 @@ struct SecureInputView: View {
     var placeholder: String = ""
     var helperText: String? = nil
     @State private var isVisible: Bool = false
-    
     var body: some View {
         HStack(alignment: .top) {
             Text(LocalizedStringKey(label))
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .frame(width: 80, alignment: .leading)
+                .frame(width: 100, alignment: .leading)
                 .padding(.top, 4)
             
             VStack(alignment: .leading, spacing: 2) {
@@ -415,7 +414,7 @@ struct ModelInputRow: View {
             Text(LocalizedStringKey(label))
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .frame(width: 80, alignment: .leading)
+                .frame(width: 100, alignment: .leading)
                 .padding(.top, 4)
             
             VStack(alignment: .leading, spacing: 2) {

@@ -24,12 +24,6 @@ struct VendorManagementView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Summary Tip
-            Text("vendor_management_subtitle")
-                .font(DesignSystem.Fonts.body)
-                .foregroundColor(DesignSystem.Colors.textSecondary)
-                .padding(.bottom, DesignSystem.Spacing.large)
-
             if hasLegacyConfig {
                 Button(action: importLegacyConfig) {
                     HStack {
@@ -115,16 +109,6 @@ struct VendorManagementView: View {
             .padding(.top, DesignSystem.Spacing.medium)
             
             Spacer()
-            
-            // Footer Info
-            HStack(spacing: 4) {
-                Image(systemName: "info.circle")
-                Text("config_path_label")
-            }
-            .font(DesignSystem.Fonts.caption)
-            .foregroundColor(DesignSystem.Colors.textTertiary)
-            .padding(.leading, 4)
-            .padding(.top, DesignSystem.Spacing.large)
         }
         .onAppear {
             loadVendors()
@@ -201,35 +185,10 @@ struct VendorRow: View {
 
     var body: some View {
         HStack(spacing: DesignSystem.Spacing.medium) {
-            // Icon Placeholder / Leading
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(isCurrent ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
-                    .frame(width: 32, height: 32)
-                Text(String(vendor.displayName.prefix(1)).uppercased())
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(isCurrent ? .blue : .gray)
-            }
-
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(vendor.displayName)
-                        .font(DesignSystem.Fonts.body.weight(.medium))
-                        .foregroundColor(DesignSystem.Colors.textPrimary)
-                    
-                    if isCurrent {
-                        Text("active_badge")
-                            .font(.system(size: 9, weight: .bold))
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1)
-                            .background(Capsule().fill(Color.blue))
-                            .foregroundColor(.white)
-                    }
-                }
-                
-                Text(vendor.env["ANTHROPIC_MODEL"] ?? vendor.env["model"] ?? "default")
-                    .font(DesignSystem.Fonts.caption)
-                    .foregroundColor(DesignSystem.Colors.textSecondary)
+                Text(vendor.displayName)
+                    .font(DesignSystem.Fonts.body.weight(.medium))
+                    .foregroundColor(DesignSystem.Colors.textPrimary)
             }
 
             Spacer()
