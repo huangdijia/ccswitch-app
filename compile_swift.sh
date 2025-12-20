@@ -42,6 +42,11 @@ mkdir -p "$APP_BUNDLE/Contents/Resources"
 # 复制 Info.plist
 if [ -f "$PROJECT_DIR/CCSwitch/Resources/Info.plist" ]; then
     cp "$PROJECT_DIR/CCSwitch/Resources/Info.plist" "$APP_BUNDLE/Contents/"
+    # 替换 Info.plist 中的变量
+    sed -i '' 's/\$(EXECUTABLE_NAME)/CCSwitch/g' "$APP_BUNDLE/Contents/Info.plist"
+    sed -i '' 's/\$(PRODUCT_BUNDLE_IDENTIFIER)/com.cccode.switch/g' "$APP_BUNDLE/Contents/Info.plist"
+    sed -i '' 's/\$(PRODUCT_NAME)/CCSwitch/g' "$APP_BUNDLE/Contents/Info.plist"
+    sed -i '' 's/\$(DEVELOPMENT_LANGUAGE)/en/g' "$APP_BUNDLE/Contents/Info.plist"
 else
     echo "⚠️  Info.plist not found, creating basic one..."
     # ... (existing fallback code)
