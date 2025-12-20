@@ -14,7 +14,7 @@ echo "🔨 使用 Swift 编译器构建 CCSwitch..."
 mkdir -p "$OUTPUT_DIR"
 
 # 编译参数
-SWIFT_FLAGS="-O -target x86_64-apple-macos11.0 -I /usr/lib/swift"
+SWIFT_FLAGS="-O -target x86_64-apple-macos13.0 -I /usr/lib/swift"
 LINK_FLAGS="-framework Cocoa -framework SwiftUI -framework Foundation"
 
 # 查找所有 Swift 源文件（排除测试文件）
@@ -60,7 +60,7 @@ else
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.0</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>11.0</string>
+	<string>13.0</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSPrincipalClass</key>
