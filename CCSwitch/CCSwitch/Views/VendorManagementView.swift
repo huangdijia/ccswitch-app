@@ -3,6 +3,10 @@ import SwiftUI
 struct VendorManagementView: View {
     @State private var vendors: [Vendor] = []
     @State private var selectedVendor: Vendor?
+    @State private var hasLegacyConfig: Bool = false
+    @State private var showImportError: Bool = false
+    @State private var importErrorMessage: String = ""
+    @State private var showImportSuccess: Bool = false
     private let currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
 
     var body: some View {
@@ -12,6 +16,41 @@ struct VendorManagementView: View {
                 .font(DesignSystem.Fonts.body)
                 .foregroundColor(DesignSystem.Colors.textSecondary)
                 .padding(.bottom, DesignSystem.Spacing.large)
+
+            if hasLegacyConfig {
+                Button(action: importLegacyConfig) {
+                    HStack {
+                        Image(systemName: "arrow.down.doc")
+                        Text("import_legacy_config_button")
+                    }
+                    .font(DesignSystem.Fonts.body.weight(.medium))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(DesignSystem.Colors.accent.opacity(0.1))
+                    .foregroundColor(DesignSystem.Colors.accent)
+                    .cornerRadius(DesignSystem.CornerRadius.medium)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium)
+                            .stroke(DesignSystem.Colors.accent.opacity(0.3), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.bottom, DesignSystem.Spacing.large)
+                .alert(isPresented: $showImportError) {
+                    Alert(
+                        title: Text("error"),
+                        message: Text(importErrorMessage),
+                        dismissButton: .default(Text("ok"))
+                    )
+                }
+                .alert(isPresented: $showImportSuccess) {
+                    Alert(
+                        title: Text("success"),
+                        message: Text("migration_success"),
+                        dismissButton: .default(Text("ok"))
+                    )
+                }
+            }
 
             ModernSection(title: "vendors") {
                 if vendors.isEmpty {
@@ -59,6 +98,21 @@ struct VendorManagementView: View {
 
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
+        // Only show legacy import if we are running on default config (which implies no user config yet) or if explicitly checking for legacy file existence
+        // But logic says: "If ~/.ccswitch/ccs.json exists, show button".
+        // Use a simpler check:
+        hasLegacyConfig = ConfigManager.shared.hasLegacyConfig
+    }
+    
+    private func importLegacyConfig() {
+        do {
+            try ConfigManager.shared.migrateFromLegacy()
+            showImportSuccess = true
+            loadVendors()
+        } catch {
+            importErrorMessage = error.localizedDescription
+            showImportError = true
+        }
     }
 }
 

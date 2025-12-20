@@ -19,7 +19,7 @@
 /* Vendor Management */
 "vendor_management_title" = "Vendor Management";
 "vendor_management_subtitle" = "Manage your available Claude Code vendors. Switch between them instantly.";
-"config_path_label" = "Config: ~/.ccswitch/ccs.json";
+"config_path_label" = "Config: ~/.ccswitch/ccswitch.json";
 "switch_button" = "Switch";
 "active_badge" = "Active";
 "currently_active" = "Currently Active";
@@ -78,3 +78,6 @@
 "error" = "Error";
 "reloaded" = "Reloaded";
 "reload_success_msg" = "Configuration reloaded.";
+"import_legacy_config_button" = "Import Legacy Configuration (ccs.json)";
+"migration_success" = "Configuration imported successfully.";
+"environment_variables" = "Environment Variables";

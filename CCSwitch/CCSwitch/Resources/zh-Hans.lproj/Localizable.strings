@@ -19,7 +19,7 @@
 /* Vendor Management */
 "vendor_management_title" = "供应商管理";
 "vendor_management_subtitle" = "管理您的 Claude Code 供应商。在它们之间即时切换。";
-"config_path_label" = "配置: ~/.ccswitch/ccs.json";
+"config_path_label" = "配置: ~/.ccswitch/ccswitch.json";
 "switch_button" = "切换";
 "active_badge" = "当前使用";
 "currently_active" = "当前使用中";
@@ -78,3 +78,6 @@
 "error" = "错误";
 "reloaded" = "已重新加载";
 "reload_success_msg" = "配置已重新加载。";
+"import_legacy_config_button" = "导入旧版配置 (ccs.json)";
+"migration_success" = "配置已成功导入。";
+"environment_variables" = "环境变量";
