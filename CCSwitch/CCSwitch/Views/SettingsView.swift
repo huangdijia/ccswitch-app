@@ -142,32 +142,33 @@ struct SidebarItem: View {
     @State private var isHovered = false
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .frame(width: 24)
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .medium))
+                .frame(width: 24)
 
-                Text(LocalizedStringKey(title))
-                    .font(.system(size: 14, weight: .medium))
+            Text(LocalizedStringKey(title))
+                .font(.system(size: 14, weight: .medium))
 
-                Spacer()
-                
-                if isActive {
-                    Image(systemName: "chevron.right")
-                        .font(.caption2)
-                        .foregroundColor(.blue)
-                }
+            Spacer()
+            
+            if isActive {
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundColor(.blue)
             }
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isActive ? Color.blue.opacity(0.1) : (isHovered ? Color.gray.opacity(0.05) : Color.clear))
-            )
-            .foregroundColor(isActive ? .blue : .primary)
         }
-        .buttonStyle(PlainButtonStyle())
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(isActive ? Color.blue.opacity(0.1) : (isHovered ? Color.gray.opacity(0.05) : Color.clear))
+        )
+        .foregroundColor(isActive ? .blue : .primary)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            action()
+        }
         .onHover { hover in
             isHovered = hover
         }
