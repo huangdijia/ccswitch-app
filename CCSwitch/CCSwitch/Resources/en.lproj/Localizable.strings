@@ -34,3 +34,6 @@
 "no_vendors_found" = "No Vendors Found";
 "check_config_msg" = "Please check your configuration file at ~/.ccswitch/ccs.json";
 "configuration" = "Configuration";
+"general_settings" = "General Settings";
+"advanced_options" = "Advanced Options";
+"fast_switching" = "Fast Claude Switching";

@@ -34,3 +34,6 @@
 "no_vendors_found" = "未找到供應商";
 "check_config_msg" = "請檢查您的配置檔案 ~/.ccswitch/ccs.json";
 "configuration" = "配置資訊";
+"general_settings" = "一般設定";
+"advanced_options" = "進階選項";
+"fast_switching" = "快速切換 Claude";
