@@ -19,13 +19,20 @@ struct SettingsView: View {
                     }
                 } header: {
                     HStack(spacing: 8) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color.blue)
+                        if let appIcon = NSImage(named: NSImage.applicationIconName) {
+                            Image(nsImage: appIcon)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
                                 .frame(width: 24, height: 24)
-                            Text("CC")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.white)
+                        } else {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color.blue)
+                                    .frame(width: 24, height: 24)
+                                Text("CC")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
                         }
                         Text("app_name")
                             .font(.headline)
