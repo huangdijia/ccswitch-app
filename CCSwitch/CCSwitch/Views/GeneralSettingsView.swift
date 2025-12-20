@@ -217,7 +217,7 @@ struct ToggleRow: View {
                 .labelsHidden()
                 .disabled(isDisabled)
                 .opacity(isDisabled ? 0.5 : 1.0)
-                .onChange(of: isOn) { newValue in
+                .onChange(of: isOn) { oldValue, newValue in
                     UserDefaults.standard.set(newValue, forKey: key)
                 }
         }

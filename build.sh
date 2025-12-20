@@ -26,7 +26,7 @@ cd "$PROJECT_DIR"
 xcodebuild \
     -project CCSwitch.xcodeproj \
     -scheme "$SCHEME" \
-    -configuration Debug \
+    -configuration Release \
     -derivedDataPath "$BUILD_DIR" \
     build
 

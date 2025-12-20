@@ -16,7 +16,8 @@ echo "🔨 使用 Swift 编译器构建 CCSwitch..."
 mkdir -p "$OUTPUT_DIR"
 
 # 编译参数
-SWIFT_FLAGS="-O -target x86_64-apple-macos13.0 -I /usr/lib/swift"
+# 使用与 project.pbxproj 一致的 14.6 版本，并移除硬编码的 x86_64 以支持原生架构
+SWIFT_FLAGS="-O -target $(uname -m)-apple-macos14.6 -I /usr/lib/swift"
 LINK_FLAGS="-framework Cocoa -framework SwiftUI -framework Foundation"
 
 # 查找所有 Swift 源文件（排除测试文件）
