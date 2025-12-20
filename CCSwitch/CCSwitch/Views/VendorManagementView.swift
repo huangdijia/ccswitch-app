@@ -277,9 +277,6 @@ struct VendorDetailView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(vendor.displayName)
                         .font(.title3.bold())
-                    Text("configuration")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
                 Spacer()
                 
@@ -318,16 +315,6 @@ struct VendorDetailView: View {
                                     ModernDivider()
                                 }
                             }
-                        }
-                    }
-                    
-                    if let notes = vendor.notes, !notes.isEmpty {
-                        ModernSection(title: "notes_label") {
-                            Text(notes)
-                                .font(DesignSystem.Fonts.body)
-                                .foregroundColor(DesignSystem.Colors.textSecondary)
-                                .padding(DesignSystem.Spacing.medium)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }

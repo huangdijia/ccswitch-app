@@ -91,3 +91,33 @@
 "github" = "GitHub";
 "help" = "Help";
 "open_github" = "Open GitHub Repo";
+
+/* Vendor Edit View */
+"basic_info" = "Basic Info";
+"id_label" = "ID";
+"name_label" = "Name";
+"unique_id_placeholder" = "unique-id";
+"display_name_placeholder" = "Display Name (e.g. Anthropic)";
+"custom_provider_label" = "Custom Provider";
+"connection_section" = "Connection";
+"base_url_placeholder" = "https://api.anthropic.com";
+"base_url_helper" = "API Endpoint URL. Must start with http:// or https://.";
+"timeout_label" = "Timeout";
+"timeout_placeholder" = "e.g. 60000";
+"timeout_helper" = "Request timeout in milliseconds.";
+"quick_set" = "Quick Set";
+"auth_section" = "Auth";
+"auth_token_label" = "Auth Token";
+"auth_token_placeholder" = "sk-...";
+"auth_token_helper" = "API Key or Token. Keep empty to use global env.";
+"models_section" = "Models";
+"default_model_label" = "Default Model";
+"opus_model_label" = "Opus Model";
+"sonnet_model_label" = "Sonnet Model";
+"haiku_model_label" = "Haiku Model";
+"small_fast_model_label" = "Small Fast";
+"validation_base_url" = "URL must start with http:// or https://";
+"validation_timeout_range" = "Timeout must be between 1000 and 300000 ms";
+"validation_timeout_number" = "Timeout must be a number";
+"validation_token_length" = "Token must be at least 10 characters";
+"paste_clipboard" = "Paste from Clipboard";

@@ -91,3 +91,33 @@
 "github" = "GitHub";
 "help" = "幫助";
 "open_github" = "打開 GitHub 倉庫";
+
+/* Vendor Edit View */
+"basic_info" = "基本資訊";
+"id_label" = "ID";
+"name_label" = "名稱";
+"unique_id_placeholder" = "unique-id";
+"display_name_placeholder" = "顯示名稱 (如 Anthropic)";
+"custom_provider_label" = "自訂供應商";
+"connection_section" = "連線";
+"base_url_placeholder" = "https://api.anthropic.com";
+"base_url_helper" = "API 端點 URL。必須以 http:// 或 https:// 開頭。";
+"timeout_label" = "逾時時間";
+"timeout_placeholder" = "例如 60000";
+"timeout_helper" = "請求逾時時間（毫秒）。";
+"quick_set" = "快速設定";
+"auth_section" = "認證";
+"auth_token_label" = "Auth Token";
+"auth_token_placeholder" = "sk-...";
+"auth_token_helper" = "API Key 或 Token。留空則使用全域環境變數。";
+"models_section" = "模型";
+"default_model_label" = "預設模型";
+"opus_model_label" = "Opus 模型";
+"sonnet_model_label" = "Sonnet 模型";
+"haiku_model_label" = "Haiku 模型";
+"small_fast_model_label" = "Small Fast";
+"validation_base_url" = "URL 必須以 http:// 或 https:// 開頭";
+"validation_timeout_range" = "逾時時間必須在 1000 到 300000 毫秒之間";
+"validation_timeout_number" = "逾時時間必須是數字";
+"validation_token_length" = "Token 長度至少為 10 個字元";
+"paste_clipboard" = "從剪貼板貼上";
