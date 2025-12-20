@@ -21,14 +21,20 @@ jobs:
             -project CCSwitch/CCSwitch.xcodeproj \
             -scheme CCSwitch \
             -configuration Release \
-            -derivedDataPath build
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Run Tests
         run: |
           xcodebuild test \
             -project CCSwitch/CCSwitch.xcodeproj \
             -scheme CCSwitch \
-            -destination 'platform=macOS'
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
