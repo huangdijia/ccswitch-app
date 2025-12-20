@@ -47,15 +47,18 @@ struct CCSConfig: Codable {
             let data = try Data(contentsOf: url)
             
             // Try loading new format first
-            if let config = try? JSONDecoder().decode(CCSConfig.self, from: data) {
-                return config
+            do {
+                return try JSONDecoder().decode(CCSConfig.self, from: data)
+            } catch {
+                Logger.shared.error("Failed to decode new config format: \(error)")
+                // Continue to fallback
             }
             
             // Fallback to legacy format
             let legacy = try JSONDecoder().decode(LegacyCCSConfig.self, from: data)
             return legacy.toNewConfig()
         } catch {
-            print("Failed to load CCS config from \(url.path): \(error)")
+            Logger.shared.error("Failed to load CCS config from \(url.path): \(error)")
             return nil
         }
     }
