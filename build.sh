@@ -4,7 +4,8 @@
 
 set -e
 
-PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-app/CCSwitch"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$SCRIPT_DIR/CCSwitch"
 BUILD_DIR="$PROJECT_DIR/build"
 SCHEME="CCSwitch"
 

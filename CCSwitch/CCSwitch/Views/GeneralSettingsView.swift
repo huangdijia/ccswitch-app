@@ -8,42 +8,38 @@ struct GeneralSettingsView: View {
     private let currentVendor = ConfigManager.shared.currentVendor
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
-            // Current Status
-            SettingsCard(
-                title: "current_status",
-                icon: "info.circle.fill",
-                iconColor: .blue
-            ) {
-                VStack(spacing: DesignSystem.Spacing.medium) {
-                    StatusCard(
-                        icon: "checkmark.circle.fill",
-                        iconColor: DesignSystem.Colors.success,
-                        title: "current_vendor",
-                        value: currentVendor?.displayName ?? NSLocalizedString("unknown", comment: "")
-                    )
-
-                    PathButton(
-                        icon: "folder.fill",
-                        title: "claude_config",
-                        path: ClaudeSettings.configFile.path
-                    )
-
-                    PathButton(
-                        icon: "folder.fill",
-                        title: "vendor_config",
-                        path: CCSConfig.configFile.path
-                    )
-                }
+        VStack(alignment: .leading, spacing: 0) {
+            ModernSection(title: "current_status") {
+                ModernRow(
+                    icon: "checkmark.circle.fill",
+                    iconColor: DesignSystem.Colors.success,
+                    title: "current_vendor",
+                    value: currentVendor?.displayName ?? NSLocalizedString("unknown", comment: "")
+                )
+                ModernDivider()
+                ModernRow(
+                    icon: "doc.text.fill",
+                    iconColor: .blue,
+                    title: "claude_config",
+                    subtitle: ClaudeSettings.configFile.path,
+                    showChevron: true,
+                    action: { openFile(ClaudeSettings.configFile.path) }
+                )
+                ModernDivider()
+                ModernRow(
+                    icon: "gearshape.fill",
+                    iconColor: .gray,
+                    title: "vendor_config",
+                    subtitle: CCSConfig.configFile.path,
+                    showChevron: true,
+                    action: { openFile(CCSConfig.configFile.path) }
+                )
             }
 
-            // Notification Settings
-            SettingsCard(
-                title: "notifications",
-                icon: "bell.fill",
-                iconColor: .orange
-            ) {
-                ToggleCard(
+            ModernSection(title: "notifications") {
+                ToggleRow(
+                    icon: "bell.fill",
+                    iconColor: .orange,
                     title: "show_notifications",
                     subtitle: "show_notifications_desc",
                     isOn: $showSwitchNotification,
@@ -51,34 +47,33 @@ struct GeneralSettingsView: View {
                 )
             }
 
-            // Startup Settings
-            SettingsCard(
-                title: "startup_backup",
-                icon: "gear.badge.checkmark",
-                iconColor: .purple
-            ) {
-                VStack(spacing: 0) {
-                    ToggleCard(
-                        title: "auto_load_config",
-                        subtitle: "auto_load_config_desc",
-                        isOn: $autoLoadConfig,
-                        key: "autoLoadConfig"
-                    )
-                    
-                    Divider().padding(.vertical, 8)
-
-                    ToggleCard(
-                        title: "auto_backup",
-                        subtitle: "auto_backup_desc",
-                        isOn: $autoBackup,
-                        key: "autoBackup"
-                    )
-                }
+            ModernSection(title: "startup_backup") {
+                ToggleRow(
+                    icon: "arrow.clockwise.circle.fill",
+                    iconColor: .purple,
+                    title: "auto_load_config",
+                    subtitle: "auto_load_config_desc",
+                    isOn: $autoLoadConfig,
+                    key: "autoLoadConfig"
+                )
+                ModernDivider()
+                ToggleRow(
+                    icon: "shield.fill",
+                    iconColor: .green,
+                    title: "auto_backup",
+                    subtitle: "auto_backup_desc",
+                    isOn: $autoBackup,
+                    key: "autoBackup"
+                )
             }
         }
         .onAppear {
             loadSettings()
         }
+    }
+
+    private func openFile(_ path: String) {
+        NSWorkspace.shared.selectFile(path, inFileViewerRootedAtPath: "")
     }
 
     private func loadSettings() {
@@ -102,128 +97,9 @@ struct GeneralSettingsView: View {
     }
 }
 
-// MARK: - Settings Card Container
-struct SettingsCard<Content: View>: View {
-    let title: String
+struct ToggleRow: View {
     let icon: String
     let iconColor: Color
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.medium) {
-            HStack(spacing: DesignSystem.Spacing.small) {
-                Image(systemName: icon)
-                    .foregroundColor(iconColor)
-                    .font(.system(size: 18, weight: .semibold))
-
-                Text(LocalizedStringKey(title))
-                    .font(DesignSystem.Fonts.headline)
-                    .foregroundColor(DesignSystem.Colors.textPrimary)
-
-                Spacer()
-            }
-
-            content()
-        }
-        .modernCardStyle()
-    }
-}
-
-// MARK: - Status Card
-struct StatusCard: View {
-    let icon: String
-    let iconColor: Color
-    let title: String
-    let value: String
-
-    var body: some View {
-        HStack(spacing: DesignSystem.Spacing.medium) {
-            ZStack {
-                Circle()
-                    .fill(iconColor.opacity(0.15))
-                    .frame(width: 40, height: 40)
-
-                Image(systemName: icon)
-                    .foregroundColor(iconColor)
-                    .font(.system(size: 16, weight: .semibold))
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(LocalizedStringKey(title))
-                    .font(DesignSystem.Fonts.caption)
-                    .foregroundColor(DesignSystem.Colors.textSecondary)
-
-                Text(value)
-                    .font(DesignSystem.Fonts.body)
-                    .fontWeight(.semibold)
-                    .foregroundColor(DesignSystem.Colors.textPrimary)
-            }
-
-            Spacer()
-        }
-        .padding(DesignSystem.Spacing.small)
-        .background(Color.clear) // cleaner look without inner background
-    }
-}
-
-// MARK: - Path Button
-struct PathButton: View {
-    let icon: String
-    let title: String
-    let path: String
-    @State private var isHovered = false
-
-    var body: some View {
-        Button(action: {
-            NSWorkspace.shared.selectFile(path, inFileViewerRootedAtPath: "")
-        }) {
-            HStack(spacing: DesignSystem.Spacing.medium) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.blue.opacity(0.1))
-                        .frame(width: 36, height: 36)
-
-                    Image(systemName: icon)
-                        .foregroundColor(.blue)
-                        .font(.system(size: 14, weight: .medium))
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(LocalizedStringKey(title))
-                        .font(DesignSystem.Fonts.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(DesignSystem.Colors.textPrimary)
-
-                    Text(path)
-                        .font(DesignSystem.Fonts.caption)
-                        .foregroundColor(DesignSystem.Colors.textSecondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                }
-
-                Spacer()
-
-                Image(systemName: "arrow.right.circle.fill")
-                    .foregroundColor(isHovered ? .blue : .gray.opacity(0.5))
-                    .font(.system(size: 16))
-            }
-            .padding(DesignSystem.Spacing.small)
-            .background(
-                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
-                    .fill(isHovered ? Color.gray.opacity(0.05) : Color.clear)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-        .onHover { hover in
-            withAnimation(.easeInOut(duration: 0.2)) {
-                isHovered = hover
-            }
-        }
-    }
-}
-
-// MARK: - Toggle Card
-struct ToggleCard: View {
     let title: String
     let subtitle: String
     @Binding var isOn: Bool
@@ -231,12 +107,19 @@ struct ToggleCard: View {
 
     var body: some View {
         HStack(spacing: DesignSystem.Spacing.medium) {
-            VStack(alignment: .leading, spacing: 4) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(iconColor.opacity(0.1))
+                    .frame(width: 28, height: 28)
+                Image(systemName: icon)
+                    .foregroundColor(iconColor)
+                    .font(.system(size: 14, weight: .medium))
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(title))
                     .font(DesignSystem.Fonts.body)
-                    .fontWeight(.medium)
                     .foregroundColor(DesignSystem.Colors.textPrimary)
-
                 Text(LocalizedStringKey(subtitle))
                     .font(DesignSystem.Fonts.caption)
                     .foregroundColor(DesignSystem.Colors.textSecondary)
@@ -251,6 +134,7 @@ struct ToggleCard: View {
                     UserDefaults.standard.set(newValue, forKey: key)
                 }
         }
-        .padding(DesignSystem.Spacing.small)
+        .padding(.horizontal, DesignSystem.Spacing.medium)
+        .padding(.vertical, DesignSystem.Spacing.small + 2)
     }
 }

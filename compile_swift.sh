@@ -4,7 +4,9 @@
 
 set -e
 
-PROJECT_DIR="/Users/hdj/github/huangdijia/ccswitch-app/CCSwitch"
+# 获取脚本所在目录的绝对路径
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$SCRIPT_DIR/CCSwitch"
 OUTPUT_DIR="$PROJECT_DIR/DerivedData"
 APP_NAME="CCSwitch"
 

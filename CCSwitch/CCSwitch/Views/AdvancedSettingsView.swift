@@ -7,84 +7,65 @@ struct AdvancedSettingsView: View {
     @State private var showingResetAlert = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
-            // Backups Section
-            SettingsCard(
-                title: "backups",
-                icon: "clock.arrow.circlepath",
-                iconColor: .blue
-            ) {
+        VStack(alignment: .leading, spacing: 0) {
+            ModernSection(title: "backups") {
                 if backups.isEmpty {
-                    VStack(spacing: DesignSystem.Spacing.medium) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.gray.opacity(0.1))
-                                .frame(width: 56, height: 56)
-
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 8) {
                             Image(systemName: "doc.text.magnifyingglass")
-                                .font(.system(size: 24, weight: .semibold))
-                                .foregroundColor(.secondary)
+                                .font(.title2)
+                                .foregroundColor(.secondary.opacity(0.5))
+                            Text("no_backups")
+                                .font(DesignSystem.Fonts.body)
+                                .foregroundColor(DesignSystem.Colors.textSecondary)
                         }
-
-                        Text("no_backups")
-                            .font(DesignSystem.Fonts.headline)
-                            .foregroundColor(DesignSystem.Colors.textPrimary)
-
-                        Text("no_backups_desc")
-                            .font(DesignSystem.Fonts.body)
-                            .foregroundColor(DesignSystem.Colors.textSecondary)
+                        .padding(DesignSystem.Spacing.xLarge)
+                        Spacer()
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(DesignSystem.Spacing.large)
-                    .background(DesignSystem.Colors.secondarySurface)
-                    .cornerRadius(DesignSystem.CornerRadius.medium)
                 } else {
-                    LazyVStack(spacing: DesignSystem.Spacing.small) {
-                        ForEach(backups, id: \.self) { backup in
-                            BackupCard(
-                                backup: backup,
-                                onRestore: {
-                                    backupToRestore = backup
-                                    showingRestoreAlert = true
-                                },
-                                onDelete: {
-                                    deleteBackup(backup)
-                                }
-                            )
+                    ForEach(Array(backups.enumerated()), id: \.element) { index, backup in
+                        BackupRow(
+                            backup: backup,
+                            onRestore: {
+                                backupToRestore = backup
+                                showingRestoreAlert = true
+                            },
+                            onDelete: {
+                                deleteBackup(backup)
+                            }
+                        )
+                        if index < backups.count - 1 {
+                            ModernDivider()
                         }
                     }
                 }
             }
 
-            // Maintenance Section
-            SettingsCard(
-                title: "maintenance",
-                icon: "wrench.and.screwdriver.fill",
-                iconColor: .orange
-            ) {
-                VStack(spacing: DesignSystem.Spacing.small) {
-                    ActionButton(
-                        icon: "arrow.clockwise",
-                        title: "reload_config",
-                        subtitle: "reload_config_desc",
-                        action: reloadConfiguration
-                    )
-
-                    ActionButton(
-                        icon: "folder",
-                        title: "open_claude_config",
-                        subtitle: "open_claude_config_desc",
-                        action: openClaudeConfig
-                    )
-
-                    ActionButton(
-                        icon: "trash",
-                        title: "reset_app_state",
-                        subtitle: "reset_app_state_desc",
-                        action: { showingResetAlert = true },
-                        isDestructive: true
-                    )
-                }
+            ModernSection(title: "maintenance") {
+                ModernRow(
+                    icon: "arrow.clockwise",
+                    iconColor: .orange,
+                    title: "reload_config",
+                    subtitle: "reload_config_desc",
+                    action: reloadConfiguration
+                )
+                ModernDivider()
+                ModernRow(
+                    icon: "folder",
+                    iconColor: .blue,
+                    title: "open_claude_config",
+                    subtitle: "open_claude_config_desc",
+                    action: openClaudeConfig
+                )
+                ModernDivider()
+                ModernRow(
+                    icon: "trash",
+                    iconColor: .red,
+                    title: "reset_app_state",
+                    subtitle: "reset_app_state_desc",
+                    action: { showingResetAlert = true }
+                )
             }
         }
         .onAppear {
@@ -151,7 +132,6 @@ struct AdvancedSettingsView: View {
     }
 
     private func resetAppState() {
-        // Logic remains the same, just keeping it cleaner
         let domain = Bundle.main.bundleIdentifier!
         UserDefaults.standard.removePersistentDomain(forName: domain)
         ConfigManager.shared.cleanup()
@@ -167,22 +147,16 @@ struct AdvancedSettingsView: View {
     }
 }
 
-// MARK: - BackupCard
-struct BackupCard: View {
+struct BackupRow: View {
     let backup: URL
     let onRestore: () -> Void
     let onDelete: () -> Void
     @State private var isHovered = false
 
-    private var fileName: String {
-        backup.lastPathComponent
-    }
-
     private var displayName: String {
+        let fileName = backup.lastPathComponent
         if let range = fileName.range(of: "bak-") {
-            let timestamp = String(fileName[range.upperBound...])
-            // Optional: format timestamp nicely if needed
-            return timestamp
+            return String(fileName[range.upperBound...])
         }
         return fileName
     }
@@ -192,7 +166,7 @@ struct BackupCard: View {
             let resourceValues = try backup.resourceValues(forKeys: [.creationDateKey])
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
-            formatter.timeStyle = .medium
+            formatter.timeStyle = .short
             return formatter.string(from: resourceValues.creationDate ?? Date())
         } catch {
             return nil
@@ -201,24 +175,19 @@ struct BackupCard: View {
 
     var body: some View {
         HStack(spacing: DesignSystem.Spacing.medium) {
-            // Icon
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 6)
                     .fill(Color.blue.opacity(0.1))
-                    .frame(width: 36, height: 36)
-
+                    .frame(width: 32, height: 32)
                 Image(systemName: "doc.on.doc.fill")
                     .foregroundColor(.blue)
                     .font(.system(size: 14))
             }
 
-            // Info
             VStack(alignment: .leading, spacing: 2) {
                 Text(displayName)
                     .font(DesignSystem.Fonts.body)
-                    .fontWeight(.medium)
                     .foregroundColor(DesignSystem.Colors.textPrimary)
-
                 if let date = creationDate {
                     Text(date)
                         .font(DesignSystem.Fonts.caption)
@@ -228,13 +197,12 @@ struct BackupCard: View {
 
             Spacer()
 
-            // Actions
             HStack(spacing: DesignSystem.Spacing.small) {
                 Button(action: onRestore) {
                     Text("restore_button")
-                        .font(.caption)
+                        .font(.system(size: 11, weight: .medium))
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 3)
                         .background(Color.blue.opacity(0.1))
                         .foregroundColor(.blue)
                         .cornerRadius(4)
@@ -243,84 +211,18 @@ struct BackupCard: View {
 
                 Button(action: onDelete) {
                     Image(systemName: "trash")
-                        .font(.system(size: 14))
-                        .foregroundColor(.red.opacity(0.8))
-                        .frame(width: 28, height: 28)
-                        .background(Color.red.opacity(0.1))
+                        .font(.system(size: 12))
+                        .foregroundColor(.red.opacity(0.7))
+                        .frame(width: 24, height: 24)
+                        .background(Color.red.opacity(0.05))
                         .clipShape(Circle())
                 }
                 .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(DesignSystem.Spacing.small)
-        .background(
-            RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
-                .fill(isHovered ? DesignSystem.Colors.secondarySurface : Color.clear)
-        )
-        .onHover { hover in
-            isHovered = hover
-        }
-    }
-}
-
-// MARK: - Action Button
-struct ActionButton: View {
-    let icon: String
-    let title: String
-    let subtitle: String
-    let action: () -> Void
-    let isDestructive: Bool
-    @State private var isHovered = false
-
-    init(icon: String, title: String, subtitle: String, action: @escaping () -> Void, isDestructive: Bool = false) {
-        self.icon = icon
-        self.title = title
-        self.subtitle = subtitle
-        self.action = action
-        self.isDestructive = isDestructive
-    }
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: DesignSystem.Spacing.medium) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            isDestructive
-                                ? DesignSystem.Colors.error.opacity(0.1)
-                                : DesignSystem.Colors.warning.opacity(0.1)
-                        )
-                        .frame(width: 36, height: 36)
-
-                    Image(systemName: icon)
-                        .foregroundColor(isDestructive ? DesignSystem.Colors.error : DesignSystem.Colors.warning)
-                        .font(.system(size: 14, weight: .semibold))
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(LocalizedStringKey(title))
-                        .font(DesignSystem.Fonts.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(isDestructive ? DesignSystem.Colors.error : DesignSystem.Colors.textPrimary)
-
-                    Text(LocalizedStringKey(subtitle))
-                        .font(DesignSystem.Fonts.caption)
-                        .foregroundColor(DesignSystem.Colors.textSecondary)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .foregroundColor(DesignSystem.Colors.textSecondary.opacity(0.5))
-                    .font(.caption)
-            }
-            .padding(DesignSystem.Spacing.small)
-            .background(
-                RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.small)
-                    .fill(isHovered ? DesignSystem.Colors.secondarySurface : Color.clear)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
+        .padding(.horizontal, DesignSystem.Spacing.medium)
+        .padding(.vertical, DesignSystem.Spacing.medium)
+        .background(isHovered ? Color.gray.opacity(0.05) : Color.clear)
         .onHover { hover in
             isHovered = hover
         }
