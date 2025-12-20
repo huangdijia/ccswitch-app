@@ -110,7 +110,9 @@ class ConfigManager {
         }
 
         // 备份当前 Claude 配置
-        try BackupManager.shared.backupCurrentSettings()
+        if UserDefaults.standard.bool(forKey: "autoBackup") {
+            try BackupManager.shared.backupCurrentSettings()
+        }
 
         // 更新 Claude 设置
         try updateClaudeSettings(with: vendor.env)
