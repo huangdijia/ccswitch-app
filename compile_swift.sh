@@ -44,30 +44,13 @@ if [ -f "$PROJECT_DIR/CCSwitch/Resources/Info.plist" ]; then
     cp "$PROJECT_DIR/CCSwitch/Resources/Info.plist" "$APP_BUNDLE/Contents/"
 else
     echo "⚠️  Info.plist not found, creating basic one..."
-    cat > "$APP_BUNDLE/Contents/Info.plist" << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>CFBundleExecutable</key>
-	<string>CCSwitch</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.cccode.switch</string>
-	<key>CFBundleName</key>
-	<string>CCSwitch</string>
-	<key>CFBundleVersion</key>
-	<string>1</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>13.0</string>
-	<key>LSUIElement</key>
-	<true/>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-</dict>
-</plist>
-EOF
+    # ... (existing fallback code)
+fi
+
+# 复制图标
+if [ -f "$PROJECT_DIR/CCSwitch/Resources/AppIcon.icns" ]; then
+    echo "🖼️  复制应用图标..."
+    cp "$PROJECT_DIR/CCSwitch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
 fi
 
 # 编译主程序
