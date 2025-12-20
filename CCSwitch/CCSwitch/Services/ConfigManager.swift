@@ -133,33 +133,16 @@ class ConfigManager {
             claudeSettings = ClaudeSettings()
         }
 
-        // 从 env 映射到 ClaudeSettings
-        // 优先使用 provider, model, apiKeyEnv 等显式键
-        if let provider = env["provider"] {
-            claudeSettings.provider = provider
-        } else if env["ANTHROPIC_AUTH_TOKEN"] != nil {
-             claudeSettings.provider = "anthropic" // 默认
-        }
-
-        if let model = env["ANTHROPIC_MODEL"] ?? env["model"] {
-            claudeSettings.model = model
-        }
-
-        if let apiKeyEnv = env["apiKeyEnv"] {
-            claudeSettings.apiKeyEnv = apiKeyEnv
-        } else if env["ANTHROPIC_AUTH_TOKEN"] != nil {
-            claudeSettings.apiKeyEnv = "ANTHROPIC_AUTH_TOKEN"
-        }
-
-        if let baseURL = env["ANTHROPIC_BASE_URL"] ?? env["baseURL"] {
-            claudeSettings.baseURL = baseURL
-        }
+        // 仅替换 env 字段
+        claudeSettings.env = env
 
         // 确保目录存在
         try ClaudeSettings.configDirectory.ensureDirectoryExists()
 
         // 写入配置
-        let data = try JSONEncoder().encode(claudeSettings)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let data = try encoder.encode(claudeSettings)
         try data.write(to: claudeConfigUrl)
     }
 

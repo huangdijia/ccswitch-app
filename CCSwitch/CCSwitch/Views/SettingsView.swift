@@ -76,6 +76,18 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    Button {
+                        withAnimation {
+                            columnVisibility = (columnVisibility == .all) ? .detailOnly : .all
+                        }
+                    } label: {
+                        Image(systemName: "sidebar.left")
+                    }
+                    .help("Toggle Sidebar")
+                }
+            }
         }
         .frame(minWidth: 700, minHeight: 500)
     }

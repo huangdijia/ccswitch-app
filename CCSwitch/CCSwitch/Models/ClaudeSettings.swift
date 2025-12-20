@@ -2,43 +2,86 @@ import Foundation
 
 // MARK: - Claude Settings Model
 struct ClaudeSettings: Codable {
-    var provider: String?
-    var model: String?
-    var apiKeyEnv: String?
-    var baseURL: String?
-
-    // 可以存储其他未知的字段
-    var additionalData: [String: Any]?
+    var env: [String: String]?
+    
+    // Store other arbitrary keys
+    private var otherSettings: [String: AnyValue] = [:]
 
     init() {
-        additionalData = [:]
+        env = [:]
+    }
+
+    // Custom coding keys to handle 'env' explicitly and others dynamically
+    struct DynamicKey: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) { self.stringValue = stringValue }
+        var intValue: Int?
+        init?(intValue: Int) { return nil }
     }
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        // 解码已知字段
-        provider = try container.decodeIfPresent(String.self, forKey: .provider)
-        model = try container.decodeIfPresent(String.self, forKey: .model)
-        apiKeyEnv = try container.decodeIfPresent(String.self, forKey: .apiKeyEnv)
-        baseURL = try container.decodeIfPresent(String.self, forKey: .baseURL)
-
-        // 这里简化处理，暂时不保存其他字段
-        additionalData = nil
+        let container = try decoder.container(keyedBy: DynamicKey.self)
+        var settings: [String: AnyValue] = [:]
+        
+        for key in container.allKeys {
+            if key.stringValue == "env" {
+                env = try container.decodeIfPresent([String: String].self, forKey: key)
+            } else {
+                if let value = try? container.decode(AnyValue.self, forKey: key) {
+                    settings[key.stringValue] = value
+                }
+            }
+        }
+        otherSettings = settings
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        var container = encoder.container(keyedBy: DynamicKey.self)
+        
+        // Encode 'env'
+        try container.encodeIfPresent(env, forKey: DynamicKey(stringValue: "env")!)
+        
+        // Encode other settings
+        for (key, value) in otherSettings {
+            if key != "env" {
+                try container.encode(value, forKey: DynamicKey(stringValue: key)!)
+            }
+        }
+    }
+}
 
-        // 编码已知字段
-        try container.encodeIfPresent(provider, forKey: .provider)
-        try container.encodeIfPresent(model, forKey: .model)
-        try container.encodeIfPresent(apiKeyEnv, forKey: .apiKeyEnv)
-        try container.encodeIfPresent(baseURL, forKey: .baseURL)
+// Helper to handle arbitrary JSON values in Codable
+enum AnyValue: Codable {
+    case string(String)
+    case bool(Bool)
+    case double(Double)
+    case int(Int)
+    case dictionary([String: AnyValue])
+    case array([AnyValue])
+    case null
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(String.self) { self = .string(x) }
+        else if let x = try? container.decode(Bool.self) { self = .bool(x) }
+        else if let x = try? container.decode(Int.self) { self = .int(x) }
+        else if let x = try? container.decode(Double.self) { self = .double(x) }
+        else if let x = try? container.decode([String: AnyValue].self) { self = .dictionary(x) }
+        else if let x = try? container.decode([AnyValue].self) { self = .array(x) }
+        else { self = .null }
     }
 
-    enum CodingKeys: String, CodingKey {
-        case provider, model, apiKeyEnv, baseURL
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let x): try container.encode(x)
+        case .bool(let x): try container.encode(x)
+        case .double(let x): try container.encode(x)
+        case .int(let x): try container.encode(x)
+        case .dictionary(let x): try container.encode(x)
+        case .array(let x): try container.encode(x)
+        case .null: try container.encodeNil()
+        }
     }
 }
 
