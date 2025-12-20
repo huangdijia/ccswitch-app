@@ -26,14 +26,81 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let iconPath = Bundle.main.path(forResource: "AppIcon", ofType: "icns") {
             NSApplication.shared.applicationIconImage = NSImage(contentsOfFile: iconPath)
         }
+        
+        // 设置主菜单
+        setupMainMenu()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         // 清理资源
         ConfigManager.shared.cleanup()
     }
+    
+    private func setupMainMenu() {
+        let mainMenu = NSMenu()
+        let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "CCSwitch"
 
-    func showSettingsWindow() {
+        // 1. App Menu
+        let appMenuItem = NSMenuItem()
+        mainMenu.addItem(appMenuItem)
+        let appMenu = NSMenu()
+        appMenuItem.submenu = appMenu
+
+        appMenu.addItem(withTitle: NSLocalizedString("about", comment: "") + " \(appName)", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        appMenu.addItem(NSMenuItem.separator())
+        
+        let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
+        settingsItem.target = self
+        appMenu.addItem(settingsItem)
+        
+        appMenu.addItem(NSMenuItem.separator())
+        appMenu.addItem(withTitle: NSLocalizedString("quit", comment: "") + " \(appName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+
+        // 2. Edit Menu (Standard functionality for text fields)
+        let editMenuItem = NSMenuItem()
+        mainMenu.addItem(editMenuItem)
+        let editMenu = NSMenu(title: "Edit")
+        editMenuItem.submenu = editMenu
+
+        editMenu.addItem(withTitle: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
+        editMenu.addItem(withTitle: "Redo", action: Selector(("redo:")), keyEquivalent: "Z")
+        editMenu.addItem(NSMenuItem.separator())
+        editMenu.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        editMenu.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        
+        // 3. Window Menu
+        let windowMenuItem = NSMenuItem()
+        mainMenu.addItem(windowMenuItem)
+        let windowMenu = NSMenu(title: "Window")
+        windowMenuItem.submenu = windowMenu
+        
+        windowMenu.addItem(withTitle: "Minimize", action: #selector(NSWindow.miniaturize(_:)), keyEquivalent: "m")
+        windowMenu.addItem(withTitle: "Zoom", action: #selector(NSWindow.zoom(_:)), keyEquivalent: "")
+        windowMenu.addItem(NSMenuItem.separator())
+        windowMenu.addItem(withTitle: "Bring All to Front", action: #selector(NSApplication.arrangeInFront(_:)), keyEquivalent: "")
+
+        // 4. Help Menu
+        let helpMenuItem = NSMenuItem()
+        mainMenu.addItem(helpMenuItem)
+        let helpMenu = NSMenu(title: NSLocalizedString("help", comment: ""))
+        helpMenuItem.submenu = helpMenu
+        
+        let githubItem = NSMenuItem(title: NSLocalizedString("open_github", comment: ""), action: #selector(openGitHub), keyEquivalent: "")
+        githubItem.target = self
+        helpMenu.addItem(githubItem)
+
+        NSApp.mainMenu = mainMenu
+    }
+    
+    @objc func openGitHub() {
+        if let url = URL(string: "https://github.com/huangdijia/ccswitch-mac") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @objc func showSettingsWindow() {
         if settingsWindow == nil {
             let contentView = SettingsView()
             let hostingView = NSHostingView(rootView: contentView)

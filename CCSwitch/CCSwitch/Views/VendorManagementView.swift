@@ -7,7 +7,21 @@ struct VendorManagementView: View {
     @State private var showImportError: Bool = false
     @State private var importErrorMessage: String = ""
     @State private var showImportSuccess: Bool = false
+    @State private var activeSheet: SheetState?
+    
     private let currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
+    
+    enum SheetState: Identifiable {
+        case detail(Vendor)
+        case edit(Vendor?)
+        
+        var id: String {
+            switch self {
+            case .detail(let v): return "detail-\(v.id)"
+            case .edit(let v): return "edit-\(v?.id ?? "new")"
+            }
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -69,7 +83,7 @@ struct VendorManagementView: View {
                                 loadVendors()
                             },
                             onEdit: {
-                                selectedVendor = vendor
+                                activeSheet = .detail(vendor)
                             }
                         )
                         if index < vendors.count - 1 {
@@ -79,6 +93,30 @@ struct VendorManagementView: View {
                 }
             }
             
+            // Add Vendor Button
+            Button(action: {
+                activeSheet = .edit(nil)
+            }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("add_vendor")
+                }
+                .font(DesignSystem.Fonts.body.weight(.medium))
+                .foregroundColor(DesignSystem.Colors.accent)
+                .padding(.vertical, DesignSystem.Spacing.medium)
+                .frame(maxWidth: .infinity)
+                .background(DesignSystem.Colors.surface)
+                .cornerRadius(DesignSystem.CornerRadius.medium)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium)
+                        .stroke(DesignSystem.Colors.border, lineWidth: 0.5)
+                )
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.top, DesignSystem.Spacing.medium)
+            
+            Spacer()
+            
             // Footer Info
             HStack(spacing: 4) {
                 Image(systemName: "info.circle")
@@ -87,12 +125,47 @@ struct VendorManagementView: View {
             .font(DesignSystem.Fonts.caption)
             .foregroundColor(DesignSystem.Colors.textTertiary)
             .padding(.leading, 4)
+            .padding(.top, DesignSystem.Spacing.large)
         }
         .onAppear {
             loadVendors()
         }
-        .sheet(item: $selectedVendor) { vendor in
-            VendorDetailView(vendor: vendor, isCurrent: vendor.id == currentVendorId)
+        .sheet(item: $activeSheet) { item in
+            switch item {
+            case .detail(let vendor):
+                VendorDetailView(
+                    vendor: vendor,
+                    isCurrent: vendor.id == currentVendorId,
+                    onEdit: {
+                        // Close detail and open edit
+                        activeSheet = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            activeSheet = .edit(vendor)
+                        }
+                    }
+                )
+            case .edit(let vendor):
+                VendorEditView(
+                    vendor: vendor,
+                    onSave: { newVendor in
+                        do {
+                            if let _ = vendor {
+                                try ConfigManager.shared.updateVendor(newVendor)
+                            } else {
+                                try ConfigManager.shared.addVendor(newVendor)
+                            }
+                            loadVendors()
+                            activeSheet = nil
+                        } catch {
+                            // TODO: Show error in edit view
+                            print("Error saving vendor: \(error)")
+                        }
+                    },
+                    onCancel: {
+                        activeSheet = nil
+                    }
+                )
+            }
         }
     }
 
@@ -172,7 +245,7 @@ struct VendorRow: View {
             }
             
             Button(action: onEdit) {
-                Image(systemName: "ellipsis.circle")
+                Image(systemName: "info.circle")
                     .foregroundColor(DesignSystem.Colors.textTertiary)
                     .font(.system(size: 16))
             }
@@ -192,6 +265,7 @@ struct VendorRow: View {
 struct VendorDetailView: View {
     let vendor: Vendor
     let isCurrent: Bool
+    let onEdit: () -> Void
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -205,6 +279,14 @@ struct VendorDetailView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
+                
+                Button(action: onEdit) {
+                    Text("edit_vendor")
+                        .font(DesignSystem.Fonts.body)
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .padding(.trailing, 8)
+
                 Button(action: { presentationMode.wrappedValue.dismiss() }) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title2)

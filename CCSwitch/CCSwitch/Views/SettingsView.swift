@@ -3,9 +3,10 @@ import AppKit
 
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab? = .general
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             List(selection: $selectedTab) {
                 Section {
                     NavigationLink(value: SettingsTab.general) {

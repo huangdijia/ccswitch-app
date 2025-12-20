@@ -80,4 +80,14 @@
 "reload_success_msg" = "Configuration reloaded.";
 "import_legacy_config_button" = "Import Legacy Configuration (ccs.json)";
 "migration_success" = "Configuration imported successfully.";
-"environment_variables" = "Environment Variables";
+"add_vendor" = "Add Vendor";
+"edit_vendor" = "Edit Vendor";
+"save" = "Save";
+"cancel" = "Cancel";
+"delete_vendor" = "Delete Vendor";
+"confirm_delete_title" = "Delete Vendor";
+"confirm_delete_msg" = "Are you sure you want to delete this vendor? This action cannot be undone.";
+"delete" = "Delete";
+"github" = "GitHub";
+"help" = "Help";
+"open_github" = "Open GitHub Repo";

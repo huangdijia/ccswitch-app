@@ -163,6 +163,67 @@ class ConfigManager {
         try data.write(to: claudeConfigUrl)
     }
 
+    // MARK: - Vendor Management
+    func addVendor(_ vendor: Vendor) throws {
+        guard var config = currentConfig else {
+            throw ConfigError.configNotLoaded
+        }
+
+        if config.vendors.contains(where: { $0.id == vendor.id }) {
+            throw ConfigError.vendorAlreadyExists
+        }
+
+        config.vendors.append(vendor)
+        try saveConfig(config)
+        currentConfig = config
+        
+        Logger.shared.info("Added new vendor: \(vendor.id)")
+        notifyObservers(.vendorsUpdated)
+    }
+
+    func updateVendor(_ vendor: Vendor) throws {
+        guard var config = currentConfig else {
+            throw ConfigError.configNotLoaded
+        }
+
+        guard let index = config.vendors.firstIndex(where: { $0.id == vendor.id }) else {
+            throw ConfigError.vendorNotFound
+        }
+
+        config.vendors[index] = vendor
+        try saveConfig(config)
+        currentConfig = config
+        
+        Logger.shared.info("Updated vendor: \(vendor.id)")
+        notifyObservers(.vendorsUpdated)
+    }
+
+    func removeVendor(with id: String) throws {
+        guard var config = currentConfig else {
+            throw ConfigError.configNotLoaded
+        }
+
+        guard config.vendors.contains(where: { $0.id == id }) else {
+            throw ConfigError.vendorNotFound
+        }
+        
+        if config.vendors.count <= 1 {
+            throw ConfigError.cannotRemoveLastVendor
+        }
+        
+        config.vendors.removeAll { $0.id == id }
+        
+        if config.current == id {
+             config.current = config.vendors.first?.id
+        }
+
+        try saveConfig(config)
+        currentConfig = config
+        
+        Logger.shared.info("Removed vendor: \(id)")
+        notifyObservers(.vendorsUpdated)
+    }
+
     // MARK: - Observer Pattern
     func addObserver(_ observer: ConfigObserver) {
         observers.append(observer)

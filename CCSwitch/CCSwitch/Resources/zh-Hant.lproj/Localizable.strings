@@ -80,4 +80,14 @@
 "reload_success_msg" = "配置已重新載入。";
 "import_legacy_config_button" = "匯入舊版配置 (ccs.json)";
 "migration_success" = "配置已成功匯入。";
-"environment_variables" = "環境變數";
+"add_vendor" = "新增供應商";
+"edit_vendor" = "編輯供應商";
+"save" = "儲存";
+"cancel" = "取消";
+"delete_vendor" = "刪除供應商";
+"confirm_delete_title" = "刪除供應商";
+"confirm_delete_msg" = "確定要刪除此供應商嗎？此操作無法撤銷。";
+"delete" = "刪除";
+"github" = "GitHub";
+"help" = "幫助";
+"open_github" = "打開 GitHub 倉庫";
