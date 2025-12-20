@@ -6,22 +6,20 @@ struct GeneralSettingsView: View {
     @State private var autoLoadConfig = true
     @State private var autoBackup = true
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @State private var currentVendor: Vendor? = ConfigManager.shared.currentVendor
 
     private var hasNotificationPermission: Bool {
         notificationStatus == .authorized
     }
 
-    private let currentVendor = ConfigManager.shared.currentVendor
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // ... (current status section remains same)
             ModernSection(title: "current_status") {
                 ModernRow(
                     icon: "checkmark.circle.fill",
                     iconColor: DesignSystem.Colors.success,
                     title: "current_vendor",
-                    value: currentVendor?.displayName ?? NSLocalizedString("unknown", comment: "")
+                    value: currentVendor?.name ?? NSLocalizedString("unknown", comment: "")
                 )
                 ModernDivider()
                 ModernRow(
@@ -84,9 +82,13 @@ struct GeneralSettingsView: View {
         .onAppear {
             loadSettings()
             checkNotificationPermission()
+            currentVendor = ConfigManager.shared.currentVendor
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             checkNotificationPermission()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .configDidChange)) { _ in
+            currentVendor = ConfigManager.shared.currentVendor
         }
     }
 
