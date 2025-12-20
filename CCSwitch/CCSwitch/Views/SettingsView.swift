@@ -12,7 +12,7 @@ struct SettingsView: View {
                 HStack(spacing: 12) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.blue.gradient)
+                            .fill(Color.blue)
                             .frame(width: 40, height: 40)
 
                         Text("CC")
@@ -64,7 +64,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                     Text("快速切换 Claude 供应商")
                         .font(.caption2)
-                        .foregroundColor(.tertiary)
+                        .foregroundColor(Color.secondary)
                 }
                 .padding(.bottom, 8)
             }
