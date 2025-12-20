@@ -9,6 +9,8 @@ struct VendorManagementView: View {
     @State private var showImportSuccess: Bool = false
     @State private var activeSheet: SheetState?
     @State private var currentVendorId: String = ""
+    @State private var showDeleteConfirmation: Bool = false
+    @State private var vendorToDelete: Vendor?
     
     enum SheetState: Identifiable {
         case detail(Vendor)
@@ -77,6 +79,10 @@ struct VendorManagementView: View {
                             },
                             onEdit: {
                                 activeSheet = .detail(vendor)
+                            },
+                            onDelete: {
+                                vendorToDelete = vendor
+                                showDeleteConfirmation = true
                             }
                         )
                         if index < vendors.count - 1 {
@@ -128,6 +134,13 @@ struct VendorManagementView: View {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             activeSheet = .edit(vendor)
                         }
+                    },
+                    onDelete: {
+                        activeSheet = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            vendorToDelete = vendor
+                            showDeleteConfirmation = true
+                        }
                     }
                 )
             case .edit(let vendor):
@@ -153,14 +166,29 @@ struct VendorManagementView: View {
                 )
             }
         }
+        .alert(isPresented: $showDeleteConfirmation) {
+            Alert(
+                title: Text("confirm_delete_title"),
+                message: Text("confirm_delete_msg"),
+                primaryButton: .destructive(Text("delete")) {
+                    if let vendor = vendorToDelete {
+                        do {
+                            try ConfigManager.shared.removeVendor(with: vendor.id)
+                            loadVendors()
+                        } catch {
+                            // TODO: Handle error
+                            print("Error deleting vendor: \(error)")
+                        }
+                    }
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
         currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
-        // Only show legacy import if we are running on default config (which implies no user config yet) or if explicitly checking for legacy file existence
-        // But logic says: "If ~/.ccswitch/ccs.json exists, show button".
-        // Use a simpler check:
         hasLegacyConfig = ConfigManager.shared.hasLegacyConfig
     }
     
@@ -181,6 +209,7 @@ struct VendorRow: View {
     let isCurrent: Bool
     let onSwitch: () -> Void
     let onEdit: () -> Void
+    let onDelete: () -> Void
     @State private var isHovered = false
 
     var body: some View {
@@ -206,13 +235,25 @@ struct VendorRow: View {
             .disabled(isCurrent)
             .padding(.trailing, 8)
             
-            Button(action: onEdit) {
-                Image(systemName: "info.circle")
-                    .foregroundColor(DesignSystem.Colors.textTertiary)
-                    .font(.system(size: 16))
+            HStack(spacing: 4) {
+                Button(action: onEdit) {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(DesignSystem.Colors.textTertiary)
+                        .font(.system(size: 16))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .help("details_tooltip")
+                
+                Button(action: onDelete) {
+                    Image(systemName: "trash")
+                        .foregroundColor(DesignSystem.Colors.error.opacity(0.8))
+                        .font(.system(size: 15))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .help("delete_vendor")
+                .disabled(isCurrent) // Cannot delete active vendor
+                .opacity(isCurrent ? 0.3 : 1.0)
             }
-            .buttonStyle(PlainButtonStyle())
-            .help("details_tooltip")
         }
         .padding(.horizontal, DesignSystem.Spacing.medium)
         .padding(.vertical, DesignSystem.Spacing.medium)
@@ -228,6 +269,7 @@ struct VendorDetailView: View {
     let vendor: Vendor
     let isCurrent: Bool
     let onEdit: () -> Void
+    let onDelete: () -> Void
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -238,6 +280,16 @@ struct VendorDetailView: View {
                         .font(.title3.bold())
                 }
                 Spacer()
+                
+                if !isCurrent {
+                    Button(action: onDelete) {
+                        Image(systemName: "trash")
+                            .foregroundColor(DesignSystem.Colors.error)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .help("delete_vendor")
+                    .padding(.trailing, 16)
+                }
                 
                 Button(action: onEdit) {
                     Text("edit_vendor")

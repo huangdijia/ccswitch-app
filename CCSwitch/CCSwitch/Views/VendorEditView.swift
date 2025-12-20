@@ -220,21 +220,7 @@ struct VendorEditView: View {
     private func save() {
         var env: [String: String] = vendor?.env ?? [:]
         
-        // We removed explicit provider selection, but we can default to anthropic 
-        // or just let the environment variables dictate the behavior (Claude Code defaults to anthropic)
-        // If we really need to set it:
-        // env["provider"] = "anthropic" 
-        // But better to not force it if we want to be generic.
-        // However, existing logic might rely on it. I'll set it if it was there, or leave it.
-        // The user explicitly asked to "Remove 'Provider' selection". 
-        // I will NOT set `provider` key specifically unless it's critical. 
-        // Looking at previous code, it was set. I'll preserve existing provider if editing, or default if new?
-        // Actually, safer to just NOT touch "provider" key if I'm not editing it.
-        // But if I create a NEW vendor, I should probably set a default?
-        // Let's assume generic "anthropic" is fine if missing.
-        if vendor == nil {
-             env["provider"] = "anthropic"
-        }
+        // Removed provider logic as requested
         
         func setOrRemove(_ key: String, _ value: String) {
             if value.trimmingCharacters(in: .whitespaces).isEmpty {

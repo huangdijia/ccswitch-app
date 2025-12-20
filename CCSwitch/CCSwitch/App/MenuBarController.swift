@@ -33,27 +33,23 @@ class MenuBarController: NSObject, ConfigObserver {
     private func buildMenu() {
         menu = NSMenu()
 
-        // 1. About
+        // 1. Vendors (Dynamic)
+        // updateVendorMenuItems will insert vendors at the beginning
+        // We need a separator after vendors
+        menu.addItem(NSMenuItem.separator())
+
+        // 2. About & Settings
         let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
-        
-        menu.addItem(NSMenuItem.separator())
 
-        // 2. Vendors (Dynamic) - Placeholder for vendors
-        // The logic in updateVendorMenuItems relies on finding separators.
-        // We need a separator before vendors (already added above) and one after.
-        
-        menu.addItem(NSMenuItem.separator())
-
-        // 3. Settings
         let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
         
         menu.addItem(NSMenuItem.separator())
 
-        // 4. Quit
+        // 3. Quit
         let quitItem = NSMenuItem(title: NSLocalizedString("quit", comment: ""), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
@@ -65,43 +61,17 @@ class MenuBarController: NSObject, ConfigObserver {
     }
 
     private func updateVendorMenuItems() {
-        // Find the separators that bound the vendor list
-        // Structure: About, Separator (0), [Vendors], Separator (1), Settings...
+        // Find the first separator
+        guard let firstSeparator = menu.items.first(where: { $0.isSeparatorItem }) else { return }
+        let separatorIndex = menu.index(of: firstSeparator)
         
-        guard let initialSeparator = menu.items.first(where: { $0.isSeparatorItem }) else { return }
-        let initialIndex = menu.index(of: initialSeparator)
-              
-        // Find the separator before Settings
-        // We look for the Settings item
-        let settingsItemIndex = menu.items.firstIndex(where: { $0.action == #selector(showSettings) }) ?? menu.items.count
-        // The separator should be before Settings
-        let endSeparatorIndex = settingsItemIndex - 1
-        
-        // Safety check
-        guard initialIndex < endSeparatorIndex else {
-            // If they are adjacent (no vendors yet), we insert between them
-            // Actually, if they are adjacent, initialIndex = endSeparatorIndex - 1?
-            // If menu is: About, Sep(1), Sep(2), Settings(3)...
-            // initialIndex = 1
-            // settingsIndex = 3
-            // endIndex = 2
-            // Range to clear is (1+1)..<2 => 2..<2 (Empty). Correct.
-            insertVendors(at: initialIndex + 1)
-            return
-        }
-
-        // Remove existing vendor items
-        let range = (initialIndex + 1)..<endSeparatorIndex
-        if !range.isEmpty {
-            // We need to remove items in reverse order or careful with indices shifting?
-            // Safer to just remove items that are NOT separators and NOT standard items if logic was loose
-            // But here we know the range.
-             for _ in range {
-                 menu.removeItem(at: initialIndex + 1)
-             }
+        // Remove items before the first separator
+        for _ in 0..<separatorIndex {
+            menu.removeItem(at: 0)
         }
         
-        insertVendors(at: initialIndex + 1)
+        // Insert vendors at the beginning
+        insertVendors(at: 0)
     }
     
     private func insertVendors(at index: Int) {
