@@ -80,10 +80,11 @@ class MenuBarController: NSObject, ConfigObserver {
 
         for (offset, vendor) in vendors.enumerated() {
             let menuItem = NSMenuItem(
-                title: vendor.id == currentVendor?.id ? "✓ \(vendor.displayName)" : vendor.displayName,
+                title: vendor.displayName,
                 action: #selector(switchVendor(_:)),
                 keyEquivalent: ""
             )
+            menuItem.state = vendor.id == currentVendor?.id ? .on : .off
             menuItem.target = self
             menuItem.tag = vendor.id.hashValue
             menu.insertItem(menuItem, at: index + offset)
