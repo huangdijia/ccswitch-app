@@ -1,9 +1,11 @@
 import SwiftUI
+import UserNotifications
 
 struct GeneralSettingsView: View {
     @State private var showSwitchNotification = true
     @State private var autoLoadConfig = true
     @State private var autoBackup = true
+    @State private var hasNotificationPermission = false
 
     private let currentVendor = ConfigManager.shared.currentVendor
 
@@ -41,9 +43,18 @@ struct GeneralSettingsView: View {
                     icon: "bell.fill",
                     iconColor: .orange,
                     title: "show_notifications",
-                    subtitle: "show_notifications_desc",
-                    isOn: $showSwitchNotification,
-                    key: "showSwitchNotification"
+                    subtitle: hasNotificationPermission ? "show_notifications_desc" : "notifications_disabled_hint",
+                    isOn: Binding(
+                        get: { hasNotificationPermission ? showSwitchNotification : false },
+                        set: { showSwitchNotification = $0 }
+                    ),
+                    key: "showSwitchNotification",
+                    isDisabled: !hasNotificationPermission,
+                    subtitleAction: hasNotificationPermission ? nil : {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }
                 )
             }
 
@@ -69,11 +80,20 @@ struct GeneralSettingsView: View {
         }
         .onAppear {
             loadSettings()
+            checkNotificationPermission()
         }
     }
 
     private func openFile(_ path: String) {
         NSWorkspace.shared.selectFile(path, inFileViewerRootedAtPath: "")
+    }
+
+    private func checkNotificationPermission() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                self.hasNotificationPermission = (settings.authorizationStatus == .authorized)
+            }
+        }
     }
 
     private func loadSettings() {
@@ -104,25 +124,37 @@ struct ToggleRow: View {
     let subtitle: String
     @Binding var isOn: Bool
     let key: String
+    var isDisabled: Bool = false
+    var subtitleAction: (() -> Void)? = nil
 
     var body: some View {
         HStack(spacing: DesignSystem.Spacing.medium) {
             ZStack {
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(iconColor.opacity(0.1))
+                    .fill(iconColor.opacity(isDisabled ? 0.05 : 0.1))
                     .frame(width: 28, height: 28)
                 Image(systemName: icon)
-                    .foregroundColor(iconColor)
+                    .foregroundColor(isDisabled ? .gray.opacity(0.5) : iconColor)
                     .font(.system(size: 14, weight: .medium))
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(title))
                     .font(DesignSystem.Fonts.body)
-                    .foregroundColor(DesignSystem.Colors.textPrimary)
-                Text(LocalizedStringKey(subtitle))
-                    .font(DesignSystem.Fonts.caption)
-                    .foregroundColor(DesignSystem.Colors.textSecondary)
+                    .foregroundColor(isDisabled ? DesignSystem.Colors.textPrimary.opacity(0.5) : DesignSystem.Colors.textPrimary)
+                
+                if let action = subtitleAction {
+                    Button(action: action) {
+                        Text(LocalizedStringKey(subtitle))
+                            .font(DesignSystem.Fonts.caption)
+                            .foregroundColor(.blue)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                } else {
+                    Text(LocalizedStringKey(subtitle))
+                        .font(DesignSystem.Fonts.caption)
+                        .foregroundColor(isDisabled ? DesignSystem.Colors.textSecondary.opacity(0.5) : DesignSystem.Colors.textSecondary)
+                }
             }
 
             Spacer()
@@ -130,6 +162,8 @@ struct ToggleRow: View {
             Toggle("", isOn: $isOn)
                 .toggleStyle(SwitchToggleStyle())
                 .labelsHidden()
+                .disabled(isDisabled)
+                .opacity(isDisabled ? 0.5 : 1.0)
                 .onChange(of: isOn) { newValue in
                     UserDefaults.standard.set(newValue, forKey: key)
                 }
