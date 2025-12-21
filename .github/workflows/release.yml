@@ -1,4 +1,4 @@
-name: Release CCSwitch
+name: Release
 
 on:
   push:

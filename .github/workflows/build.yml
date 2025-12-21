@@ -1,4 +1,4 @@
-name: Build CCSwitch
+name: Test
 
 on:
   push:
