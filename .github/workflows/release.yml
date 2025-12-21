@@ -18,20 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update Version in Info.plist
+      - name: Set Version
         run: |
           # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
           VERSION=${GITHUB_REF_NAME#v}
-          PLIST="CCSwitch/CCSwitch/Resources/Info.plist"
-          
-          echo "🏷️ Setting version to $VERSION in $PLIST"
-          
-          # Update CFBundleShortVersionString and CFBundleVersion
-          plutil -replace CFBundleShortVersionString -string "$VERSION" "$PLIST"
-          plutil -replace CFBundleVersion -string "$GITHUB_RUN_NUMBER" "$PLIST"
-          
-          # Verify
-          cat "$PLIST" | grep -A 1 "CFBundleShortVersionString"
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+          echo "🏷️ Version set to $VERSION (Build $GITHUB_RUN_NUMBER)"
 
       - name: Run Tests
         run: |
@@ -39,6 +32,8 @@ jobs:
             -project CCSwitch/CCSwitch.xcodeproj \
             -scheme CCSwitch \
             -destination 'platform=macOS' \
+            MARKETING_VERSION=${{ env.APP_VERSION }} \
+            CURRENT_PROJECT_VERSION=${{ env.BUILD_NUMBER }} \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
@@ -50,6 +45,8 @@ jobs:
             -scheme CCSwitch \
             -configuration Release \
             -derivedDataPath build \
+            MARKETING_VERSION=${{ env.APP_VERSION }} \
+            CURRENT_PROJECT_VERSION=${{ env.BUILD_NUMBER }} \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
