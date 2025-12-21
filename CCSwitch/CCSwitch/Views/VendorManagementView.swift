@@ -111,6 +111,7 @@ struct VendorManagementView: View {
                     )
                     .id(selectedId)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .background(Color(NSColor.windowBackgroundColor))
                 } else {
                     VStack(spacing: 16) {
                         Image(systemName: "server.rack").font(.system(size: 48)).foregroundColor(.secondary)
@@ -285,7 +286,7 @@ struct VendorDetailView: View {
                     }
                 }
             }
-            .padding().background(Color(NSColor.controlBackgroundColor))
+            .padding().background(Color(NSColor.windowBackgroundColor))
             .onChange(of: isDirty) { _, newValue in isDirtyBinding = newValue }
             
             Divider()
@@ -325,7 +326,11 @@ struct VendorDetailView: View {
                         if let error = validationErrors["timeout"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
                     }
                 }
-            }.formStyle(.grouped)
+            }
+            .formStyle(.grouped)
+            .scrollContentBackground(.hidden)
+            .background(Color(NSColor.windowBackgroundColor))
+            
             Divider()
             HStack {
                 Button(action: testConnection) {
@@ -337,7 +342,7 @@ struct VendorDetailView: View {
                     else { Label(testMessage ?? "Failed", systemImage: "exclamationmark.triangle").foregroundColor(.red) }
                 }
                 Spacer()
-            }.padding().background(Color(NSColor.controlBackgroundColor))
+            }.padding().background(Color(NSColor.windowBackgroundColor))
         }.onAppear { validate(quiet: true) }
     }
     
