@@ -1,0 +1,95 @@
+name: Release CCSwitch
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Tests
+        run: |
+          xcodebuild test \
+            -project CCSwitch/CCSwitch.xcodeproj \
+            -scheme CCSwitch \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Build App
+        run: |
+          xcodebuild build \
+            -project CCSwitch/CCSwitch.xcodeproj \
+            -scheme CCSwitch \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+          # Define path
+          APP_PATH="build/Build/Products/Release/CCSwitch.app"
+          APP_RESOURCES_DIR="$APP_PATH/Contents/Resources"
+          
+          echo "📦 Patching resources..."
+          mkdir -p "$APP_RESOURCES_DIR"
+          
+          # Copy localization files
+          if [ -d CCSwitch/CCSwitch/Resources ]; then
+            cp -R CCSwitch/CCSwitch/Resources/*.lproj "$APP_RESOURCES_DIR/" || true
+            cp CCSwitch/CCSwitch/Resources/AppIcon.icns "$APP_RESOURCES_DIR/" || true
+          fi
+          
+          echo "✅ Resources patched."
+
+      - name: Create DMG
+        run: |
+          # Ad-hoc sign the app (required for Apple Silicon execution)
+          codesign --force --deep --sign - build/Build/Products/Release/CCSwitch.app
+
+          mkdir -p dmg-source
+          cp -r build/Build/Products/Release/CCSwitch.app dmg-source/
+          ln -s /Applications dmg-source/Applications
+          
+          # Use tag name for DMG filename if possible
+          VERSION=${GITHUB_REF#refs/tags/}
+          DMG_NAME="CCSwitch-${VERSION}.dmg"
+          
+          hdiutil create -volname "CCSwitch" -srcfolder dmg-source -ov -format UDZO "$DMG_NAME"
+          
+          # Save name for next step
+          echo "DMG_PATH=$DMG_NAME" >> $GITHUB_ENV
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          # Simple changelog from last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            git log --pretty=format:"* %s" > changelog.txt
+          else
+            git log ${PREV_TAG}..HEAD --pretty=format:"* %s" > changelog.txt
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: changelog.txt
+          files: |
+            ${{ env.DMG_PATH }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
