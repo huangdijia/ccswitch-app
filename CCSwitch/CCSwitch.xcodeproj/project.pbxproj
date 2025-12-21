@@ -23,17 +23,17 @@
 		01000014 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000014 /* AdvancedSettingsView.swift */; };
 		01000015 /* ConfigManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000015 /* ConfigManagerTests.swift */; };
 		01000016 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000016 /* ModelTests.swift */; };
-		03000002 /* VendorSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000002 /* VendorSwitcher.swift */; };
-		03000003 /* ConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000003 /* ConfigurationRepository.swift */; };
-		03000004 /* SettingsWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000004 /* SettingsWriter.swift */; };
-		03000005 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000005 /* BackupService.swift */; };
-		03000006 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000006 /* NotificationService.swift */; };
-		03000007 /* SettingsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000007 /* SettingsRepository.swift */; };
-		03000008 /* ServiceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000008 /* ServiceContainer.swift */; };
-		03000009 /* VendorTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000009 /* VendorTemplate.swift */; };
-		01000017 /* MockConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000010 /* MockConfigurationRepository.swift */; };
-		01000018 /* MockServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04000011 /* MockServices.swift */; };
-		/* End PBXBuildFile section */
+		15000001 /* VendorSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000001 /* VendorSwitcher.swift */; };
+		15000002 /* ConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000002 /* ConfigurationRepository.swift */; };
+		15000003 /* SettingsWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000003 /* SettingsWriter.swift */; };
+		15000004 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000004 /* BackupService.swift */; };
+		15000005 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000005 /* NotificationService.swift */; };
+		15000006 /* SettingsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000006 /* SettingsRepository.swift */; };
+		15000007 /* ServiceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000007 /* ServiceContainer.swift */; };
+		15000008 /* VendorTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000008 /* VendorTemplate.swift */; };
+		15000009 /* MockConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000009 /* MockConfigurationRepository.swift */; };
+		15000010 /* MockServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000010 /* MockServices.swift */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		13000001 /* PBXContainerItemProxy */ = {
@@ -65,17 +65,17 @@
 		03000001 /* CCSwitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		03000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		04000001 /* CCSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CCSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		04000002 /* VendorSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorSwitcher.swift; sourceTree = "<group>"; };
-		04000003 /* ConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationRepository.swift; sourceTree = "<group>"; };
-		04000004 /* SettingsWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWriter.swift; sourceTree = "<group>"; };
-		04000005 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
-		04000006 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		04000007 /* SettingsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRepository.swift; sourceTree = "<group>"; };
-		04000008 /* ServiceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceContainer.swift; sourceTree = "<group>"; };
-		04000009 /* VendorTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorTemplate.swift; sourceTree = "<group>"; };
-		04000010 /* MockConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationRepository.swift; sourceTree = "<group>"; };
-		04000011 /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
-		/* End PBXFileReference section */
+		16000001 /* VendorSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorSwitcher.swift; sourceTree = "<group>"; };
+		16000002 /* ConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationRepository.swift; sourceTree = "<group>"; };
+		16000003 /* SettingsWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWriter.swift; sourceTree = "<group>"; };
+		16000004 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		16000005 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		16000006 /* SettingsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRepository.swift; sourceTree = "<group>"; };
+		16000007 /* ServiceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceContainer.swift; sourceTree = "<group>"; };
+		16000008 /* VendorTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorTemplate.swift; sourceTree = "<group>"; };
+		16000009 /* MockConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationRepository.swift; sourceTree = "<group>"; };
+		16000010 /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		05000001 /* Frameworks */ = {
@@ -109,10 +109,10 @@
 			children = (
 				06000005 /* App */,
 				06000006 /* Models */,
+				17000001 /* Protocols */,
 				06000007 /* Services */,
 				06000008 /* Views */,
 				06000009 /* Resources */,
-				06000010 /* Protocols */,
 			);
 			path = CCSwitch;
 			sourceTree = "<group>";
@@ -122,20 +122,21 @@
 			children = (
 				02000015 /* ConfigManagerTests.swift */,
 				02000016 /* ModelTests.swift */,
-				06000011 /* Mocks */,
+				17000002 /* Mocks */,
 			);
 			path = CCSwitchTests;
 			sourceTree = "<group>";
 		};
-		06000011 /* Mocks */ = {
-			isa = PBXGroup;
-			children = (
-				04000010 /* MockConfigurationRepository.swift */,
-				04000011 /* MockServices.swift */,
-			);
-			path = Mocks;
-			sourceTree = "<group>";
-		};
+17000002 /* Mocks */ = {
+isa = PBXGroup;
+children = (
+16000009 /* MockConfigurationRepository.swift */,
+16000010 /* MockServices.swift */,
+);
+path = Mocks;
+sourceTree = "<group>";
+};
+
 		06000004 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -160,24 +161,25 @@
 				02000003 /* Vendor.swift */,
 				02000004 /* CCSConfig.swift */,
 				02000005 /* ClaudeSettings.swift */,
-				04000009 /* VendorTemplate.swift */,
+				16000008 /* VendorTemplate.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		06000010 /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				04000002 /* VendorSwitcher.swift */,
-				04000003 /* ConfigurationRepository.swift */,
-				04000004 /* SettingsWriter.swift */,
-				04000005 /* BackupService.swift */,
-				04000006 /* NotificationService.swift */,
-				04000007 /* SettingsRepository.swift */,
-			);
-			path = Protocols;
-			sourceTree = "<group>";
-		};
+17000001 /* Protocols */ = {
+isa = PBXGroup;
+children = (
+16000001 /* VendorSwitcher.swift */,
+16000002 /* ConfigurationRepository.swift */,
+16000003 /* SettingsWriter.swift */,
+16000004 /* BackupService.swift */,
+16000005 /* NotificationService.swift */,
+16000006 /* SettingsRepository.swift */,
+);
+path = Protocols;
+sourceTree = "<group>";
+};
+
 		06000007 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -185,7 +187,7 @@
 				02000007 /* BackupManager.swift */,
 				02000008 /* Logger.swift */,
 				02000009 /* ErrorHandler.swift */,
-				04000008 /* ServiceContainer.swift */,
+				16000007 /* ServiceContainer.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -322,14 +324,14 @@
 				01000012 /* VendorManagementView.swift in Sources */,
 				01000013 /* VendorEditView.swift in Sources */,
 				01000014 /* AdvancedSettingsView.swift in Sources */,
-				03000002 /* VendorSwitcher.swift in Sources */,
-				03000003 /* ConfigurationRepository.swift in Sources */,
-				03000004 /* SettingsWriter.swift in Sources */,
-				03000005 /* BackupService.swift in Sources */,
-				03000006 /* NotificationService.swift in Sources */,
-				03000007 /* SettingsRepository.swift in Sources */,
-				03000008 /* ServiceContainer.swift in Sources */,
-				03000009 /* VendorTemplate.swift in Sources */,
+				15000001 /* VendorSwitcher.swift in Sources */,
+				15000002 /* ConfigurationRepository.swift in Sources */,
+				15000003 /* SettingsWriter.swift in Sources */,
+				15000004 /* BackupService.swift in Sources */,
+				15000005 /* NotificationService.swift in Sources */,
+				15000006 /* SettingsRepository.swift in Sources */,
+				15000007 /* ServiceContainer.swift in Sources */,
+				15000008 /* VendorTemplate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,9 +341,8 @@
 			files = (
 				01000015 /* ConfigManagerTests.swift in Sources */,
 				01000016 /* ModelTests.swift in Sources */,
-			
-				01000017 /* MockConfigurationRepository.swift in Sources */,
-				01000018 /* MockServices.swift in Sources */,
+				15000009 /* MockConfigurationRepository.swift in Sources */,
+				15000010 /* MockServices.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
