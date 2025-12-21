@@ -46,20 +46,6 @@ struct VendorManagementView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.bottom, DesignSystem.Spacing.large)
-                .alert(isPresented: $showImportError) {
-                    Alert(
-                        title: Text("error"),
-                        message: Text(importErrorMessage),
-                        dismissButton: .default(Text("ok"))
-                    )
-                }
-                .alert(isPresented: $showImportSuccess) {
-                    Alert(
-                        title: Text("success"),
-                        message: Text("Successfully imported \(importedCount) vendors."),
-                        dismissButton: .default(Text("ok"))
-                    )
-                }
             }
 
             ModernSection(title: "vendors") {
@@ -183,6 +169,20 @@ struct VendorManagementView: View {
                     }
                 },
                 secondaryButton: .cancel()
+            )
+        }
+        .alert(isPresented: $showImportError) {
+            Alert(
+                title: Text("error"),
+                message: Text(importErrorMessage),
+                dismissButton: .default(Text("ok"))
+            )
+        }
+        .alert(isPresented: $showImportSuccess) {
+            Alert(
+                title: Text("success"),
+                message: Text("Successfully imported \(importedCount) vendors."),
+                dismissButton: .default(Text("ok"))
             )
         }
     }
