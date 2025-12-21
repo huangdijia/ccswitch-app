@@ -252,3 +252,5 @@
 "up_to_date_title" = "已是最新版本";
 "up_to_date_msg" = "您当前使用的是最新版本的 CCSwitch。";
 "update_check_failed" = "检查更新失败";
+"error_rate_limit" = "请求过于频繁（GitHub API 频率限制），请稍后再试。";
+"ok" = "确定";

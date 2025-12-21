@@ -48,7 +48,14 @@ class UpdateManager: NSObject, ObservableObject {
             
             if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 if let message = json["message"] as? String, (response as? HTTPURLResponse)?.statusCode != 200 {
-                    let error = NSError(domain: "UpdateManager", code: (response as? HTTPURLResponse)?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: message])
+                    let friendlyMessage: String
+                    if message.contains("rate limit exceeded") {
+                        friendlyMessage = NSLocalizedString("error_rate_limit", comment: "GitHub API rate limit exceeded")
+                    } else {
+                        friendlyMessage = message
+                    }
+                    
+                    let error = NSError(domain: "UpdateManager", code: (response as? HTTPURLResponse)?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: friendlyMessage])
                     self.lastError = error
                     Logger.shared.error("Update check API error: \(message)")
                     return
