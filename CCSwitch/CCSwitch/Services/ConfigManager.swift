@@ -115,6 +115,41 @@ class ConfigManager {
         notifyObservers(.vendorChanged)
     }
 
+    private let favoritesKey = "favoriteVendorIds"
+    
+    // MARK: - Favorites Management
+    var favoriteVendorIds: Set<String> {
+        get {
+            let list = UserDefaults.standard.stringArray(forKey: favoritesKey) ?? []
+            return Set(list)
+        }
+        set {
+            UserDefaults.standard.set(Array(newValue), forKey: favoritesKey)
+            notifyObservers(.vendorsUpdated) // Notify UI to refresh
+        }
+    }
+    
+    var favoriteVendors: [Vendor] {
+        let all = allVendors
+        let favIds = favoriteVendorIds
+        // Sort by name or keep original order, filtering by favorites
+        return all.filter { favIds.contains($0.id) }
+    }
+    
+    func isFavorite(_ id: String) -> Bool {
+        return favoriteVendorIds.contains(id)
+    }
+    
+    func toggleFavorite(_ id: String) {
+        var current = favoriteVendorIds
+        if current.contains(id) {
+            current.remove(id)
+        } else {
+            current.insert(id)
+        }
+        favoriteVendorIds = current
+    }
+
     // MARK: - Vendor Management
     func addVendor(_ vendor: Vendor) throws {
         try configRepository.addVendor(vendor)

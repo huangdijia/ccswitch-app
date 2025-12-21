@@ -1,104 +1,72 @@
 import SwiftUI
-import AppKit
 
 struct SettingsView: View {
-    @State private var selectedTab: SettingsTab? = .general
-    @State private var columnVisibility = NavigationSplitViewVisibility.all
+    @State private var selectedTab: SettingsTab = .general
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            List(selection: $selectedTab) {
-                Section {
-                    NavigationLink(value: SettingsTab.general) {
-                        Label("general", systemImage: "gearshape")
+        VStack(spacing: 0) {
+            // 自定义标签栏 (类似 Finder 设置)
+            HStack(spacing: 25) {
+                TabItemView(tab: .general, selection: $selectedTab, icon: "gearshape", title: "general")
+                TabItemView(tab: .vendors, selection: $selectedTab, icon: "tag", title: "vendors")
+                TabItemView(tab: .advanced, selection: $selectedTab, icon: "gearshape.2", title: "advanced")
+            }
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            .frame(maxWidth: .infinity)
+            .background(Color(NSColor.windowBackgroundColor))
+            
+            Divider()
+            
+            // 内容区域
+            ZStack(alignment: .top) {
+                Group {
+                    switch selectedTab {
+                    case .general:
+                        GeneralSettingsView()
+                    case .vendors:
+                        VendorManagementView()
+                    case .advanced:
+                        AdvancedSettingsView()
                     }
-                    NavigationLink(value: SettingsTab.vendors) {
-                        Label("vendors", systemImage: "server.rack")
-                    }
-                    NavigationLink(value: SettingsTab.advanced) {
-                        Label("advanced", systemImage: "wrench.and.screwdriver")
-                    }
-                } header: {
-                    HStack(spacing: 8) {
-                        if let appIcon = NSImage(named: NSImage.applicationIconName) {
-                            Image(nsImage: appIcon)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                        } else {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color.blue)
-                                    .frame(width: 24, height: 24)
-                                Text("CC")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        Text("app_name")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                    }
-                    .padding(.vertical, 8)
                 }
             }
-            .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 240)
-            .removeSidebarToggle()
-        } detail: {
-            ZStack {
-                DesignSystem.Colors.background.ignoresSafeArea()
-                
-                if let tab = selectedTab {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 0) {
-                            HStack {
-                                Text(LocalizedStringKey(tabTitle(for: tab)))
-                                    .font(.title2.bold())
-                                Spacer()
-                            }
-                            .padding(.bottom, DesignSystem.Spacing.large)
-                            
-                            switch tab {
-                            case .general:
-                                GeneralSettingsView()
-                            case .vendors:
-                                VendorManagementView()
-                            case .advanced:
-                                AdvancedSettingsView()
-                            }
-                        }
-                        .padding(DesignSystem.Spacing.xLarge)
-                        .frame(maxWidth: 800) // ChatGPT style max width for readability
-                    }
-                } else {
-                    Text("Select an option")
-                        .foregroundColor(.secondary)
-                }
-            }
-            .navigationTitle("")
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    Button {
-                        withAnimation {
-                            columnVisibility = (columnVisibility == .all) ? .detailOnly : .all
-                        }
-                    } label: {
-                        Image(systemName: "sidebar.left")
-                    }
-                    .help("Toggle Sidebar")
-                }
-            }
+            .frame(width: 600)
+            .fixedSize(horizontal: true, vertical: true) // 关键：强制垂直方向紧贴内容
         }
-        .frame(minWidth: 700, minHeight: 500)
+        .background(Color(NSColor.windowBackgroundColor))
     }
+}
 
-    private func tabTitle(for tab: SettingsTab) -> String {
-        switch tab {
-        case .general: return "general_settings"
-        case .vendors: return "vendor_management_title"
-        case .advanced: return "advanced_options"
+struct TabItemView: View {
+    let tab: SettingsTab
+    @Binding var selection: SettingsTab
+    let icon: String
+    let title: String
+    
+    var isSelected: Bool { selection == tab }
+    
+    var body: some View {
+        Button(action: { selection = tab }) {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(isSelected ? .blue : .secondary)
+                    .frame(height: 28)
+                
+                Text(LocalizedStringKey(title))
+                    .font(.system(size: 11))
+                    .foregroundColor(isSelected ? .primary : .secondary)
+            }
+            .frame(width: 60)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(isSelected ? Color.primary.opacity(0.05) : Color.clear)
+        )
     }
 }
 
@@ -106,15 +74,4 @@ enum SettingsTab: Hashable {
     case general
     case vendors
     case advanced
-}
-
-extension View {
-    @ViewBuilder
-    func removeSidebarToggle() -> some View {
-        if #available(macOS 14.0, *) {
-            self.toolbar(removing: .sidebarToggle)
-        } else {
-            self
-        }
-    }
 }

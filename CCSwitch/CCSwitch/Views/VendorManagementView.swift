@@ -2,16 +2,10 @@ import SwiftUI
 
 struct VendorManagementView: View {
     @State private var vendors: [Vendor] = []
-    @State private var selectedVendor: Vendor?
-    @State private var hasLegacyConfig: Bool = false
-    @State private var showImportError: Bool = false
-    @State private var importErrorMessage: String = ""
-    @State private var showImportSuccess: Bool = false
-    @State private var importedCount: Int = 0
+    @State private var selection: Set<String> = []
     @State private var activeSheet: SheetState?
     @State private var currentVendorId: String = ""
     @State private var showDeleteConfirmation: Bool = false
-    @State private var vendorToDelete: Vendor?
     
     enum SheetState: Identifiable {
         case detail(Vendor)
@@ -26,82 +20,207 @@ struct VendorManagementView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if hasLegacyConfig {
-                Button(action: importLegacyConfig) {
-                    HStack {
-                        Image(systemName: "arrow.down.doc")
-                        Text("import_legacy_config_button")
-                    }
-                    .font(DesignSystem.Fonts.body.weight(.medium))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(DesignSystem.Colors.accent.opacity(0.1))
-                    .foregroundColor(DesignSystem.Colors.accent)
-                    .cornerRadius(DesignSystem.CornerRadius.medium)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium)
-                            .stroke(DesignSystem.Colors.accent.opacity(0.3), lineWidth: 1)
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
-                .padding(.bottom, DesignSystem.Spacing.large)
+        VStack(spacing: 0) {
+            HStack {
+                Text(LocalizedStringKey("vendor_list"))
+                    .font(.headline)
+                Spacer()
             }
-
-            ModernSection(title: "vendors") {
-                if vendors.isEmpty {
-                    Text("no_vendors_found")
-                        .font(DesignSystem.Fonts.body)
-                        .foregroundColor(DesignSystem.Colors.textTertiary)
-                        .padding(DesignSystem.Spacing.large)
-                        .frame(maxWidth: .infinity)
-                } else {
-                    ForEach(Array(vendors.enumerated()), id: \.element.id) { index, vendor in
-                        VendorRow(
-                            vendor: vendor,
-                            isCurrent: vendor.id == currentVendorId,
-                            onSwitch: {
-                                try? ConfigManager.shared.switchToVendor(with: vendor.id)
-                                loadVendors()
-                            },
-                            onEdit: {
-                                activeSheet = .detail(vendor)
-                            },
-                            onDelete: {
-                                vendorToDelete = vendor
-                                showDeleteConfirmation = true
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 8)
+            
+            // Unified List and Toolbar Container
+            List(selection: $selection) {
+                ForEach(vendors) { vendor in
+                    HStack {
+                        Circle()
+                            .fill(colorForVendor(vendor.id))
+                            .frame(width: 10, height: 10)
+                            .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
+                        
+                        Text(vendor.displayName)
+                            .font(.system(size: 13))
+                            .foregroundColor(.primary)
+                            .padding(.leading, 4)
+                        
+                        Spacer()
+                        
+                        Group {
+                            if vendor.id == currentVendorId {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 14))
                             }
-                        )
-                        if index < vendors.count - 1 {
-                            ModernDivider()
+                        }
+                        .frame(width: 24)
+                    }
+                    .padding(.vertical, 2)
+                    .tag(vendor.id)
+                    .onTapGesture(count: 2) {
+                         activeSheet = .edit(vendor)
+                    }
+                    .contextMenu {
+                        Button(LocalizedStringKey("edit_vendor")) {
+                            activeSheet = .edit(vendor)
+                        }
+                        
+                        Button(LocalizedStringKey("set_active")) {
+                            try? ConfigManager.shared.switchToVendor(with: vendor.id)
+                            loadVendors()
+                        }
+                        .disabled(vendor.id == currentVendorId)
+                        
+                        Button(LocalizedStringKey(ConfigManager.shared.isFavorite(vendor.id) ? "remove_from_favorites" : "add_to_favorites")) {
+                            ConfigManager.shared.toggleFavorite(vendor.id)
+                            loadVendors()
+                        }
+                        
+                        Divider()
+                        
+                        Button(LocalizedStringKey("delete_vendor")) {
+                            selection = [vendor.id]
+                            showDeleteConfirmation = true
                         }
                     }
                 }
             }
+            .listStyle(.inset(alternatesRowBackgrounds: true))
+            .frame(height: max(200, CGFloat(vendors.count * 30)))
+            .border(Color(NSColor.separatorColor), width: 1)
+            .padding(.horizontal, 20)
             
-            // Add Vendor Button
-            Button(action: {
-                activeSheet = .edit(nil)
-            }) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                    Text("add_vendor")
+            // Bottom Toolbar
+            HStack(spacing: 0) {
+                // Segmented-style control group
+                HStack(spacing: 0) {
+                    Button(action: { activeSheet = .edit(nil) }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 11, weight: .semibold))
+                            .frame(width: 26, height: 22)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .help("Add Vendor")
+                    
+                    Divider()
+                        .frame(height: 14)
+                    
+                    Button(action: { showDeleteConfirmation = true }) {
+                        Image(systemName: "minus")
+                            .font(.system(size: 11, weight: .semibold))
+                            .frame(width: 26, height: 22)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(selection.isEmpty)
+                    .opacity(selection.isEmpty ? 0.5 : 1.0)
+                    .help("Delete Vendor")
+                    
+                    Divider()
+                        .frame(height: 14)
+                    
+                    Button(action: {
+                        if let id = selection.first, let vendor = vendors.first(where: { $0.id == id }) {
+                            activeSheet = .edit(vendor)
+                        }
+                    }) {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 11, weight: .semibold))
+                            .frame(width: 26, height: 22)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(selection.count != 1)
+                    .opacity(selection.count != 1 ? 0.5 : 1.0)
+                    .help("Edit Vendor")
                 }
-                .font(DesignSystem.Fonts.body.weight(.medium))
-                .foregroundColor(DesignSystem.Colors.accent)
-                .padding(.vertical, DesignSystem.Spacing.medium)
-                .frame(maxWidth: .infinity)
-                .background(DesignSystem.Colors.surface)
-                .cornerRadius(DesignSystem.CornerRadius.medium)
+                .background(Color(NSColor.controlBackgroundColor))
+                .cornerRadius(4)
                 .overlay(
-                    RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium)
-                        .stroke(DesignSystem.Colors.border, lineWidth: 0.5)
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color(NSColor.separatorColor), lineWidth: 1)
                 )
+                
+                Spacer()
+                
+                if selection.count == 1 {
+                    Button(action: {
+                        if let id = selection.first {
+                             try? ConfigManager.shared.switchToVendor(with: id)
+                             loadVendors()
+                        }
+                    }) {
+                        Text(LocalizedStringKey("set_active"))
+                            .font(.system(size: 12))
+                            .foregroundColor(.primary)
+                    }
+                    .disabled(selection.first == currentVendorId)
+                    .padding(.trailing, 0)
+                    .buttonStyle(.plain)
+                }
             }
-            .buttonStyle(PlainButtonStyle())
-            .padding(.top, DesignSystem.Spacing.medium)
+            .padding(.horizontal, 20)
+            .padding(.top, 6)
+            .padding(.bottom, 0)
             
             Spacer()
+            
+            Divider()
+            
+            // Favorites / Tags Area
+            VStack(alignment: .leading, spacing: 10) {
+                Text(LocalizedStringKey("favorite_vendors"))
+                    .font(.headline)
+                    .padding(.top, 12)
+                    .padding(.horizontal, 20)
+                
+                if ConfigManager.shared.favoriteVendors.isEmpty {
+                     Text(LocalizedStringKey("drag_favorite_hint")) // Keeping the hint, or update it
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 20)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(ConfigManager.shared.favoriteVendors) { vendor in
+                                 Button(action: {
+                                     try? ConfigManager.shared.switchToVendor(with: vendor.id)
+                                     loadVendors()
+                                 }) {
+                                     HStack(spacing: 6) {
+                                         Circle()
+                                             .fill(colorForVendor(vendor.id))
+                                             .frame(width: 8, height: 8)
+                                         Text(vendor.displayName)
+                                             .font(.caption)
+                                             .foregroundColor(.primary)
+                                     }
+                                     .padding(.horizontal, 10)
+                                     .padding(.vertical, 6)
+                                     .background(vendor.id == currentVendorId ? Color.blue.opacity(0.1) : Color(NSColor.controlBackgroundColor))
+                                     .cornerRadius(12)
+                                     .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(vendor.id == currentVendorId ? Color.blue : Color(NSColor.separatorColor), lineWidth: 1)
+                                     )
+                                 }
+                                 .buttonStyle(.plain)
+                                 .contextMenu {
+                                     Button(LocalizedStringKey("remove_from_favorites")) {
+                                         ConfigManager.shared.toggleFavorite(vendor.id)
+                                         loadVendors()
+                                     }
+                                 }
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 20)
+                    }
+                }
+            }
+            .frame(minHeight: 80)
+            .background(Color(NSColor.windowBackgroundColor))
         }
         .onAppear {
             loadVendors()
@@ -112,77 +231,19 @@ struct VendorManagementView: View {
         .sheet(item: $activeSheet) { item in
             switch item {
             case .detail(let vendor):
-                VendorDetailView(
-                    vendor: vendor,
-                    isCurrent: vendor.id == currentVendorId,
-                    onEdit: {
-                        // Close detail and open edit
-                        activeSheet = nil
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            activeSheet = .edit(vendor)
-                        }
-                    },
-                    onDelete: {
-                        activeSheet = nil
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            vendorToDelete = vendor
-                            showDeleteConfirmation = true
-                        }
-                    }
-                )
+                VendorEditView(vendor: vendor, onSave: handleSave, onCancel: { activeSheet = nil })
             case .edit(let vendor):
-                VendorEditView(
-                    vendor: vendor,
-                    onSave: { newVendor in
-                        do {
-                            if let _ = vendor {
-                                try ConfigManager.shared.updateVendor(newVendor)
-                            } else {
-                                try ConfigManager.shared.addVendor(newVendor)
-                            }
-                            loadVendors()
-                            activeSheet = nil
-                        } catch {
-                            // TODO: Show error in edit view
-                            print("Error saving vendor: \(error)")
-                        }
-                    },
-                    onCancel: {
-                        activeSheet = nil
-                    }
-                )
+                VendorEditView(vendor: vendor, onSave: handleSave, onCancel: { activeSheet = nil })
             }
         }
         .alert(isPresented: $showDeleteConfirmation) {
             Alert(
-                title: Text("confirm_delete_title"),
-                message: Text("confirm_delete_msg"),
-                primaryButton: .destructive(Text("delete")) {
-                    if let vendor = vendorToDelete {
-                        do {
-                            try ConfigManager.shared.removeVendor(with: vendor.id)
-                            loadVendors()
-                        } catch {
-                            // TODO: Handle error
-                            print("Error deleting vendor: \(error)")
-                        }
-                    }
+                title: Text(LocalizedStringKey("confirm_delete_title")),
+                message: Text(LocalizedStringKey("confirm_delete_msg")),
+                primaryButton: .destructive(Text(LocalizedStringKey("delete"))) {
+                    deleteSelectedVendors()
                 },
                 secondaryButton: .cancel()
-            )
-        }
-        .alert(isPresented: $showImportError) {
-            Alert(
-                title: Text("error"),
-                message: Text(importErrorMessage),
-                dismissButton: .default(Text("ok"))
-            )
-        }
-        .alert(isPresented: $showImportSuccess) {
-            Alert(
-                title: Text("success"),
-                message: Text(String(format: NSLocalizedString("import_success_count", comment: ""), importedCount)),
-                dismissButton: .default(Text("ok"))
             )
         }
     }
@@ -190,188 +251,33 @@ struct VendorManagementView: View {
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
         currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
-        hasLegacyConfig = ConfigManager.shared.hasLegacyConfig
     }
     
-    private func importLegacyConfig() {
+    private func handleSave(_ newVendor: Vendor) {
         do {
-            importedCount = try ConfigManager.shared.migrateFromLegacy()
-            showImportSuccess = true
+            if vendors.contains(where: { $0.id == newVendor.id }) {
+                 try ConfigManager.shared.updateVendor(newVendor)
+            } else {
+                 try ConfigManager.shared.addVendor(newVendor)
+            }
             loadVendors()
+            activeSheet = nil
         } catch {
-            importErrorMessage = error.localizedDescription
-            showImportError = true
+            print("Error saving vendor: \(error)")
         }
     }
-}
-
-struct VendorRow: View {
-    let vendor: Vendor
-    let isCurrent: Bool
-    let onSwitch: () -> Void
-    let onEdit: () -> Void
-    let onDelete: () -> Void
-    @State private var isHovered = false
-
-    var body: some View {
-        HStack(spacing: DesignSystem.Spacing.medium) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(vendor.displayName)
-                    .font(DesignSystem.Fonts.body.weight(.medium))
-                    .foregroundColor(DesignSystem.Colors.textPrimary)
-            }
-
-            Spacer()
-
-            Toggle("", isOn: Binding(
-                get: { isCurrent },
-                set: { newValue in
-                    if newValue {
-                        onSwitch()
-                    }
-                }
-            ))
-            .toggleStyle(.switch)
-            .labelsHidden()
-            .disabled(isCurrent)
-            .padding(.trailing, 8)
-            
-            HStack(spacing: 4) {
-                Button(action: onEdit) {
-                    Image(systemName: "info.circle")
-                        .foregroundColor(DesignSystem.Colors.textTertiary)
-                        .font(.system(size: 16))
-                }
-                .buttonStyle(PlainButtonStyle())
-                .help("details_tooltip")
-                
-                Button(action: onDelete) {
-                    Image(systemName: "trash")
-                        .foregroundColor(DesignSystem.Colors.error.opacity(0.8))
-                        .font(.system(size: 15))
-                }
-                .buttonStyle(PlainButtonStyle())
-                .help("delete_vendor")
-                .disabled(isCurrent) // Cannot delete active vendor
-                .opacity(isCurrent ? 0.3 : 1.0)
-            }
+    
+    private func deleteSelectedVendors() {
+        for id in selection {
+            try? ConfigManager.shared.removeVendor(with: id)
         }
-        .padding(.horizontal, DesignSystem.Spacing.medium)
-        .padding(.vertical, DesignSystem.Spacing.medium)
-        .background(isHovered ? Color.gray.opacity(0.05) : Color.clear)
-        .onHover { hover in
-            isHovered = hover
-        }
+        selection.removeAll()
+        loadVendors()
     }
-}
 
-// MARK: - Vendor Detail View
-struct VendorDetailView: View {
-    let vendor: Vendor
-    let isCurrent: Bool
-    let onEdit: () -> Void
-    let onDelete: () -> Void
-    @Environment(\.presentationMode) var presentationMode
-
-    var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(vendor.displayName)
-                        .font(.title3.bold())
-                }
-                Spacer()
-                
-                if !isCurrent {
-                    Button(action: onDelete) {
-                        Image(systemName: "trash")
-                            .foregroundColor(DesignSystem.Colors.error)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .help("delete_vendor")
-                    .padding(.trailing, 16)
-                }
-                
-                Button(action: onEdit) {
-                    Text("edit_vendor")
-                        .font(DesignSystem.Fonts.body)
-                }
-                .buttonStyle(SecondaryButtonStyle())
-                .padding(.trailing, 8)
-
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.secondary.opacity(0.5))
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-            .padding(DesignSystem.Spacing.large)
-            
-            Divider()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: DesignSystem.Spacing.large) {
-                    ModernSection(title: "environment_variables") {
-                        let sortedKeys = vendor.env.keys.sorted()
-                        if sortedKeys.isEmpty {
-                            Text("no_env_vars")
-                                .font(DesignSystem.Fonts.body)
-                                .foregroundColor(DesignSystem.Colors.textTertiary)
-                                .padding(DesignSystem.Spacing.medium)
-                        } else {
-                            ForEach(0..<sortedKeys.count, id: \.self) { index in
-                                let key = sortedKeys[index]
-                                DetailRowItem(label: key, value: vendor.env[key] ?? "")
-                                if index < sortedKeys.count - 1 {
-                                    ModernDivider()
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(DesignSystem.Spacing.large)
-            }
-
-            Divider()
-
-            HStack(spacing: DesignSystem.Spacing.medium) {
-                Spacer()
-                Button("close_button") {
-                    presentationMode.wrappedValue.dismiss()
-                }
-                .buttonStyle(SecondaryButtonStyle())
-
-                if !isCurrent {
-                    Button("switch_to_vendor_button") {
-                        try? ConfigManager.shared.switchToVendor(with: vendor.id)
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                }
-            }
-            .padding(DesignSystem.Spacing.large)
-        }
-        .frame(width: 400, height: 500)
-        .background(DesignSystem.Colors.background)
-    }
-}
-
-struct DetailRowItem: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(LocalizedStringKey(label))
-                .font(DesignSystem.Fonts.body)
-                .foregroundColor(DesignSystem.Colors.textSecondary)
-            Spacer()
-            Text(value)
-                .font(DesignSystem.Fonts.body.monospaced())
-                .foregroundColor(DesignSystem.Colors.textPrimary)
-        }
-        .padding(.horizontal, DesignSystem.Spacing.medium)
-        .padding(.vertical, DesignSystem.Spacing.medium)
+    private func colorForVendor(_ id: String) -> Color {
+        let colors: [Color] = [.red, .orange, .yellow, .green, .blue, .purple, .pink, .gray]
+        let hash = abs(id.hashValue)
+        return colors[hash % colors.count]
     }
 }

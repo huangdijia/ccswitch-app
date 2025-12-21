@@ -134,3 +134,20 @@
 "template_not_found" = "未找到模板：%@";
 "import_success_count" = "成功匯入 %d 個供應商。";
 "no_env_vars" = "無環境變數";
+
+/* New Keys */
+"open_system_settings" = "打開系統設定";
+"allow_notifications" = "允許通知";
+"show_vendors_in_menu" = "在選單中顯示這些項目：";
+"set_active" = "設為當前";
+"favorite_vendors" = "常用供應商";
+"drag_favorite_hint" = "將您常用的供應商拖曳到下方區域以便快速存取。";
+"show_debug_logs" = "顯示除錯日誌";
+"confirm_backup_deletion" = "刪除備份時確認";
+"manage_backups" = "管理備份...";
+"done" = "完成";
+"restore" = "恢復";
+"system" = "系統";
+"add_to_favorites" = "添加到常用";
+"remove_from_favorites" = "从常用移除";
+"vendor_list" = "供應商列表";

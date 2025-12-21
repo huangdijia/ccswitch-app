@@ -134,3 +134,20 @@
 "template_not_found" = "Template not found: %@";
 "import_success_count" = "Successfully imported %d vendors.";
 "no_env_vars" = "No environment variables";
+
+/* New Keys */
+"open_system_settings" = "Open System Settings";
+"allow_notifications" = "Allow Notifications";
+"show_vendors_in_menu" = "Show these items in menu:";
+"set_active" = "Set Active";
+"favorite_vendors" = "Favorite Vendors";
+"drag_favorite_hint" = "Drag your favorite vendors into the area below to access them quickly.";
+"show_debug_logs" = "Show Debug Logs";
+"confirm_backup_deletion" = "Confirm Backup Deletion";
+"manage_backups" = "Manage Backups...";
+"done" = "Done";
+"restore" = "Restore";
+"system" = "System";
+"add_to_favorites" = "Add to Favorites";
+"remove_from_favorites" = "Remove from Favorites";
+"vendor_list" = "Vendor List";

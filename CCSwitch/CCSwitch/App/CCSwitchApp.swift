@@ -45,17 +45,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     @objc func showSettingsWindow() {
         if settingsWindow == nil {
             let contentView = SettingsView()
-            let hostingView = NSHostingView(rootView: contentView)
-
-            settingsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 600, height: 500),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered,
-                defer: false
-            )
-
+            let hostingController = NSHostingController(rootView: contentView)
+            
+            // 使用 NSWindow(contentViewController:) 让窗口自动匹配内容大小
+            settingsWindow = NSWindow(contentViewController: hostingController)
+            settingsWindow?.styleMask = [.titled, .closable]
             settingsWindow?.title = NSLocalizedString("window_title_settings", comment: "")
-            settingsWindow?.contentView = hostingView
             settingsWindow?.center()
             settingsWindow?.setFrameAutosaveName("SettingsWindow")
             settingsWindow?.delegate = self

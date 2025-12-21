@@ -1,73 +1,147 @@
 import SwiftUI
 
 struct AdvancedSettingsView: View {
+    @State private var showDebugLogs = false
+    @State private var confirmBackupDeletion = true
+    @State private var showingResetAlert = false
+    @State private var showingBackupSheet = false
+    @State private var showingReloadSuccess = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            // System Options
+            VStack(alignment: .leading, spacing: 16) {
+                Toggle("show_debug_logs", isOn: $showDebugLogs)
+                    .toggleStyle(.checkbox)
+                
+                Toggle("confirm_backup_deletion", isOn: $confirmBackupDeletion)
+                    .toggleStyle(.checkbox)
+            }
+            
+            // Maintenance Section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("maintenance")
+                    .font(.headline)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Button("manage_backups") {
+                            showingBackupSheet = true
+                        }
+                        
+                        Button("reload_config") {
+                            reloadConfiguration()
+                        }
+                    }
+                    
+                    HStack {
+                        Button("open_claude_config") {
+                            openClaudeConfig()
+                        }
+                        
+                        Button(role: .destructive, action: {
+                            showingResetAlert = true
+                        }) {
+                            Text("reset_app_state")
+                                .foregroundColor(.red)
+                        }
+                    }
+                }
+                .padding(.leading, 16) // Indent actions
+            }
+            
+            Spacer()
+        }
+        .padding(24)
+        .sheet(isPresented: $showingBackupSheet) {
+            BackupListView()
+        }
+        .alert(isPresented: $showingResetAlert) {
+            Alert(
+                title: Text("confirm_reset_title"),
+                message: Text("confirm_reset_msg"),
+                primaryButton: .destructive(Text("reset_button")) {
+                    resetAppState()
+                },
+                secondaryButton: .cancel()
+            )
+        }
+        .alert(isPresented: $showingReloadSuccess) {
+            Alert(
+                title: Text("reloaded"),
+                message: Text("reload_success_msg"),
+                dismissButton: .default(Text("ok"))
+            )
+        }
+    }
+
+    private func reloadConfiguration() {
+        ConfigManager.shared.initialize()
+        showingReloadSuccess = true
+    }
+
+    private func openClaudeConfig() {
+        NSWorkspace.shared.selectFile(ClaudeSettings.configFile.path, inFileViewerRootedAtPath: "")
+    }
+
+    private func resetAppState() {
+        let domain = Bundle.main.bundleIdentifier!
+        UserDefaults.standard.removePersistentDomain(forName: domain)
+        ConfigManager.shared.cleanup()
+        ConfigManager.shared.initialize()
+    }
+}
+
+struct BackupListView: View {
     @State private var backups: [URL] = []
     @State private var showingRestoreAlert = false
     @State private var backupToRestore: URL?
-    @State private var showingResetAlert = false
-
+    @Environment(\.presentationMode) var presentationMode
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ModernSection(title: "backups") {
+        VStack {
+            HStack {
+                Text("backups")
+                    .font(.headline)
+                Spacer()
+                Button("done") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+            .padding()
+            
+            List {
                 if backups.isEmpty {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 8) {
-                            Image(systemName: "doc.text.magnifyingglass")
-                                .font(.title2)
-                                .foregroundColor(.secondary.opacity(0.5))
-                            Text("no_backups")
-                                .font(DesignSystem.Fonts.body)
-                                .foregroundColor(DesignSystem.Colors.textSecondary)
-                        }
-                        .padding(DesignSystem.Spacing.xLarge)
-                        Spacer()
-                    }
+                    Text("no_backups")
+                        .foregroundColor(.secondary)
                 } else {
-                    ForEach(Array(backups.enumerated()), id: \.element) { index, backup in
-                        BackupRow(
-                            backup: backup,
-                            onRestore: {
+                    ForEach(backups, id: \.self) { backup in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(backup.lastPathComponent)
+                                    .font(.body)
+                                Text(getCreationDate(for: backup))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Button("restore") {
                                 backupToRestore = backup
                                 showingRestoreAlert = true
-                            },
-                            onDelete: {
-                                deleteBackup(backup)
                             }
-                        )
-                        if index < backups.count - 1 {
-                            ModernDivider()
+                            .buttonStyle(.link)
+                            
+                            Button(action: { deleteBackup(backup) }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
             }
-
-            ModernSection(title: "maintenance") {
-                ModernRow(
-                    icon: "arrow.clockwise",
-                    iconColor: .orange,
-                    title: "reload_config",
-                    subtitle: "reload_config_desc",
-                    action: reloadConfiguration
-                )
-                ModernDivider()
-                ModernRow(
-                    icon: "folder",
-                    iconColor: .blue,
-                    title: "open_claude_config",
-                    subtitle: "open_claude_config_desc",
-                    action: openClaudeConfig
-                )
-                ModernDivider()
-                ModernRow(
-                    icon: "trash",
-                    iconColor: .red,
-                    title: "reset_app_state",
-                    subtitle: "reset_app_state_desc",
-                    action: { showingResetAlert = true }
-                )
-            }
         }
+        .frame(width: 400, height: 300)
         .onAppear {
             loadBackups()
         }
@@ -83,18 +157,8 @@ struct AdvancedSettingsView: View {
                 secondaryButton: .cancel()
             )
         }
-        .alert(isPresented: $showingResetAlert) {
-            Alert(
-                title: Text("confirm_reset_title"),
-                message: Text("confirm_reset_msg"),
-                primaryButton: .destructive(Text("reset_button")) {
-                    resetAppState()
-                },
-                secondaryButton: .cancel()
-            )
-        }
     }
-
+    
     private func loadBackups() {
         do {
             backups = try BackupManager.shared.getAllBackups()
@@ -103,13 +167,25 @@ struct AdvancedSettingsView: View {
         }
     }
 
+    private func getCreationDate(for url: URL) -> String {
+        do {
+            let values = try url.resourceValues(forKeys: [.creationDateKey])
+            if let date = values.creationDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .medium
+                formatter.timeStyle = .short
+                return formatter.string(from: date)
+            }
+        } catch {}
+        return ""
+    }
+
     private func restoreBackup(_ backup: URL) {
         do {
             try BackupManager.shared.restoreFromBackup(backup)
-            showAlert(title: NSLocalizedString("success", comment: ""), message: NSLocalizedString("restore_success_msg", comment: ""))
             loadBackups()
         } catch {
-            showAlert(title: NSLocalizedString("error", comment: ""), message: error.localizedDescription)
+            print("Error restoring backup: \(error)")
         }
     }
 
@@ -118,113 +194,7 @@ struct AdvancedSettingsView: View {
             try BackupManager.shared.deleteBackup(backup)
             loadBackups()
         } catch {
-            showAlert(title: NSLocalizedString("error", comment: ""), message: error.localizedDescription)
-        }
-    }
-
-    private func reloadConfiguration() {
-        ConfigManager.shared.initialize()
-        showAlert(title: NSLocalizedString("reloaded", comment: ""), message: NSLocalizedString("reload_success_msg", comment: ""))
-    }
-
-    private func openClaudeConfig() {
-        NSWorkspace.shared.selectFile(ClaudeSettings.configFile.path, inFileViewerRootedAtPath: "")
-    }
-
-    private func resetAppState() {
-        let domain = Bundle.main.bundleIdentifier!
-        UserDefaults.standard.removePersistentDomain(forName: domain)
-        ConfigManager.shared.cleanup()
-        ConfigManager.shared.initialize()
-    }
-
-    private func showAlert(title: String, message: String) {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = message
-        alert.alertStyle = .informational
-        alert.runModal()
-    }
-}
-
-struct BackupRow: View {
-    let backup: URL
-    let onRestore: () -> Void
-    let onDelete: () -> Void
-    @State private var isHovered = false
-
-    private var displayName: String {
-        let fileName = backup.lastPathComponent
-        if let range = fileName.range(of: "bak-") {
-            return String(fileName[range.upperBound...])
-        }
-        return fileName
-    }
-
-    private var creationDate: String? {
-        do {
-            let resourceValues = try backup.resourceValues(forKeys: [.creationDateKey])
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            formatter.timeStyle = .short
-            return formatter.string(from: resourceValues.creationDate ?? Date())
-        } catch {
-            return nil
-        }
-    }
-
-    var body: some View {
-        HStack(spacing: DesignSystem.Spacing.medium) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.blue.opacity(0.1))
-                    .frame(width: 32, height: 32)
-                Image(systemName: "doc.on.doc.fill")
-                    .foregroundColor(.blue)
-                    .font(.system(size: 14))
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(displayName)
-                    .font(DesignSystem.Fonts.body)
-                    .foregroundColor(DesignSystem.Colors.textPrimary)
-                if let date = creationDate {
-                    Text(date)
-                        .font(DesignSystem.Fonts.caption)
-                        .foregroundColor(DesignSystem.Colors.textSecondary)
-                }
-            }
-
-            Spacer()
-
-            HStack(spacing: DesignSystem.Spacing.small) {
-                Button(action: onRestore) {
-                    Text("restore_button")
-                        .font(.system(size: 11, weight: .medium))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.blue.opacity(0.1))
-                        .foregroundColor(.blue)
-                        .cornerRadius(4)
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                Button(action: onDelete) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 12))
-                        .foregroundColor(.red.opacity(0.7))
-                        .frame(width: 24, height: 24)
-                        .background(Color.red.opacity(0.05))
-                        .clipShape(Circle())
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-        }
-        .padding(.horizontal, DesignSystem.Spacing.medium)
-        .padding(.vertical, DesignSystem.Spacing.medium)
-        .background(isHovered ? Color.gray.opacity(0.05) : Color.clear)
-        .onHover { hover in
-            isHovered = hover
+            print("Error deleting backup: \(error)")
         }
     }
 }
