@@ -141,7 +141,9 @@ class MenuBarController: NSObject, ConfigObserver {
     }
 
     @objc private func checkForUpdates() {
-        UpdateManager.shared.checkForUpdates(isManual: true)
+        Task { @MainActor in
+            UpdateManager.shared.checkForUpdates(isManual: true)
+        }
     }
 
     @objc private func switchVendor(_ sender: NSMenuItem) {
