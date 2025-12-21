@@ -24,7 +24,7 @@
    - 支持配置模板复用
 
 4. **设置界面**
-   - General：通用设置、路径显示、通知权限管理
+   - General：通用设置、路径显示、通知权限管理、软件更新 🆕
    - 供应商管理：增删改查供应商，支持从旧配置导入
    - Advanced：备份管理、高级操作
 
@@ -46,6 +46,12 @@
    - 依赖注入模式提升可测试性
    - 清晰的关注点分离
    - 易于扩展的模块化设计
+
+8. **自动更新** 🆕
+   - 基于 GitHub Releases 的自动更新检查
+   - 自动下载和安装更新选项
+   - 手动检查更新功能
+   - 更新进度显示
 
 ## 安装使用
 
@@ -76,8 +82,17 @@ git clone https://github.com/huangdijia/ccswitch-app.git
 cd ccswitch-app
 ```
 
-2. 运行构建脚本：
+2. 运行构建脚本（多种方式）：
 
+使用 Makefile（推荐）：
+```bash
+make build      # 完整构建（需要 Xcode）
+make fast-build # 快速构建（仅需 Swift 命令行工具）
+make run        # 构建并运行
+make test       # 运行单元测试（需要 Xcode）
+```
+
+或使用 shell 脚本：
 ```bash
 ./build.sh
 ```
@@ -152,11 +167,13 @@ ccswitch-app/
 ├── run_dev.sh                        # 开发运行脚本
 ├── test_app.sh                       # 应用测试脚本
 ├── fix_and_run.sh                    # 修复并运行脚本
+├── Makefile                          # Make 构建系统 🆕
 ├── README.md                         # 项目说明
 ├── README_XCODE.md                   # Xcode 使用指南
 ├── ARCHITECTURE.md                   # 架构文档 🆕
 ├── EXTENSION_GUIDE.md                # 扩展指南 🆕
 ├── CONTRIBUTING.md                   # 贡献指南 🆕
+├── BUILD_REQUIREMENTS.md             # 构建要求说明 🆕
 └── CCSwitch/
     ├── CCSwitch.xcodeproj            # Xcode 项目文件
     ├── CCSwitch.xcworkspace          # Xcode 工作空间
@@ -164,7 +181,8 @@ ccswitch-app/
     ├── CCSwitch/
     │   ├── App/
     │   │   ├── CCSwitchApp.swift        # 应用入口
-    │   │   └── MenuBarController.swift  # 状态栏控制器
+    │   │   ├── MenuBarController.swift  # 状态栏控制器
+    │   │   └── AppInfo.swift            # 应用版本信息 🆕
     │   ├── Models/
     │   │   ├── Vendor.swift             # 供应商模型
     │   │   ├── VendorTemplate.swift     # 供应商模板 🆕
@@ -180,6 +198,7 @@ ccswitch-app/
     │   ├── Services/
     │   │   ├── ConfigManager.swift      # 配置管理服务（重构）
     │   │   ├── ServiceContainer.swift   # 依赖注入容器 🆕
+    │   │   ├── UpdateManager.swift      # 自动更新管理器 🆕
     │   │   ├── BackupManager.swift      # 备份管理
     │   │   ├── Logger.swift            # 日志系统
     │   │   └── ErrorHandler.swift      # 错误处理
@@ -207,6 +226,13 @@ ccswitch-app/
 
 运行单元测试：
 
+使用 Makefile：
+```bash
+make test       # 运行单元测试（需要 Xcode）
+make test-app   # 运行手动测试脚本
+```
+
+或使用命令行：
 ```bash
 cd CCSwitch
 xcodebuild test -project CCSwitch.xcodeproj -scheme CCSwitch -destination 'platform=macOS'
@@ -247,11 +273,17 @@ MIT License
 
 ## 更新日志
 
-### v1.0.0 (2025-12-21)
+### v0.1.7 (2025-12-21)
 
-- 初始版本发布
-- 实现所有核心功能
-- 支持供应商切换和配置管理
-- 支持通知权限检测和引导
-- 多语言支持（简体中文、繁体中文、英文）
-- 提供多个开发辅助脚本
+- ✨ 新增自动更新功能（基于 GitHub Releases）
+- ✨ 新增软件更新设置界面
+- ✨ 新增 AppInfo 工具类用于获取版本信息
+- 🔧 添加 Makefile 支持多种构建方式
+- 🔧 完善本地化字符串
+- 📝 更新文档和架构说明
+- 🎉 初始版本发布
+- 🎯 实现所有核心功能
+- ✅ 支持供应商切换和配置管理
+- ✅ 支持通知权限检测和引导
+- ✅ 多语言支持（简体中文、繁体中文、英文）
+- 🛠️ 提供多个开发辅助脚本
