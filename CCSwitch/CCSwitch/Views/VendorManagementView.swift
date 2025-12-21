@@ -181,7 +181,7 @@ struct VendorManagementView: View {
         .alert(isPresented: $showImportSuccess) {
             Alert(
                 title: Text("success"),
-                message: Text("Successfully imported \(importedCount) vendors."),
+                message: Text(String(format: NSLocalizedString("import_success_count", comment: ""), importedCount)),
                 dismissButton: .default(Text("ok"))
             )
         }
@@ -315,7 +315,7 @@ struct VendorDetailView: View {
                     ModernSection(title: "environment_variables") {
                         let sortedKeys = vendor.env.keys.sorted()
                         if sortedKeys.isEmpty {
-                            Text("No environment variables")
+                            Text("no_env_vars")
                                 .font(DesignSystem.Fonts.body)
                                 .foregroundColor(DesignSystem.Colors.textTertiary)
                                 .padding(DesignSystem.Spacing.medium)

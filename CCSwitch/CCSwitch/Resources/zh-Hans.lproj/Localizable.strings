@@ -110,7 +110,7 @@
 "quick_set" = "快速设置";
 "auth_section" = "认证";
 "auth_token_label" = "Auth Token";
-"auth_token_placeholder" = "sk-...";
+"auth_token_placeholder" = "sk-ப்புகளை";
 "auth_token_helper" = "API Key 或 Token。留空则使用全局环境变量。";
 "models_section" = "模型";
 "default_model_label" = "默认模型";
@@ -125,3 +125,12 @@
 "paste_clipboard" = "从剪贴板粘贴";
 "more" = "更多";
 "less" = "折叠";
+
+/* Missing Keys */
+"vendor_switched" = "供应商已切换";
+"switched_to_vendor" = "已切换至 %@";
+"switching_failed_with_error" = "切换失败：%@";
+"missing_required_variable" = "缺失必要变量：%@";
+"template_not_found" = "未找到模板：%@";
+"import_success_count" = "成功导入 %d 个供应商。";
+"no_env_vars" = "无环境变量";
