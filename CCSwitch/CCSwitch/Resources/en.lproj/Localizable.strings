@@ -212,6 +212,12 @@
 "validation_error_title" = "Validation Error";
 "please_fix_errors" = "Please fix the errors before saving.";
 "use_this_vendor_hint" = "Save changes to use this vendor.";
+"config_load_failed" = "Failed to load configuration.";
+"config_not_loaded" = "Configuration not loaded.";
+"vendor_not_found" = "Vendor not found.";
+"vendor_already_exists" = "Vendor already exists.";
+"cannot_remove_last_vendor" = "Cannot remove the last vendor.";
+"config_save_failed" = "Failed to save configuration.";
 "advanced_model_mapping_desc" = "Specific models used for shortcuts or specialized tasks.";
 "connection_and_auth" = "Connection & Auth";
 "network_settings" = "Network";

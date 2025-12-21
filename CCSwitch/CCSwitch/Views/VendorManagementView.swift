@@ -12,6 +12,10 @@ struct VendorManagementView: View {
     @State private var isDetailDirty: Bool = false
     @State private var pendingVendorId: String? = nil
     @State private var showUnsavedChangesAlert = false
+    
+    // Error Handling
+    @State private var errorMessage: String?
+    @State private var showErrorAlert = false
 
     // Filtered vendors based on search text
     var filteredVendors: [Vendor] {
@@ -185,6 +189,14 @@ struct VendorManagementView: View {
                 }
             )
         }
+        // Error Alert
+        .alert(isPresented: $showErrorAlert) {
+            Alert(
+                title: Text("error"),
+                message: Text(errorMessage ?? "Unknown error"),
+                dismissButton: .default(Text("ok"))
+            )
+        }
     }
     
     // MARK: - Navigation Guard Logic
@@ -217,10 +229,7 @@ struct VendorManagementView: View {
     
     private func addNewVendor() {
         if isDetailDirty {
-            // Edge case: if creating new while dirty. 
-            // For simplicity, we just force selection change which triggers the alert logic.
-            // But here we are creating data. Let's just alert first if dirty.
-             pendingVendorId = nil // No pending existing ID
+             pendingVendorId = nil
              // Ideally we should block adding if dirty, but let's just let the user fix it first.
         }
         
@@ -231,7 +240,7 @@ struct VendorManagementView: View {
         )
         try? ConfigManager.shared.addVendor(newVendor)
         loadVendors()
-        // Select the new one (will trigger guard if dirty, effectively blocking "Add" if you have unsaved changes on current)
+        // Select the new one
         attemptSelectionChange(to: newVendor.id)
     }
     
@@ -247,12 +256,19 @@ struct VendorManagementView: View {
     }
     
     private func deleteVendor(_ vendor: Vendor) {
-        try? ConfigManager.shared.removeVendor(with: vendor.id)
-        if selectedVendorId == vendor.id {
-            selectedVendorId = nil
-            isDetailDirty = false
+        do {
+            try ConfigManager.shared.removeVendor(with: vendor.id)
+            if selectedVendorId == vendor.id {
+                selectedVendorId = nil
+                isDetailDirty = false
+            }
+            loadVendors()
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = error.localizedDescription
+                self.showErrorAlert = true
+            }
         }
-        loadVendors()
     }
     
     private func duplicateVendor(_ vendor: Vendor) {
@@ -262,7 +278,6 @@ struct VendorManagementView: View {
         let newVendor = Vendor(id: newId, name: newName, env: newEnv)
         try? ConfigManager.shared.addVendor(newVendor)
         loadVendors()
-        // Try to switch to new copy
         attemptSelectionChange(to: newId)
     }
     
@@ -292,7 +307,7 @@ struct VendorManagementView: View {
     }
 }
 
-// MARK: - Vendor Detail View (Refactored)
+// MARK: - Vendor Detail View (Unchanged from previous turn, but included for completeness)
 
 struct VendorDetailView: View {
     let vendor: Vendor

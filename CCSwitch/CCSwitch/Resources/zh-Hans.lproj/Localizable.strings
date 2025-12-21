@@ -212,6 +212,12 @@
 "validation_error_title" = "验证错误";
 "please_fix_errors" = "请修正错误后再保存。";
 "use_this_vendor_hint" = "请先保存更改以使用此供应商。";
+"config_load_failed" = "无法加载配置。";
+"config_not_loaded" = "配置未加载。";
+"vendor_not_found" = "未找到供应商。";
+"vendor_already_exists" = "供应商已存在。";
+"cannot_remove_last_vendor" = "无法删除最后一个供应商。";
+"config_save_failed" = "无法保存配置。";
 "advanced_model_mapping_desc" = "用于快捷指令或特殊任务的特定模型。";
 "connection_and_auth" = "连接与认证";
 "network_settings" = "网络";
