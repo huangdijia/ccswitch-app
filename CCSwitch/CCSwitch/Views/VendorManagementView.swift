@@ -2,7 +2,7 @@ import SwiftUI
 
 struct VendorManagementView: View {
     @State private var vendors: [Vendor] = []
-    @State private var selectedVendorId: String? // The "official" selection
+    @State private var selectedVendorId: String?
     @State private var searchText = ""
     @State private var currentVendorId: String = ""
 
@@ -10,7 +10,6 @@ struct VendorManagementView: View {
     @State private var isDetailDirty: Bool = false
     @State private var pendingVendorId: String? = nil
     
-    // Unified Alert System
     enum ActiveAlert: Identifiable {
         case deleteConfirmation(Vendor)
         case unsavedChanges(vendorName: String)
@@ -26,22 +25,13 @@ struct VendorManagementView: View {
     }
     @State private var activeAlert: ActiveAlert?
 
-    // Filtered vendors based on search text
     var filteredVendors: [Vendor] {
-        if searchText.isEmpty {
-            return vendors
-        } else {
-            return vendors.filter { $0.displayName.localizedCaseInsensitiveContains(searchText) }
-        }
+        if searchText.isEmpty { return vendors }
+        else { return vendors.filter { $0.displayName.localizedCaseInsensitiveContains(searchText) } }
     }
     
-    var favoriteVendors: [Vendor] {
-        filteredVendors.filter { ConfigManager.shared.isFavorite($0.id) }
-    }
-    
-    var otherVendors: [Vendor] {
-        filteredVendors.filter { !ConfigManager.shared.isFavorite($0.id) }
-    }
+    var favoriteVendors: [Vendor] { filteredVendors.filter { ConfigManager.shared.isFavorite($0.id) } }
+    var otherVendors: [Vendor] { filteredVendors.filter { !ConfigManager.shared.isFavorite($0.id) } }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -49,26 +39,16 @@ struct VendorManagementView: View {
             VStack(spacing: 0) {
                 // Search Bar
                 HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-                    TextField("search_vendors", text: $searchText)
-                        .textFieldStyle(.plain)
+                    Image(systemName: "magnifyingglass").foregroundColor(.secondary)
+                    TextField("search_vendors", text: $searchText).textFieldStyle(.plain)
                 }
                 .padding(8)
                 .background(Color(NSColor.controlBackgroundColor))
-                .overlay(
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(Color(NSColor.separatorColor)),
-                    alignment: .bottom
-                )
+                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor)), alignment: .bottom)
                 
-                // Binding wrapper to intercept selection changes
                 let selectionBinding = Binding<String?>(
                     get: { selectedVendorId },
-                    set: { newValue in
-                        attemptSelectionChange(to: newValue)
-                    }
+                    set: { attemptSelectionChange(to: $0) }
                 )
                 
                 List(selection: selectionBinding) {
@@ -97,12 +77,8 @@ struct VendorManagementView: View {
                 // Bottom Toolbar
                 HStack(spacing: 0) {
                     Button(action: addNewVendor) {
-                        Image(systemName: "plus")
-                            .contentShape(Rectangle())
-                            .frame(width: 30, height: 28)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Add Vendor")
+                        Image(systemName: "plus").contentShape(Rectangle()).frame(width: 30, height: 28)
+                    }.buttonStyle(.plain).help("Add Vendor")
                     
                     Divider().frame(height: 16)
                     
@@ -111,23 +87,13 @@ struct VendorManagementView: View {
                             activeAlert = .deleteConfirmation(v)
                         }
                     }) {
-                        Image(systemName: "minus")
-                            .contentShape(Rectangle())
-                            .frame(width: 30, height: 28)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(selectedVendorId == nil || selectedVendorId == currentVendorId)
-                    .help("Delete Vendor")
+                        Image(systemName: "minus").contentShape(Rectangle()).frame(width: 30, height: 28)
+                    }.buttonStyle(.plain).disabled(selectedVendorId == nil || selectedVendorId == currentVendorId).help("Delete Vendor")
                     
                     Spacer()
                 }
                 .background(Color(NSColor.controlBackgroundColor))
-                .overlay(
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(Color(NSColor.separatorColor)),
-                    alignment: .top
-                )
+                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor)), alignment: .top)
             }
             .frame(width: 200)
             .background(Color(NSColor.controlBackgroundColor))
@@ -135,7 +101,7 @@ struct VendorManagementView: View {
             Divider()
             
             // MARK: - Right Detail View
-            Group {
+            ZStack {
                 if let selectedId = selectedVendorId, let vendor = vendors.first(where: { $0.id == selectedId }) {
                     VendorDetailView(
                         vendor: vendor,
@@ -144,26 +110,20 @@ struct VendorManagementView: View {
                         onSave: handleSave
                     )
                     .id(selectedId)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                 } else {
                     VStack(spacing: 16) {
-                        Image(systemName: "server.rack")
-                            .font(.system(size: 48))
-                            .foregroundColor(.secondary)
-                        Text("no_vendor_selected")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                        Text("no_vendor_selected_desc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        Image(systemName: "server.rack").font(.system(size: 48)).foregroundColor(.secondary)
+                        Text("no_vendor_selected").font(.title3).foregroundColor(.secondary)
+                        Text("no_vendor_selected_desc").font(.caption).foregroundColor(.secondary).multilineTextAlignment(.center).padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color(NSColor.windowBackgroundColor))
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(minHeight: 450) // Ensure stable height to prevent UI jumping via fixedSize
         .onAppear {
             loadVendors()
             if selectedVendorId == nil, let first = vendors.first {
@@ -171,62 +131,48 @@ struct VendorManagementView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .configDidChange)) { _ in
-            loadVendors()
+            withAnimation { loadVendors() }
         }
-        // Unified Alert Implementation
         .alert(item: $activeAlert) { alertType in
             switch alertType {
             case .deleteConfirmation(let vendor):
                 return Alert(
                     title: Text("delete_vendor"),
                     message: Text(String(format: NSLocalizedString("delete_vendor_confirmation", comment: ""), vendor.displayName)),
-                    primaryButton: .destructive(Text("delete")) {
-                        deleteVendor(vendor)
-                    },
+                    primaryButton: .destructive(Text("delete")) { deleteVendor(vendor) },
                     secondaryButton: .cancel()
                 )
             case .unsavedChanges(let vendorName):
                 return Alert(
                     title: Text("unsaved_changes"),
                     message: Text(String(format: NSLocalizedString("unsaved_changes_msg", comment: ""), vendorName)),
-                    primaryButton: .destructive(Text("discard_changes")) {
-                        discardAndSwitch()
-                    },
-                    secondaryButton: .cancel(Text("keep_editing")) {
-                        pendingVendorId = nil
-                    }
+                    primaryButton: .destructive(Text("discard_changes")) { discardAndSwitch() },
+                    secondaryButton: .cancel(Text("keep_editing")) { pendingVendorId = nil }
                 )
             case .error(let message):
-                return Alert(
-                    title: Text("error"),
-                    message: Text(message),
-                    dismissButton: .default(Text("ok"))
-                )
+                return Alert(title: Text("error"), message: Text(message), dismissButton: .default(Text("ok")))
             }
         }
     }
     
-    // MARK: - Navigation Guard Logic
-    
     private func attemptSelectionChange(to newId: String?) {
         guard newId != selectedVendorId else { return }
-        
         if isDetailDirty {
             pendingVendorId = newId
             let currentName = vendors.first(where: { $0.id == selectedVendorId })?.displayName ?? ""
             activeAlert = .unsavedChanges(vendorName: currentName)
         } else {
-            selectedVendorId = newId
+            withAnimation { selectedVendorId = newId }
         }
     }
     
     private func discardAndSwitch() {
         isDetailDirty = false
-        selectedVendorId = pendingVendorId
-        pendingVendorId = nil
+        withAnimation {
+            selectedVendorId = pendingVendorId
+            pendingVendorId = nil
+        }
     }
-    
-    // MARK: - Actions
     
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
@@ -234,82 +180,51 @@ struct VendorManagementView: View {
     }
     
     private func addNewVendor() {
-        let newVendor = Vendor(
-            id: UUID().uuidString.prefix(8).lowercased(),
-            name: "New Vendor",
-            env: [:]
-        )
+        let newVendor = Vendor(id: UUID().uuidString.prefix(8).lowercased(), name: "New Vendor", env: [:])
         do {
             try ConfigManager.shared.addVendor(newVendor)
-            loadVendors()
+            // UI reloads via notification
             attemptSelectionChange(to: newVendor.id)
-        } catch {
-            activeAlert = .error(error.localizedDescription)
-        }
+        } catch { activeAlert = .error(error.localizedDescription) }
     }
     
     private func handleSave(_ updatedVendor: Vendor) {
         do {
             try ConfigManager.shared.updateVendor(updatedVendor)
-            loadVendors()
-        } catch {
-            activeAlert = .error(error.localizedDescription)
-        }
+        } catch { activeAlert = .error(error.localizedDescription) }
     }
     
     private func deleteVendor(_ vendor: Vendor) {
         do {
             try ConfigManager.shared.removeVendor(with: vendor.id)
-            // Successful deletion
             if selectedVendorId == vendor.id {
-                selectedVendorId = nil
-                isDetailDirty = false
+                withAnimation {
+                    selectedVendorId = nil
+                    isDetailDirty = false
+                }
             }
-            loadVendors()
         } catch {
-            // Error occurred
-            DispatchQueue.main.async {
-                self.activeAlert = .error(error.localizedDescription)
-            }
+            DispatchQueue.main.async { self.activeAlert = .error(error.localizedDescription) }
         }
     }
     
     private func duplicateVendor(_ vendor: Vendor) {
-        let newEnv = vendor.env
         let newId = UUID().uuidString.prefix(8).lowercased()
-        let newName = "\(vendor.displayName) Copy"
-        let newVendor = Vendor(id: newId, name: newName, env: newEnv)
+        let newVendor = Vendor(id: newId, name: "\(vendor.displayName) Copy", env: vendor.env)
         do {
             try ConfigManager.shared.addVendor(newVendor)
-            loadVendors()
             attemptSelectionChange(to: newId)
-        } catch {
-            activeAlert = .error(error.localizedDescription)
-        }
+        } catch { activeAlert = .error(error.localizedDescription) }
     }
     
     @ViewBuilder
     private func vendorContextMenu(_ vendor: Vendor) -> some View {
         Button {
             ConfigManager.shared.toggleFavorite(vendor.id)
-            loadVendors()
-        } label: {
-            Text(ConfigManager.shared.isFavorite(vendor.id) ? "remove_from_favorites" : "add_to_favorites")
-        }
-        
-        Button {
-            duplicateVendor(vendor)
-        } label: {
-            Text("duplicate_vendor")
-        }
-        
+        } label: { Text(ConfigManager.shared.isFavorite(vendor.id) ? "remove_from_favorites" : "add_to_favorites") }
+        Button { duplicateVendor(vendor) } label: { Text("duplicate_vendor") }
         Divider()
-        
-        Button {
-            activeAlert = .deleteConfirmation(vendor)
-        } label: {
-            Text("delete")
-        }
+        Button { activeAlert = .deleteConfirmation(vendor) } label: { Text("delete") }
         .disabled(vendor.id == currentVendorId)
     }
 }
@@ -317,37 +232,17 @@ struct VendorManagementView: View {
 // MARK: - Vendor Detail View
 
 struct VendorDetailView: View {
-    let vendor: Vendor
-    let isActive: Bool
-    @Binding var isDirtyBinding: Bool
-    let onSave: (Vendor) -> Void
-    
-    @State private var originalVendor: Vendor
-    @State private var name: String
-    @State private var baseURL: String
-    @State private var authToken: String
-    @State private var timeout: String
-    @State private var defaultModel: String
-    @State private var opusModel: String
-    @State private var sonnetModel: String
-    @State private var haikuModel: String
+    let vendor: Vendor; let isActive: Bool; @Binding var isDirtyBinding: Bool; let onSave: (Vendor) -> Void
+    @State private var originalVendor: Vendor; @State private var name: String; @State private var baseURL: String
+    @State private var authToken: String; @State private var timeout: String; @State private var defaultModel: String
+    @State private var opusModel: String; @State private var sonnetModel: String; @State private var haikuModel: String
     @State private var smallFastModel: String
-    
-    @State private var showAdvancedModels = false
-    @State private var showToken = false
-    @State private var validationErrors: [String: String] = [:]
-    @State private var isTesting = false
-    @State private var testResult: Bool?
-    @State private var testMessage: String?
+    @State private var showAdvancedModels = false; @State private var showToken = false; @State private var validationErrors: [String: String] = [:]
+    @State private var isTesting = false; @State private var testResult: Bool?; @State private var testMessage: String?
 
     init(vendor: Vendor, isActive: Bool, isDirtyBinding: Binding<Bool>, onSave: @escaping (Vendor) -> Void) {
-        self.vendor = vendor
-        self.isActive = isActive
-        self._isDirtyBinding = isDirtyBinding
-        self.onSave = onSave
-        
-        _originalVendor = State(initialValue: vendor)
-        _name = State(initialValue: vendor.name)
+        self.vendor = vendor; self.isActive = isActive; self._isDirtyBinding = isDirtyBinding; self.onSave = onSave
+        _originalVendor = State(initialValue: vendor); _name = State(initialValue: vendor.name)
         let env = vendor.env
         _baseURL = State(initialValue: env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? "")
         _authToken = State(initialValue: env["ANTHROPIC_AUTH_TOKEN"] ?? "")
@@ -375,49 +270,31 @@ struct VendorDetailView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(name.isEmpty ? "Untitled" : name)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    if isDirty {
-                        Text("unsaved_changes")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                    }
+                    Text(name.isEmpty ? "Untitled" : name).font(.title2).fontWeight(.bold)
+                    if isDirty { Text("unsaved_changes").font(.caption).foregroundColor(.orange) }
                 }
                 Spacer()
                 if isDirty {
                     Button("revert") { revertChanges() }
-                    Button("save_changes") { save() }
-                        .buttonStyle(.borderedProminent)
+                    Button("save_changes") { save() }.buttonStyle(.borderedProminent)
                 } else {
                     if isActive {
-                        Label("using_current", systemImage: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.green.opacity(0.1))
-                            .cornerRadius(8)
+                        Label("using_current", systemImage: "checkmark.circle.fill").foregroundColor(.green).padding(.horizontal, 8).padding(.vertical, 4).background(Color.green.opacity(0.1)).cornerRadius(8)
                     } else {
-                        Button("use_this_vendor") {
-                            try? ConfigManager.shared.switchToVendor(with: vendor.id)
-                        }
+                        Button("use_this_vendor") { try? ConfigManager.shared.switchToVendor(with: vendor.id) }
                     }
                 }
             }
-            .padding()
-            .background(Color(NSColor.controlBackgroundColor))
+            .padding().background(Color(NSColor.controlBackgroundColor))
             .onChange(of: isDirty) { _, newValue in isDirtyBinding = newValue }
             
             Divider()
-            
             Form {
                 Section("basic_info") {
                     TextField("name_label", text: $name)
                     VStack(alignment: .leading, spacing: 4) {
                         TextField("base_url_label", text: $baseURL).textContentType(.URL)
-                        if let error = validationErrors["baseURL"] {
-                            Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red)
-                        }
+                        if let error = validationErrors["baseURL"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
                     }
                 }
                 Section("auth_section") {
@@ -427,15 +304,9 @@ struct VendorDetailView: View {
                             else { SecureField("auth_token_label", text: $authToken) }
                         }
                         if showToken {
-                            Button {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(authToken, forType: .string)
-                            } label: { Image(systemName: "doc.on.doc").foregroundColor(.secondary) }
-                            .buttonStyle(.plain).padding(.trailing, 4)
+                            Button { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(authToken, forType: .string) } label: { Image(systemName: "doc.on.doc").foregroundColor(.secondary) }.buttonStyle(.plain).padding(.trailing, 4)
                         }
-                        Button { showToken.toggle() } label: {
-                            Image(systemName: showToken ? "eye.slash" : "eye").foregroundColor(.secondary)
-                        }.buttonStyle(.plain)
+                        Button { showToken.toggle() } label: { Image(systemName: showToken ? "eye.slash" : "eye").foregroundColor(.secondary) }.buttonStyle(.plain)
                     }
                     Text("auth_token_helper").font(.caption).foregroundColor(.secondary)
                 }
@@ -451,44 +322,32 @@ struct VendorDetailView: View {
                 Section("connection_section") {
                     VStack(alignment: .leading, spacing: 4) {
                         TextField("timeout_label", text: $timeout)
-                        if let error = validationErrors["timeout"] {
-                             Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red)
-                        }
+                        if let error = validationErrors["timeout"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
                     }
                 }
-            }
-            .formStyle(.grouped)
-            
+            }.formStyle(.grouped)
             Divider()
-            
             HStack {
                 Button(action: testConnection) {
                     if isTesting { ProgressView().controlSize(.small).padding(.horizontal, 4) }
                     else { Label("test_connection", systemImage: "network") }
                 }.disabled(isTesting || baseURL.isEmpty)
-                
                 if let result = testResult {
                     if result { Label("connection_success", systemImage: "checkmark").foregroundColor(.green) }
                     else { Label(testMessage ?? "Failed", systemImage: "exclamationmark.triangle").foregroundColor(.red) }
                 }
                 Spacer()
             }.padding().background(Color(NSColor.controlBackgroundColor))
-        }
-        .onAppear { validate(quiet: true) }
+        }.onAppear { validate(quiet: true) }
     }
     
     private func revertChanges() {
-        name = originalVendor.name
-        let env = originalVendor.env
+        name = originalVendor.name; let env = originalVendor.env
         baseURL = env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? ""
-        authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? ""
-        timeout = env["API_TIMEOUT_MS"] ?? ""
-        defaultModel = env["ANTHROPIC_MODEL"] ?? ""
-        opusModel = env["ANTHROPIC_DEFAULT_OPUS_MODEL"] ?? ""
-        sonnetModel = env["ANTHROPIC_DEFAULT_SONNET_MODEL"] ?? ""
-        haikuModel = env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] ?? ""
-        smallFastModel = env["ANTHROPIC_SMALL_FAST_MODEL"] ?? ""
-        validationErrors.removeAll()
+        authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? ""; timeout = env["API_TIMEOUT_MS"] ?? ""
+        defaultModel = env["ANTHROPIC_MODEL"] ?? ""; opusModel = env["ANTHROPIC_DEFAULT_OPUS_MODEL"] ?? ""
+        sonnetModel = env["ANTHROPIC_DEFAULT_SONNET_MODEL"] ?? ""; haikuModel = env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] ?? ""
+        smallFastModel = env["ANTHROPIC_SMALL_FAST_MODEL"] ?? ""; validationErrors.removeAll()
     }
     
     @discardableResult
@@ -496,9 +355,7 @@ struct VendorDetailView: View {
         var errors: [String: String] = [:]
         if name.isEmpty { errors["name"] = "validation_name_required" }
         if !baseURL.isEmpty {
-            if !baseURL.lowercased().hasPrefix("http://") && !baseURL.lowercased().hasPrefix("https://") {
-                errors["baseURL"] = "validation_url_invalid"
-            }
+            if !baseURL.lowercased().hasPrefix("http://") && !baseURL.lowercased().hasPrefix("https://") { errors["baseURL"] = "validation_url_invalid" }
         }
         if !timeout.isEmpty {
              if let val = Int(timeout), val >= 1000, val <= 300000 {}
@@ -515,31 +372,22 @@ struct VendorDetailView: View {
             if value.trimmingCharacters(in: .whitespaces).isEmpty { env.removeValue(forKey: key) }
             else { env[key] = value.trimmingCharacters(in: .whitespaces) }
         }
-        update("ANTHROPIC_BASE_URL", baseURL)
-        update("NTHROPIC_BASE_URL", baseURL) 
-        update("ANTHROPIC_AUTH_TOKEN", authToken)
-        update("API_TIMEOUT_MS", timeout)
-        update("ANTHROPIC_MODEL", defaultModel)
-        update("ANTHROPIC_DEFAULT_OPUS_MODEL", opusModel)
-        update("ANTHROPIC_DEFAULT_SONNET_MODEL", sonnetModel)
-        update("ANTHROPIC_DEFAULT_HAIKU_MODEL", haikuModel)
+        update("ANTHROPIC_BASE_URL", baseURL); update("NTHROPIC_BASE_URL", baseURL) 
+        update("ANTHROPIC_AUTH_TOKEN", authToken); update("API_TIMEOUT_MS", timeout)
+        update("ANTHROPIC_MODEL", defaultModel); update("ANTHROPIC_DEFAULT_OPUS_MODEL", opusModel)
+        update("ANTHROPIC_DEFAULT_SONNET_MODEL", sonnetModel); update("ANTHROPIC_DEFAULT_HAIKU_MODEL", haikuModel)
         update("ANTHROPIC_SMALL_FAST_MODEL", smallFastModel)
         let updatedVendor = Vendor(id: vendor.id, name: name, env: env)
-        onSave(updatedVendor)
-        originalVendor = updatedVendor
+        onSave(updatedVendor); originalVendor = updatedVendor
     }
     
     private func testConnection() {
         guard let url = URL(string: baseURL) else { return }
         isTesting = true; testResult = nil; testMessage = nil
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        var request = URLRequest(url: url); request.httpMethod = "GET" 
         if url.path.isEmpty || url.path == "/" { request.url = url.appendingPathComponent("v1/models") }
         request.timeoutInterval = 5
-        if !authToken.isEmpty {
-            request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-            request.setValue(authToken, forHTTPHeaderField: "x-api-key")
-        }
+        if !authToken.isEmpty { request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization"); request.setValue(authToken, forHTTPHeaderField: "x-api-key") }
         URLSession.shared.dataTask(with: request) { _, response, error in
             DispatchQueue.main.async {
                 isTesting = false
@@ -553,10 +401,9 @@ struct VendorDetailView: View {
     }
 }
 
-// MARK: - Subviews
+// MARK: - VendorRowView (Unchanged)
 struct VendorRowView: View {
-    let vendor: Vendor; let isActive: Bool
-    @State private var isHovered = false
+    let vendor: Vendor; let isActive: Bool; @State private var isHovered = false
     var body: some View {
         HStack {
             if isActive { Circle().fill(Color.green).frame(width: 8, height: 8) }
@@ -569,14 +416,8 @@ struct VendorRowView: View {
                 }
             }
             Spacer()
-            if ConfigManager.shared.isFavorite(vendor.id) {
-                Image(systemName: "star.fill").foregroundColor(.yellow).font(.caption)
-            } else if isHovered {
-                Image(systemName: "star").foregroundColor(.secondary).font(.caption)
-                    .onTapGesture { ConfigManager.shared.toggleFavorite(vendor.id) }
-            }
-        }
-        .padding(.vertical, 4)
-        .onHover { isHovered = $0 }
+            if ConfigManager.shared.isFavorite(vendor.id) { Image(systemName: "star.fill").foregroundColor(.yellow).font(.caption) }
+            else if isHovered { Image(systemName: "star").foregroundColor(.secondary).font(.caption).onTapGesture { ConfigManager.shared.toggleFavorite(vendor.id) } }
+        }.padding(.vertical, 4).onHover { isHovered = $0 }
     }
 }
