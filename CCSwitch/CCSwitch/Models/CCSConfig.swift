@@ -114,7 +114,7 @@ struct LegacyCCSConfig: Codable {
 extension CCSConfig {
     static let configDirectory = URL(fileURLWithPath: FileManager.default.homeDirectoryForCurrentUser.path)
         .appendingPathComponent(".ccswitch")
-    static let configFile = configDirectory.appendingPathComponent("ccswitch.json")
+    static let configFile = configDirectory.appendingPathComponent("vendors.json")
     static let legacyConfigFile = configDirectory.appendingPathComponent("ccs.json")
 
     static func ensureConfigDirectoryExists() throws {

@@ -19,7 +19,7 @@
 /* Vendor Management */
 "vendor_management_title" = "供應商管理";
 "vendor_management_subtitle" = "管理您的 Claude Code 供應商。在它們之間即時切換。";
-"config_path_label" = "配置: ~/.ccswitch/ccswitch.json";
+"config_path_label" = "配置: ~/.ccswitch/vendors.json";
 "switch_button" = "切換";
 "active_badge" = "當前使用";
 "currently_active" = "當前使用中";
