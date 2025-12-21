@@ -3,6 +3,7 @@ import SwiftUI
 import AppKit
 
 /// 基于 GitHub Releases 的更新管理器
+@MainActor
 class UpdateManager: NSObject, ObservableObject {
     static let shared = UpdateManager()
     
@@ -17,95 +18,89 @@ class UpdateManager: NSObject, ObservableObject {
     
     private let githubRepo = "huangdijia/ccswitch-mac"
     
-    /// 检查更新
-    /// - Parameter isManual: 是否为用户手动触发。手动触发时会显示“已是最新”或“错误”弹窗。
-    func checkForUpdates(isManual: Bool = false) {
+    override private init() {
+        super.init()
+    }
+    
+    /// 检查更新 (异步版本)
+    func checkForUpdates() async {
         guard !isChecking else { return }
         
         isChecking = true
+        defer { isChecking = false }
+        
         let urlString = "https://api.github.com/repos/\(githubRepo)/releases/latest"
-        guard let url = URL(string: urlString) else {
-            isChecking = false
-            return
-        }
+        guard let url = URL(string: urlString) else { return }
         
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
         request.timeoutInterval = 15
         
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                self.isChecking = false
-                self.lastUpdateCheckDate = Date()
-                
-                if let error = error {
-                    if isManual { self.showErrorAlert(error.localizedDescription) }
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            lastUpdateCheckDate = Date()
+            
+            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                if let message = json["message"] as? String, (response as? HTTPURLResponse)?.statusCode != 200 {
+                    Logger.shared.error("Update check API error: \(message)")
                     return
                 }
                 
-                guard let data = data else {
-                    if isManual { self.showErrorAlert("No data received from GitHub") }
+                guard let tagName = json["tag_name"] as? String else {
                     return
                 }
                 
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                        if let message = json["message"] as? String, (response as? HTTPURLResponse)?.statusCode != 200 {
-                             if isManual { self.showErrorAlert(message) }
-                             return
-                        }
-                        
-                        guard let tagName = json["tag_name"] as? String else {
-                            if isManual { self.showNoUpdateAlert() }
-                            return
-                        }
-                        
-                        let version = tagName.replacingOccurrences(of: "v", with: "")
-                        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
-                        
-                        if version.compare(currentVersion, options: .numeric) == .orderedDescending {
-                            let body = json["body"] as? String ?? ""
-                            let htmlUrl = json["html_url"] as? String ?? ""
-                            
-                            var downloadUrlString = htmlUrl
-                            if let assets = json["assets"] as? [[String: Any]] {
-                                for asset in assets {
-                                    if let name = asset["name"] as? String,
-                                       (name.hasSuffix(".dmg") || name.hasSuffix(".zip")),
-                                       let browserDownloadUrl = asset["browser_download_url"] as? String {
-                                        downloadUrlString = browserDownloadUrl
-                                        break
-                                    }
-                                }
-                            }
-                            
-                            let downloadUrl = URL(string: downloadUrlString) ?? URL(string: htmlUrl)!
-                            
-                            self.latestRelease = UpdateInfo(
-                                version: version,
-                                releaseNotes: body,
-                                downloadUrl: downloadUrl,
-                                isPrerelease: json["prerelease"] as? Bool ?? false
-                            )
-                            
-                            self.showUpdateAlert()
-                        } else {
-                            if isManual {
-                                self.showNoUpdateAlert()
+                let version = tagName.replacingOccurrences(of: "v", with: "")
+                let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+                
+                if version.compare(currentVersion, options: .numeric) == .orderedDescending {
+                    let body = json["body"] as? String ?? ""
+                    let htmlUrl = json["html_url"] as? String ?? ""
+                    
+                    var downloadUrlString = htmlUrl
+                    if let assets = json["assets"] as? [[String: Any]] {
+                        for asset in assets {
+                            if let name = asset["name"] as? String,
+                               (name.hasSuffix(".dmg") || name.hasSuffix(".zip")),
+                               let browserDownloadUrl = asset["browser_download_url"] as? String {
+                                downloadUrlString = browserDownloadUrl
+                                break
                             }
                         }
                     }
-                } catch {
-                    if isManual { self.showErrorAlert(error.localizedDescription) }
+                    
+                    let downloadUrl = URL(string: downloadUrlString) ?? URL(string: htmlUrl)!
+                    
+                    latestRelease = UpdateInfo(
+                        version: version,
+                        releaseNotes: body,
+                        downloadUrl: downloadUrl,
+                        isPrerelease: json["prerelease"] as? Bool ?? false
+                    )
+                } else {
+                    latestRelease = nil
                 }
             }
-        }.resume()
+        } catch {
+            Logger.shared.error("Update check failed", error: error)
+        }
     }
     
-    private func showUpdateAlert() {
-        guard let release = latestRelease else { return }
-        
+    /// 兼容旧代码的同步/带参数版本
+    func checkForUpdates(isManual: Bool) {
+        Task {
+            await checkForUpdates()
+            if isManual {
+                if let release = latestRelease {
+                    showUpdateAlert(release: release)
+                } else {
+                    showNoUpdateAlert()
+                }
+            }
+        }
+    }
+    
+    private func showUpdateAlert(release: UpdateInfo) {
         let alert = NSAlert()
         alert.messageText = String(format: NSLocalizedString("update_available_title", comment: ""), release.version)
         alert.informativeText = "\(NSLocalizedString("update_available_msg", comment: ""))\n\n\(NSLocalizedString("release_notes_label", comment: ""))\n\(release.releaseNotes)"
@@ -124,15 +119,6 @@ class UpdateManager: NSObject, ObservableObject {
         alert.messageText = NSLocalizedString("up_to_date_title", comment: "")
         alert.informativeText = NSLocalizedString("up_to_date_msg", comment: "")
         alert.alertStyle = .informational
-        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
-        alert.runModal()
-    }
-    
-    private func showErrorAlert(_ message: String) {
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("update_check_failed", comment: "")
-        alert.informativeText = message
-        alert.alertStyle = .warning
         alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
         alert.runModal()
     }
