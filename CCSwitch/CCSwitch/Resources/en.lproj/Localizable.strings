@@ -257,4 +257,9 @@
 "up_to_date_msg" = "You are currently using the latest version of CCSwitch.";
 "update_check_failed" = "Update Check Failed";
 "error_rate_limit" = "Request too frequent (GitHub API rate limit exceeded). Please try again later.";
+"update_successful_title" = "Update Successful";
+"update_successful_msg" = "CCSwitch has been successfully updated to version %@.";
+"relaunch_now" = "Relaunch Now";
+"relaunch_later" = "Later";
+"checking_for_updates" = "Checking for updates...";
 "ok" = "OK";

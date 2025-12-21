@@ -1,306 +1,180 @@
 import Foundation
 import SwiftUI
-import AppKit
+import Sparkle
 
-/// 基于 GitHub Releases 的更新管理器
-@MainActor
-class UpdateManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
-    static let shared = UpdateManager()
+/// 状态机枚举
+enum UpdateState: Equatable {
+    case idle
+    case checking
+    case upToDate
+    case downloading(progress: Double)
+    case installing
+    case awaitingRelaunch(version: String)
+    case error(String)
     
-    @Published var canCheckForUpdates = true
-    @Published var lastUpdateCheckDate: Date?
-    @Published var isChecking = false
-    @Published var latestRelease: UpdateInfo?
-    @Published var lastError: Error?
-    
-    @Published var isDownloading = false
-    @Published var downloadProgress: Double = 0
-    @Published var installationStatus: String?
-    
-    private var downloadTask: URLSessionDownloadTask?
-    private lazy var downloadSession: URLSession = {
-        let config = URLSessionConfiguration.default
-        return URLSession(configuration: config, delegate: self, delegateQueue: .main)
-    }()
-    
-    // 配置项
-    @AppStorage("SUEnableAutomaticChecks") var automaticallyChecksForUpdates = true
-    @AppStorage("SUAutomaticallyUpdate") var automaticallyDownloadsAndInstallsUpdates = false
-    @AppStorage("SULastCheckDate") private var lastCheckDateValue: Double = 0
-    @AppStorage("SULastCheckETag") private var lastCheckETag: String = ""
-    
-    private let githubRepo = "huangdijia/ccswitch-mac"
-    private let checkInterval: TimeInterval = 3600 // 1 hour
-    
-    override private init() {
-        super.init()
+    var isChecking: Bool {
+        if case .checking = self { return true }
+        return false
     }
     
-    // MARK: - Download & Install
-    
-    func downloadAndInstallUpdate(release: UpdateInfo) {
-        guard !isDownloading else { return }
-        
-        isDownloading = true
-        downloadProgress = 0
-        installationStatus = NSLocalizedString("downloading", comment: "")
-        
-        let task = downloadSession.downloadTask(with: release.downloadUrl)
-        self.downloadTask = task
-        task.resume()
-    }
-    
-    // URLSessionDownloadDelegate
-    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        let tempDir = FileManager.default.temporaryDirectory
-        let destinationURL = tempDir.appendingPathComponent("CCSwitch_Update.zip")
-        
-        do {
-            if FileManager.default.fileExists(atPath: destinationURL.path) {
-                try FileManager.default.removeItem(at: destinationURL)
-            }
-            try FileManager.default.moveItem(at: location, to: destinationURL)
-            
-            Task { @MainActor in
-                self.installationStatus = NSLocalizedString("installing", comment: "")
-                self.installUpdate(at: destinationURL)
-            }
-        } catch {
-            Task { @MainActor in
-                self.isDownloading = false
-                self.lastError = error
-                self.showErrorAlert(error: error)
-            }
-        }
-    }
-    
-    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        if totalBytesExpectedToWrite > 0 {
-            let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-            Task { @MainActor in
-                self.downloadProgress = progress
-            }
-        }
-    }
-    
-    private func installUpdate(at localURL: URL) {
-        let appPath = Bundle.main.bundlePath
-        let tempExtractDir = FileManager.default.temporaryDirectory.appendingPathComponent("CCSwitch_Extracted")
-        
-        do {
-            if FileManager.default.fileExists(atPath: tempExtractDir.path) {
-                try FileManager.default.removeItem(at: tempExtractDir)
-            }
-            try FileManager.default.createDirectory(at: tempExtractDir, withIntermediateDirectories: true)
-            
-            // 使用 ditto 解压
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
-            process.arguments = ["-x", "-k", localURL.path, tempExtractDir.path]
-            try process.run()
-            process.waitUntilExit()
-            
-            // 找到解压后的 .app
-            let contents = try FileManager.default.contentsOfDirectory(at: tempExtractDir, includingPropertiesForKeys: nil)
-            guard let newAppBundle = contents.first(where: { $0.pathExtension == "app" }) else {
-                throw NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find .app in update package"])
-            }
-            
-            // 准备更新脚本
-            let scriptPath = FileManager.default.temporaryDirectory.appendingPathComponent("install_update.sh").path
-            let script = """
-            #!/bin/bash
-            sleep 1
-            rm -rf "\(appPath)"
-            cp -R "\(newAppBundle.path)" "\(appPath)"
-            open "\(appPath)"
-            """
-            
-            try script.write(toFile: scriptPath, atomically: true, encoding: .utf8)
-            try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: scriptPath)
-            
-            // 运行更新脚本并退出
-            let scriptProcess = Process()
-            scriptProcess.executableURL = URL(fileURLWithPath: "/bin/bash")
-            scriptProcess.arguments = [scriptPath]
-            try scriptProcess.run()
-            
-            NSApplication.shared.terminate(nil)
-            
-        } catch {
-            self.isDownloading = false
-            self.lastError = error
-            self.showErrorAlert(error: error)
-        }
-    }
-    
-    /// 检查更新 (异步版本)
-    func checkForUpdates(isManual: Bool = false) async {
-        guard !isChecking else { return }
-        
-        // 非手动检查时，检查时间间隔
-        if !isManual {
-            let lastCheck = Date(timeIntervalSince1970: lastCheckDateValue)
-            if Date().timeIntervalSince(lastCheck) < checkInterval {
-                return
-            }
-        }
-        
-        isChecking = true
-        lastError = nil
-        defer { isChecking = false }
-        
-        let urlString = "https://api.github.com/repos/\(githubRepo)/releases/latest"
-        guard let url = URL(string: urlString) else { 
-            lastError = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
-            return 
-        }
-        
-        var request = URLRequest(url: url)
-        request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
-        request.setValue("CCSwitch/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
-        
-        // 添加 ETag 支持以节省额度
-        if !isManual && !lastCheckETag.isEmpty {
-            request.setValue(lastCheckETag, forHTTPHeaderField: "If-None-Match")
-        }
-        
-        request.timeoutInterval = 15
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            let httpResponse = response as? HTTPURLResponse
-            
-            // 更新最后检查时间
-            lastCheckDateValue = Date().timeIntervalSince1970
-            lastUpdateCheckDate = Date()
-            
-            // 304 Not Modified 表示内容没变
-            if httpResponse?.statusCode == 304 {
-                Logger.shared.info("Update check: 304 Not Modified")
-                return
-            }
-            
-            // 保存新的 ETag
-            if let etag = httpResponse?.allHeaderFields["Etag"] as? String {
-                lastCheckETag = etag
-            }
-            
-            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                if let message = json["message"] as? String, httpResponse?.statusCode != 200 {
-                    let friendlyMessage: String
-                    if message.contains("rate limit exceeded") {
-                        friendlyMessage = NSLocalizedString("error_rate_limit", comment: "GitHub API rate limit exceeded")
-                    } else {
-                        friendlyMessage = message
-                    }
-                    
-                    let error = NSError(domain: "UpdateManager", code: httpResponse?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: friendlyMessage])
-                    self.lastError = error
-                    Logger.shared.error("Update check API error: \(message)")
-                    return
-                }
-                
-                guard let tagName = json["tag_name"] as? String else {
-                    lastError = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No tag_name found in response"])
-                    return
-                }
-                
-                let version = tagName.replacingOccurrences(of: "v", with: "")
-                let currentVersion = AppInfo.version
-                
-                if version.compare(currentVersion, options: .numeric) == .orderedDescending {
-                    let body = json["body"] as? String ?? ""
-                    let htmlUrl = json["html_url"] as? String ?? ""
-                    
-                    var downloadUrlString = htmlUrl
-                    if let assets = json["assets"] as? [[String: Any]] {
-                        for asset in assets {
-                            if let name = asset["name"] as? String,
-                               (name.hasSuffix(".dmg") || name.hasSuffix(".zip")),
-                               let browserDownloadUrl = asset["browser_download_url"] as? String {
-                                downloadUrlString = browserDownloadUrl
-                                break
-                            }
-                        }
-                    }
-                    
-                    let downloadUrl = URL(string: downloadUrlString) ?? URL(string: htmlUrl)!
-                    
-                    latestRelease = UpdateInfo(
-                        version: version,
-                        releaseNotes: body,
-                        downloadUrl: downloadUrl,
-                        isPrerelease: json["prerelease"] as? Bool ?? false
-                    )
-                } else {
-                    latestRelease = nil
-                }
-            }
-        } catch {
-            self.lastError = error
-            Logger.shared.error("Update check failed", error: error)
-        }
-    }
-    
-    /// 兼容旧代码的同步/带参数版本
-    func checkForUpdates(isManual: Bool) {
-        Task {
-            await checkForUpdates(isManual: isManual)
-            if isManual {
-                if let error = lastError {
-                    showErrorAlert(error: error)
-                } else if let release = latestRelease {
-                    showUpdateAlert(release: release)
-                } else {
-                    showNoUpdateAlert()
-                }
-            }
-        }
-    }
-    
-    private func showUpdateAlert(release: UpdateInfo) {
-        let alert = NSAlert()
-        alert.messageText = String(format: NSLocalizedString("update_available_title", comment: ""), release.version)
-        alert.informativeText = "\(NSLocalizedString("update_available_msg", comment: ""))\n\n\(NSLocalizedString("release_notes_label", comment: ""))\n\(release.releaseNotes)"
-        alert.alertStyle = .informational
-        
-        let updateTitle = release.downloadUrl.pathExtension == "zip" ? NSLocalizedString("update_now", comment: "") : NSLocalizedString("download_now", comment: "")
-        alert.addButton(withTitle: updateTitle)
-        alert.addButton(withTitle: NSLocalizedString("later", comment: ""))
-        
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            if release.downloadUrl.pathExtension == "zip" {
-                downloadAndInstallUpdate(release: release)
-            } else {
-                NSWorkspace.shared.open(release.downloadUrl)
-            }
-        }
-    }
-    
-    private func showNoUpdateAlert() {
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("up_to_date_title", comment: "")
-        alert.informativeText = NSLocalizedString("up_to_date_msg", comment: "")
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
-        alert.runModal()
-    }
-
-    private func showErrorAlert(error: Error) {
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("update_check_failed", comment: "")
-        alert.informativeText = error.localizedDescription
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
-        alert.runModal()
+    var isDownloading: Bool {
+        if case .downloading = self { return true }
+        return false
     }
 }
 
-struct UpdateInfo {
-    let version: String
-    let releaseNotes: String
-    let downloadUrl: URL
-    let isPrerelease: Bool
+/// 基于 Sparkle 2 的更新管理器
+@MainActor
+class UpdateManager: NSObject, ObservableObject {
+    static let shared = UpdateManager()
+    
+    @Published var state: UpdateState = .idle
+    @Published var lastUpdateCheckDate: Date?
+    @Published var showAlert = false
+    @Published var alertTitle = ""
+    @Published var alertMessage = ""
+    
+    private var updater: SPUUpdater?
+    private var updaterController: SPUStandardUpdaterController?
+    
+    // 配置项桥接
+    @AppStorage("SUEnableAutomaticChecks") var automaticallyChecksForUpdates = true {
+        didSet { updater?.automaticallyChecksForUpdates = automaticallyChecksForUpdates }
+    }
+    @AppStorage("SUAutomaticallyUpdate") var automaticallyDownloadsAndInstallsUpdates = false {
+        didSet { updater?.automaticallyDownloadsAndInstallsUpdates = automaticallyDownloadsAndInstallsUpdates }
+    }
+    @AppStorage("SULastCheckDate") private var lastCheckDateValue: Double = 0
+    
+    override private init() {
+        super.init()
+        
+        // 初始化 Sparkle 控制器
+        // 使用 self 作为 userDriverDelegate 以便捕获进度
+        self.updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: self)
+        self.updater = updaterController?.updater
+        
+        // 同步配置
+        self.updater?.automaticallyChecksForUpdates = automaticallyChecksForUpdates
+        self.updater?.automaticallyDownloadsAndInstallsUpdates = automaticallyDownloadsAndInstallsUpdates
+        
+        if lastCheckDateValue > 0 {
+            self.lastUpdateCheckDate = Date(timeIntervalSince1970: lastCheckDateValue)
+        }
+    }
+    
+    /// 检查更新
+    func checkForUpdates(isManual: Bool = false) async {
+        guard state == .idle || state == .upToDate || state == .error("") else { return }
+        
+        if isManual {
+            state = .checking
+            // 手动触发检查
+            updater?.checkForUpdates()
+        } else {
+            // 后台自动检查
+            updater?.checkForUpdatesInBackground()
+        }
+    }
+    
+    /// 兼容非 async 调用
+    func checkForUpdates(isManual: Bool = false) {
+        Task {
+            await checkForUpdates(isManual: isManual)
+        }
+    }
+    
+    /// 立即重启以完成更新
+    func relaunch() {
+        updater?.relaunchApplication()
+    }
+}
+
+// MARK: - SPUUpdaterDelegate
+extension UpdateManager: SPUUpdaterDelegate {
+    
+    nonisolated func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        Task { @MainActor in
+            // 发现更新，进入下载状态
+            self.state = .downloading(progress: 0)
+            Logger.shared.info("Found valid update: \(item.displayVersionString)")
+        }
+    }
+    
+    nonisolated func updaterDidNotFindUpdate(_ updater: SPUUpdater) {
+        Task { @MainActor in
+            self.lastUpdateCheckDate = Date()
+            self.lastCheckDateValue = Date().timeIntervalSince1970
+            
+            // 只有在手动检查时才进入 upToDate 状态并弹窗
+            if self.state == .checking {
+                self.state = .upToDate
+                self.alertTitle = NSLocalizedString("up_to_date_title", comment: "")
+                self.alertMessage = NSLocalizedString("up_to_date_msg", comment: "")
+                self.showAlert = true
+            } else {
+                self.state = .idle
+            }
+        }
+    }
+    
+    nonisolated func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
+        Task { @MainActor in
+            self.state = .installing
+        }
+    }
+    
+    nonisolated func updater(_ updater: SPUUpdater, willInstallUpdateOnQuit item: SUAppcastItem, immediateInstallationBlock installHandler: @escaping () -> Void) {
+        Task { @MainActor in
+            // 安装完成，等待重启
+            self.state = .awaitingRelaunch(version: item.displayVersionString)
+            self.alertTitle = NSLocalizedString("update_successful_title", comment: "")
+            self.alertMessage = String(format: NSLocalizedString("update_successful_msg", comment: ""), item.displayVersionString)
+            self.showAlert = true
+        }
+    }
+    
+    nonisolated func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
+        Task { @MainActor in
+            let nsError = error as NSError
+            // 忽略“用户取消”或“没有更新”引发的错误提示
+            if nsError.domain == SUSparkleErrorDomain && 
+               (nsError.code == Int(SUError.noUpdateError.rawValue) || nsError.code == Int(SUError.userRejectedUpdateError.rawValue)) {
+                if self.state == .checking {
+                    self.updaterDidNotFindUpdate(updater)
+                } else {
+                    self.state = .idle
+                }
+                return
+            }
+            
+            self.state = .error(error.localizedDescription)
+            self.alertTitle = NSLocalizedString("update_check_failed", comment: "")
+            self.alertMessage = error.localizedDescription
+            self.showAlert = true
+            Logger.shared.error("Update failed", error: error)
+        }
+    }
+}
+
+// MARK: - SPUStandardUserDriverDelegate
+extension UpdateManager: SPUStandardUserDriverDelegate {
+    
+    nonisolated func userDriver(_ userDriver: SPUStandardUserDriver, didUpdateDownloadProgressWith progress: Double) {
+        Task { @MainActor in
+            self.state = .downloading(progress: progress)
+        }
+    }
+    
+    nonisolated func userDriver(_ userDriver: SPUStandardUserDriver, willDisplayUpdate item: SUAppcastItem, reply: @escaping (SPUUserUpdateChoice) -> Void) {
+        // 当发现更新并准备显示 UI 时触发
+        // 如果我们要全自动，可以直接回复 .install
+        // 除非用户关闭了“自动下载安装”
+        if self.automaticallyDownloadsAndInstallsUpdates {
+            reply(.install)
+        } else {
+            // 否则遵循 Sparkle 默认行为（弹出标准窗口）
+            reply(.show)
+        }
+    }
 }

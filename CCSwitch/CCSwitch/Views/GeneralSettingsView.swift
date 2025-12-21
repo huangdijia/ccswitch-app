@@ -141,17 +141,17 @@ struct GeneralSettingsView: View {
                             Button {
                                 updateManager.checkForUpdates(isManual: true)
                             } label: {
-                                if updateManager.isChecking {
+                                if updateManager.state.isChecking {
                                     HStack(spacing: 4) {
                                         ProgressView().controlSize(.small)
-                                        Text("check_for_updates_now")
+                                        Text("checking_for_updates")
                                     }
                                 } else {
                                     Text("check_for_updates_now")
                                 }
                             }
                             .buttonStyle(.bordered)
-                            .disabled(updateManager.isChecking || updateManager.isDownloading)
+                            .disabled(updateManager.state.isChecking || updateManager.state.isDownloading)
                             
                             if let lastDate = updateManager.lastUpdateCheckDate {
                                 Text(String(format: NSLocalizedString("last_checked_format", comment: ""), lastDate.formatted()))
@@ -167,19 +167,27 @@ struct GeneralSettingsView: View {
                             .foregroundColor(.secondary)
                     }
 
-                    if updateManager.isDownloading {
+                    if case .downloading(let progress) = updateManager.state {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text(updateManager.installationStatus ?? "")
+                                Text("downloading")
                                     .font(.caption)
                                 Spacer()
-                                Text("\(Int(updateManager.downloadProgress * 100))%")
+                                Text("\(Int(progress * 100))%")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
-                            ProgressView(value: updateManager.downloadProgress)
+                            ProgressView(value: progress)
                                 .progressViewStyle(.linear)
                                 .controlSize(.small)
+                        }
+                        .padding(.top, 4)
+                    } else if case .installing = updateManager.state {
+                        HStack(spacing: 8) {
+                            ProgressView().controlSize(.small)
+                            Text("installing")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         .padding(.top, 4)
                     }
@@ -191,6 +199,30 @@ struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .padding()
+        .alert(isPresented: $updateManager.showAlert) {
+            if case .awaitingRelaunch = updateManager.state {
+                return Alert(
+                    title: Text(updateManager.alertTitle),
+                    message: Text(updateManager.alertMessage),
+                    primaryButton: .default(Text("relaunch_now")) {
+                        updateManager.relaunch()
+                    },
+                    secondaryButton: .cancel(Text("relaunch_later")) {
+                        updateManager.state = .idle
+                    }
+                )
+            } else {
+                return Alert(
+                    title: Text(updateManager.alertTitle),
+                    message: Text(updateManager.alertMessage),
+                    dismissButton: .default(Text("ok")) {
+                        if case .error = updateManager.state {
+                            updateManager.state = .idle
+                        }
+                    }
+                )
+            }
+        }
         .onAppear {
             checkNotificationPermission()
         }

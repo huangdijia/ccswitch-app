@@ -28,7 +28,16 @@
 	<string>Copyright © 2025 CCSwitch. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-</dict>
-</plist>
+		<key>NSPrincipalClass</key>
+		<string>NSApplication</string>
+		<key>SUFeedURL</key>
+		<string>https://raw.githubusercontent.com/huangdijia/ccswitch-mac/master/appcast.xml</string>
+		<key>SUPublicEDKey</key>
+		<string>PLACEHOLDER_YOUR_PUBLIC_ED25519_KEY</string>
+		<key>SUAutomaticallyUpdate</key>
+		<true/>
+		<key>SUEnableAutomaticChecks</key>
+		<true/>
+	</dict>
+	</plist>
+	
