@@ -1,65 +1,87 @@
 import SwiftUI
 
 struct AdvancedSettingsView: View {
-    @State private var showDebugLogs = false
-    @State private var confirmBackupDeletion = true
+    @AppStorage("showDebugLogs") private var showDebugLogs = false
+    @AppStorage("confirmBackupDeletion") private var confirmBackupDeletion = true
+    
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
     @State private var showingReloadSuccess = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // System Options
-            VStack(alignment: .leading, spacing: 16) {
+        Form {
+            // MARK: - Section 1: System Behavior
+            Section {
                 Toggle("show_debug_logs", isOn: $showDebugLogs)
-                    .toggleStyle(.checkbox)
-                
                 Toggle("confirm_backup_deletion", isOn: $confirmBackupDeletion)
-                    .toggleStyle(.checkbox)
+            } header: {
+                Text("system_behavior")
+            } footer: {
+                Text("debug_logs_desc")
             }
             
-            // Maintenance Section
-            VStack(alignment: .leading, spacing: 12) {
-                Text("maintenance")
-                    .font(.headline)
+            // MARK: - Section 2: Data & Maintenance
+            Section {
+                HStack {
+                    Text("backups")
+                    Spacer()
+                    Button("manage_backups") {
+                        showingBackupSheet = true
+                    }
+                }
                 
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Button("manage_backups") {
-                            showingBackupSheet = true
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("config_file")
+                        Text("config_file_path")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    HStack(spacing: 12) {
+                        Button("show_in_finder") {
+                            openConfigFolder()
                         }
+                        .buttonStyle(.link)
+                        .font(.subheadline)
                         
                         Button("reload_config") {
                             reloadConfiguration()
                         }
-                    }
-                    
-                    HStack {
-                        Button("open_claude_config") {
-                            openClaudeConfig()
-                        }
-                        
-                        Button(role: .destructive, action: {
-                            showingResetAlert = true
-                        }) {
-                            Text("reset_app_state")
-                                .foregroundColor(.red)
-                        }
+                        .controlSize(.small)
                     }
                 }
-                .padding(.leading, 16) // Indent actions
+            } header: {
+                Text("data_maintenance")
             }
             
-            Spacer()
+            // MARK: - Section 3: Danger Zone
+            Section {
+                Button(role: .destructive) {
+                    showingResetAlert = true
+                } label: {
+                    HStack {
+                        Spacer()
+                        Text("reset_app_action")
+                        Spacer()
+                    }
+                }
+            } header: {
+                Text("danger_zone")
+            } footer: {
+                Text("reset_app_state_warning")
+                    .foregroundColor(.red.opacity(0.8))
+            }
         }
-        .padding(24)
+        .formStyle(.grouped)
+        .padding()
         .sheet(isPresented: $showingBackupSheet) {
             BackupListView()
         }
         .alert(isPresented: $showingResetAlert) {
             Alert(
-                title: Text("confirm_reset_title"),
-                message: Text("confirm_reset_msg"),
+                title: Text("reset_app_state_confirm_title"),
+                message: Text("reset_app_state_confirm_msg"),
                 primaryButton: .destructive(Text("reset_button")) {
                     resetAppState()
                 },
@@ -80,8 +102,9 @@ struct AdvancedSettingsView: View {
         showingReloadSuccess = true
     }
 
-    private func openClaudeConfig() {
-        NSWorkspace.shared.selectFile(ClaudeSettings.configFile.path, inFileViewerRootedAtPath: "")
+    private func openConfigFolder() {
+        // Pointing to the CCSwitch config file specifically
+        NSWorkspace.shared.selectFile(CCSConfig.configFile.path, inFileViewerRootedAtPath: "")
     }
 
     private func resetAppState() {
@@ -89,6 +112,9 @@ struct AdvancedSettingsView: View {
         UserDefaults.standard.removePersistentDomain(forName: domain)
         ConfigManager.shared.cleanup()
         ConfigManager.shared.initialize()
+        
+        // Note: In a real app, you might want to force restart or notify the user 
+        // that defaults have been restored.
     }
 }
 
@@ -99,7 +125,7 @@ struct BackupListView: View {
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
                 Text("backups")
                     .font(.headline)
@@ -107,13 +133,28 @@ struct BackupListView: View {
                 Button("done") {
                     presentationMode.wrappedValue.dismiss()
                 }
+                .controlSize(.small)
             }
             .padding()
+            .background(Color(NSColor.windowBackgroundColor))
+            
+            Divider()
             
             List {
                 if backups.isEmpty {
-                    Text("no_backups")
-                        .foregroundColor(.secondary)
+                    HStack {
+                        Spacer()
+                        VStack(spacing: 8) {
+                            Image(systemName: "archivebox")
+                                .font(.largeTitle)
+                                .foregroundColor(.secondary)
+                            Text("no_backups")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
                 } else {
                     ForEach(backups, id: \.self) { backup in
                         HStack {
@@ -141,7 +182,7 @@ struct BackupListView: View {
                 }
             }
         }
-        .frame(width: 400, height: 300)
+        .frame(width: 450, height: 350)
         .onAppear {
             loadBackups()
         }

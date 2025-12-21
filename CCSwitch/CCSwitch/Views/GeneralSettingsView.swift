@@ -10,54 +10,95 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
+            // Section 1: Configuration Management
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("notifications")
-                        .font(.headline)
-                    
+                // Auto Reload Config
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("auto_reload_config")
+                            .font(.body)
+                        Text("auto_reload_config_desc")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $autoLoadConfig)
+                        .labelsHidden()
+                }
+                
+                // Auto Backup
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("auto_backup")
+                            .font(.body)
+                        Text("auto_backup_desc_refined")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $autoBackup)
+                        .labelsHidden()
+                }
+                
+                Button {
+                    openBackupFolder()
+                } label: {
                     HStack {
-                        Toggle("show_notifications", isOn: $showSwitchNotification)
-                            .disabled(notificationStatus == .denied)
+                        Image(systemName: "folder")
+                        Text("show_backup_files")
+                    }
+                }
+                .buttonStyle(.link)
+                .padding(.leading, 0) // Align with text, no extra indent needed in Form usually, or minimal
+                .padding(.top, 4)
+            } header: {
+                Text("config_management")
+            }
+
+            // Section 2: Notifications
+            Section {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("show_notifications")
+                            .font(.body)
+                        Text("show_notifications_desc")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $showSwitchNotification)
+                        .labelsHidden()
+                        .disabled(notificationStatus == .denied)
+                }
+                
+                if notificationStatus == .denied {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.yellow)
                         
-                        if notificationStatus == .denied {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("notification_permission_disabled")
+                                .font(.callout)
                             Button("open_system_settings") {
                                 openSystemSettings()
                             }
+                            .buttonStyle(.link)
                             .font(.caption)
-                        } else if notificationStatus == .notDetermined {
-                             Button("allow_notifications") {
-                                 requestNotificationPermission()
-                             }
-                             .font(.caption)
                         }
                     }
-                    
-                    Text("show_notifications_desc")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    .padding(.vertical, 4)
+                } else if notificationStatus == .notDetermined {
+                    Button("allow_notifications") {
+                        requestNotificationPermission()
+                    }
+                    .buttonStyle(.link)
+                    .font(.caption)
                 }
-                .padding(.bottom, 10)
-                
-                Divider()
-                    .padding(.bottom, 10)
-
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("startup_backup")
-                        .font(.headline)
-                    
-                    Toggle("auto_load_config", isOn: $autoLoadConfig)
-                    Text("auto_load_config_desc")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.bottom, 4)
-                        
-                    Toggle("auto_backup", isOn: $autoBackup)
-                    Text("auto_backup_desc")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+            } header: {
+                Text("notifications")
             }
         }
+        .formStyle(.grouped)
         .padding()
         .onAppear {
             checkNotificationPermission()
@@ -90,5 +131,10 @@ struct GeneralSettingsView: View {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") {
             NSWorkspace.shared.open(url)
         }
+    }
+    
+    private func openBackupFolder() {
+        let folderURL = CCSConfig.configDirectory
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: folderURL.path)
     }
 }
