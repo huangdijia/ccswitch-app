@@ -32,6 +32,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // 设置主菜单
         setupMainMenu()
+        
+        // 自动检查更新
+        if UpdateManager.shared.automaticallyChecksForUpdates {
+            Task {
+                await UpdateManager.shared.checkForUpdates(isManual: false)
+            }
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

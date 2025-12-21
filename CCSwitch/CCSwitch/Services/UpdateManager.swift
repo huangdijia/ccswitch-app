@@ -16,16 +16,27 @@ class UpdateManager: NSObject, ObservableObject {
     // 配置项
     @AppStorage("SUEnableAutomaticChecks") var automaticallyChecksForUpdates = true
     @AppStorage("SUAutomaticallyUpdate") var automaticallyDownloadsAndInstallsUpdates = false
+    @AppStorage("SULastCheckDate") private var lastCheckDateValue: Double = 0
+    @AppStorage("SULastCheckETag") private var lastCheckETag: String = ""
     
     private let githubRepo = "huangdijia/ccswitch-mac"
+    private let checkInterval: TimeInterval = 3600 // 1 hour
     
     override private init() {
         super.init()
     }
     
     /// 检查更新 (异步版本)
-    func checkForUpdates() async {
+    func checkForUpdates(isManual: Bool = false) async {
         guard !isChecking else { return }
+        
+        // 非手动检查时，检查时间间隔
+        if !isManual {
+            let lastCheck = Date(timeIntervalSince1970: lastCheckDateValue)
+            if Date().timeIntervalSince(lastCheck) < checkInterval {
+                return
+            }
+        }
         
         isChecking = true
         lastError = nil
@@ -40,14 +51,35 @@ class UpdateManager: NSObject, ObservableObject {
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
         request.setValue("CCSwitch/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
+        
+        // 添加 ETag 支持以节省额度
+        if !isManual && !lastCheckETag.isEmpty {
+            request.setValue(lastCheckETag, forHTTPHeaderField: "If-None-Match")
+        }
+        
         request.timeoutInterval = 15
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
+            let httpResponse = response as? HTTPURLResponse
+            
+            // 更新最后检查时间
+            lastCheckDateValue = Date().timeIntervalSince1970
             lastUpdateCheckDate = Date()
             
+            // 304 Not Modified 表示内容没变
+            if httpResponse?.statusCode == 304 {
+                Logger.shared.info("Update check: 304 Not Modified")
+                return
+            }
+            
+            // 保存新的 ETag
+            if let etag = httpResponse?.allHeaderFields["Etag"] as? String {
+                lastCheckETag = etag
+            }
+            
             if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                if let message = json["message"] as? String, (response as? HTTPURLResponse)?.statusCode != 200 {
+                if let message = json["message"] as? String, httpResponse?.statusCode != 200 {
                     let friendlyMessage: String
                     if message.contains("rate limit exceeded") {
                         friendlyMessage = NSLocalizedString("error_rate_limit", comment: "GitHub API rate limit exceeded")
@@ -55,7 +87,7 @@ class UpdateManager: NSObject, ObservableObject {
                         friendlyMessage = message
                     }
                     
-                    let error = NSError(domain: "UpdateManager", code: (response as? HTTPURLResponse)?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: friendlyMessage])
+                    let error = NSError(domain: "UpdateManager", code: httpResponse?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: friendlyMessage])
                     self.lastError = error
                     Logger.shared.error("Update check API error: \(message)")
                     return
@@ -106,7 +138,7 @@ class UpdateManager: NSObject, ObservableObject {
     /// 兼容旧代码的同步/带参数版本
     func checkForUpdates(isManual: Bool) {
         Task {
-            await checkForUpdates()
+            await checkForUpdates(isManual: isManual)
             if isManual {
                 if let error = lastError {
                     showErrorAlert(error: error)
