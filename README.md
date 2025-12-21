@@ -239,6 +239,7 @@ xcodebuild test -project CCSwitch.xcodeproj -scheme CCSwitch -destination 'platf
 ```
 
 或使用测试脚本：
+
 ```bash
 ./test_app.sh
 ```
