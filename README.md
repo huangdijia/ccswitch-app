@@ -15,11 +15,13 @@
    - 一键切换 Claude Code 供应商
    - 支持多个供应商配置
    - 当前供应商标记（✓）
+   - 预置供应商模板（Anthropic、DeepSeek、OpenAI等）
 
 3. **配置管理**
    - 自动读取和写入 `~/.claude/settings.json`
    - 集中管理供应商配置（`~/.ccswitch/vendors.json`）
    - 配置自动备份机制
+   - 支持配置模板复用
 
 4. **设置界面**
    - General：通用设置、路径显示、通知权限管理
@@ -38,6 +40,12 @@
    - 详细的错误提示
    - 日志记录和问题报告
    - 多语言支持（简体中文、繁体中文、英文）
+
+7. **架构优化** 🆕
+   - 协议导向架构（Protocol-Oriented Architecture）
+   - 依赖注入模式提升可测试性
+   - 清晰的关注点分离
+   - 易于扩展的模块化设计
 
 ## 安装使用
 
@@ -146,6 +154,9 @@ ccswitch-app/
 ├── fix_and_run.sh                    # 修复并运行脚本
 ├── README.md                         # 项目说明
 ├── README_XCODE.md                   # Xcode 使用指南
+├── ARCHITECTURE.md                   # 架构文档 🆕
+├── EXTENSION_GUIDE.md                # 扩展指南 🆕
+├── CONTRIBUTING.md                   # 贡献指南 🆕
 └── CCSwitch/
     ├── CCSwitch.xcodeproj            # Xcode 项目文件
     ├── CCSwitch.xcworkspace          # Xcode 工作空间
@@ -156,10 +167,19 @@ ccswitch-app/
     │   │   └── MenuBarController.swift  # 状态栏控制器
     │   ├── Models/
     │   │   ├── Vendor.swift             # 供应商模型
+    │   │   ├── VendorTemplate.swift     # 供应商模板 🆕
     │   │   ├── CCSConfig.swift          # CCSwitch 配置
     │   │   └── ClaudeSettings.swift     # Claude 配置模型
+    │   ├── Protocols/                   # 协议定义 🆕
+    │   │   ├── VendorSwitcher.swift        # 供应商切换协议
+    │   │   ├── ConfigurationRepository.swift # 配置仓库协议
+    │   │   ├── SettingsWriter.swift        # 设置写入协议
+    │   │   ├── BackupService.swift         # 备份服务协议
+    │   │   ├── NotificationService.swift   # 通知服务协议
+    │   │   └── SettingsRepository.swift    # 设置仓库协议
     │   ├── Services/
-    │   │   ├── ConfigManager.swift      # 配置管理服务
+    │   │   ├── ConfigManager.swift      # 配置管理服务（重构）
+    │   │   ├── ServiceContainer.swift   # 依赖注入容器 🆕
     │   │   ├── BackupManager.swift      # 备份管理
     │   │   ├── Logger.swift            # 日志系统
     │   │   └── ErrorHandler.swift      # 错误处理
@@ -176,8 +196,11 @@ ccswitch-app/
     │       ├── zh-Hans.lproj/           # 简体中文本地化
     │       └── zh-Hant.lproj/           # 繁体中文本地化
     └── CCSwitchTests/
-        ├── ConfigManagerTests.swift
-        └── ModelTests.swift
+        ├── ConfigManagerTests.swift     # 配置管理测试 🆕
+        ├── ModelTests.swift             # 模型测试 🆕
+        └── Mocks/                       # Mock对象 🆕
+            ├── MockConfigurationRepository.swift
+            └── MockServices.swift
 ```
 
 ## 测试
@@ -195,9 +218,28 @@ xcodebuild test -project CCSwitch.xcodeproj -scheme CCSwitch -destination 'platf
 ./test_app.sh
 ```
 
+## 架构
+
+CCSwitch 采用**协议导向架构**（Protocol-Oriented Architecture）配合**依赖注入**模式：
+
+- ✅ **高可测试性**：所有核心组件都有协议定义和 Mock 实现
+- ✅ **高复用性**：通过协议抽象和依赖注入实现组件复用
+- ✅ **低耦合**：清晰的关注点分离，各层职责明确
+- ✅ **易扩展**：新增供应商、存储后端、通知渠道等无需修改核心代码
+
+详细架构文档请参考：
+- [ARCHITECTURE.md](ARCHITECTURE.md) - 架构设计详解
+- [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - 扩展开发指南
+- [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
+
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+在贡献之前，请阅读：
+- [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
+- [ARCHITECTURE.md](ARCHITECTURE.md) - 了解项目架构
+- [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - 学习如何扩展功能
 
 ## 许可证
 
