@@ -18,6 +18,9 @@ struct AdvancedSettingsView: View {
                 Text("system_behavior")
             } footer: {
                 Text("debug_logs_desc")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             
             // MARK: - Section 2: Data & Maintenance
@@ -60,17 +63,17 @@ struct AdvancedSettingsView: View {
                 Button(role: .destructive) {
                     showingResetAlert = true
                 } label: {
-                    HStack {
-                        Spacer()
-                        Text("reset_app_action")
-                        Spacer()
-                    }
+                    Text("reset_app_action")
+                        .frame(maxWidth: .infinity)
                 }
             } header: {
                 Text("danger_zone")
             } footer: {
                 Text("reset_app_state_warning")
+                    .font(.caption)
                     .foregroundColor(.red.opacity(0.8))
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .formStyle(.grouped)
