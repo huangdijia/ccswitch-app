@@ -98,6 +98,7 @@
 "confirm_delete_msg" = "Are you sure you want to delete this vendor? This action cannot be undone.";
 "delete" = "Delete";
 "github" = "GitHub";
+"community" = "Community";
 "help" = "Help";
 "open_github" = "Open GitHub Repo";
 

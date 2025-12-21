@@ -98,6 +98,7 @@
 "confirm_delete_msg" = "确定要删除此供应商吗？此操作无法撤销。";
 "delete" = "删除";
 "github" = "GitHub";
+"community" = "社区";
 "help" = "帮助";
 "open_github" = "打开 GitHub 仓库";
 

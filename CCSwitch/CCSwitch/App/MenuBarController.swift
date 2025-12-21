@@ -38,7 +38,19 @@ class MenuBarController: NSObject, ConfigObserver {
         // We need a separator after vendors
         menu.addItem(NSMenuItem.separator())
 
-        // 2. About & Settings
+        // 2. Links
+        let githubItem = NSMenuItem(title: NSLocalizedString("community", comment: ""), action: #selector(openGitHub), keyEquivalent: "")
+        githubItem.title = "GitHub"
+        githubItem.target = self
+        menu.addItem(githubItem)
+
+        let communityItem = NSMenuItem(title: NSLocalizedString("community", comment: ""), action: #selector(openCommunity), keyEquivalent: "")
+        communityItem.target = self
+        menu.addItem(communityItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        // 3. About & Settings
         let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
@@ -53,7 +65,7 @@ class MenuBarController: NSObject, ConfigObserver {
         
         menu.addItem(NSMenuItem.separator())
 
-        // 3. Quit
+        // 4. Quit
         let quitItem = NSMenuItem(title: NSLocalizedString("quit", comment: ""), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
@@ -102,6 +114,18 @@ class MenuBarController: NSObject, ConfigObserver {
     }
 
     // MARK: - Menu Actions
+    @objc private func openGitHub() {
+        if let url = URL(string: "https://github.com/huangdijia/ccswitch-app") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    @objc private func openCommunity() {
+        if let url = URL(string: "https://github.com/huangdijia/ccswitch-app/discussions") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
     @objc private func showAbout() {
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
             appDelegate.showAbout()
