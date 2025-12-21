@@ -234,3 +234,21 @@
 "status_success" = "连接成功 (200 OK)";
 "status_auth_failed" = "鉴权失败 (401) - 请检查 Token";
 "status_network_error" = "网络错误 - 请检查 URL";
+
+/* Software Update */
+"software_update" = "软件更新";
+"auto_check_updates" = "自动检查更新";
+"auto_check_updates_desc" = "定期检查 GitHub 以获取新版本。";
+"auto_install_updates" = "自动下载并安装";
+"auto_install_updates_desc" = "在后台安装更新（需要重启）。";
+"check_for_updates_now" = "检查更新...";
+"last_checked_format" = "上次检查时间：%@";
+"version_info" = "版本";
+"update_available_title" = "发现新版本：%@";
+"update_available_msg" = "CCSwitch 有新版本可供下载。";
+"release_notes_label" = "更新日志：";
+"download_now" = "立即下载";
+"later" = "以后再说";
+"up_to_date_title" = "已是最新版本";
+"up_to_date_msg" = "您当前使用的是最新版本的 CCSwitch。";
+"update_check_failed" = "检查更新失败";

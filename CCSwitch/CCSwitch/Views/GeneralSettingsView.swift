@@ -97,6 +97,81 @@ struct GeneralSettingsView: View {
             } header: {
                 Text("notifications")
             }
+            
+            // Section 3: Software Update
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("auto_check_updates")
+                                .font(.body)
+                            Text("auto_check_updates_desc")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { UpdateManager.shared.automaticallyChecksForUpdates },
+                            set: { UpdateManager.shared.automaticallyChecksForUpdates = $0 }
+                        ))
+                        .labelsHidden()
+                    }
+                    
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("auto_install_updates")
+                                .font(.body)
+                            Text("auto_install_updates_desc")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { UpdateManager.shared.automaticallyDownloadsAndInstallsUpdates },
+                            set: { UpdateManager.shared.automaticallyDownloadsAndInstallsUpdates = $0 }
+                        ))
+                        .labelsHidden()
+                    }
+                    
+                    Divider().padding(.vertical, 4)
+                    
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Button {
+                                UpdateManager.shared.checkForUpdates(isManual: true)
+                            } label: {
+                                if UpdateManager.shared.isChecking {
+                                    HStack(spacing: 4) {
+                                        ProgressView().controlSize(.small)
+                                        Text("check_for_updates_now")
+                                    }
+                                } else {
+                                    Text("check_for_updates_now")
+                                }
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(UpdateManager.shared.isChecking)
+                            
+                            if let lastDate = UpdateManager.shared.lastUpdateCheckDate {
+                                Text(String(format: NSLocalizedString("last_checked_format", comment: ""), lastDate.formatted()))
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+                        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+                        Text("\(NSLocalizedString("version_info", comment: "")) \(version) (\(build))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+            } header: {
+                Text("software_update")
+            }
         }
         .formStyle(.grouped)
         .padding()

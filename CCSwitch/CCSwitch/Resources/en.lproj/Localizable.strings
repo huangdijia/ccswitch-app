@@ -234,3 +234,22 @@
 "status_success" = "Connection Successful (200 OK)";
 "status_auth_failed" = "Auth Failed (401) - Check Token";
 "status_network_error" = "Network Error - Check URL";
+
+/* Software Update */
+"software_update" = "Software Update";
+"auto_check_updates" = "Automatically check for updates";
+"auto_check_updates_desc" = "Periodically check GitHub for new versions.";
+"auto_install_updates" = "Automatically download and install";
+"auto_install_updates_desc" = "Install updates in the background (requires relaunch).";
+"check_for_updates_now" = "Check for Updates...";
+"last_checked_format" = "Last checked: %@";
+"version_info" = "Version";
+"update_available_title" = "New Version Available: %@";
+"update_available_msg" = "A new version of CCSwitch is available.";
+"release_notes_label" = "Release Notes:";
+"download_now" = "Download Now";
+"later" = "Later";
+"up_to_date_title" = "Up to Date";
+"up_to_date_msg" = "You are currently using the latest version of CCSwitch.";
+"update_check_failed" = "Update Check Failed";
+"ok" = "OK";

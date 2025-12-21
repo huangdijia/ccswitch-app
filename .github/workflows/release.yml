@@ -18,6 +18,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Update Version in Info.plist
+        run: |
+          # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
+          VERSION=${GITHUB_REF_NAME#v}
+          PLIST="CCSwitch/CCSwitch/Resources/Info.plist"
+          
+          echo "🏷️ Setting version to $VERSION in $PLIST"
+          
+          # Update CFBundleShortVersionString and CFBundleVersion
+          plutil -replace CFBundleShortVersionString -string "$VERSION" "$PLIST"
+          plutil -replace CFBundleVersion -string "$GITHUB_RUN_NUMBER" "$PLIST"
+          
+          # Verify
+          cat "$PLIST" | grep -A 1 "CFBundleShortVersionString"
+
       - name: Run Tests
         run: |
           xcodebuild test \

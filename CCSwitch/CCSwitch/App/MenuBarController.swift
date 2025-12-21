@@ -47,6 +47,10 @@ class MenuBarController: NSObject, ConfigObserver {
         settingsItem.target = self
         menu.addItem(settingsItem)
         
+        let updateItem = NSMenuItem(title: NSLocalizedString("check_for_updates_now", comment: ""), action: #selector(checkForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
+        
         menu.addItem(NSMenuItem.separator())
 
         // 3. Quit
@@ -134,6 +138,10 @@ class MenuBarController: NSObject, ConfigObserver {
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
             appDelegate.showSettingsWindow()
         }
+    }
+
+    @objc private func checkForUpdates() {
+        UpdateManager.shared.checkForUpdates(isManual: true)
     }
 
     @objc private func switchVendor(_ sender: NSMenuItem) {
