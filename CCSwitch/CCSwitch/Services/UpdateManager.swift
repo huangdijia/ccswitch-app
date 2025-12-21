@@ -4,7 +4,7 @@ import AppKit
 
 /// 基于 GitHub Releases 的更新管理器
 @MainActor
-class UpdateManager: NSObject, ObservableObject {
+class UpdateManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     static let shared = UpdateManager()
     
     @Published var canCheckForUpdates = true
@@ -12,6 +12,16 @@ class UpdateManager: NSObject, ObservableObject {
     @Published var isChecking = false
     @Published var latestRelease: UpdateInfo?
     @Published var lastError: Error?
+    
+    @Published var isDownloading = false
+    @Published var downloadProgress: Double = 0
+    @Published var installationStatus: String?
+    
+    private var downloadTask: URLSessionDownloadTask?
+    private lazy var downloadSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        return URLSession(configuration: config, delegate: self, delegateQueue: .main)
+    }()
     
     // 配置项
     @AppStorage("SUEnableAutomaticChecks") var automaticallyChecksForUpdates = true
@@ -24,6 +34,104 @@ class UpdateManager: NSObject, ObservableObject {
     
     override private init() {
         super.init()
+    }
+    
+    // MARK: - Download & Install
+    
+    func downloadAndInstallUpdate(release: UpdateInfo) {
+        guard !isDownloading else { return }
+        
+        isDownloading = true
+        downloadProgress = 0
+        installationStatus = NSLocalizedString("downloading", comment: "")
+        
+        let task = downloadSession.downloadTask(with: release.downloadUrl)
+        self.downloadTask = task
+        task.resume()
+    }
+    
+    // URLSessionDownloadDelegate
+    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        let tempDir = FileManager.default.temporaryDirectory
+        let destinationURL = tempDir.appendingPathComponent("CCSwitch_Update.zip")
+        
+        do {
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+            try FileManager.default.moveItem(at: location, to: destinationURL)
+            
+            Task { @MainActor in
+                self.installationStatus = NSLocalizedString("installing", comment: "")
+                self.installUpdate(at: destinationURL)
+            }
+        } catch {
+            Task { @MainActor in
+                self.isDownloading = false
+                self.lastError = error
+                self.showErrorAlert(error: error)
+            }
+        }
+    }
+    
+    nonisolated func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        if totalBytesExpectedToWrite > 0 {
+            let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+            Task { @MainActor in
+                self.downloadProgress = progress
+            }
+        }
+    }
+    
+    private func installUpdate(at localURL: URL) {
+        let appPath = Bundle.main.bundlePath
+        let tempExtractDir = FileManager.default.temporaryDirectory.appendingPathComponent("CCSwitch_Extracted")
+        
+        do {
+            if FileManager.default.fileExists(atPath: tempExtractDir.path) {
+                try FileManager.default.removeItem(at: tempExtractDir)
+            }
+            try FileManager.default.createDirectory(at: tempExtractDir, withIntermediateDirectories: true)
+            
+            // 使用 ditto 解压
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+            process.arguments = ["-x", "-k", localURL.path, tempExtractDir.path]
+            try process.run()
+            process.waitUntilExit()
+            
+            // 找到解压后的 .app
+            let contents = try FileManager.default.contentsOfDirectory(at: tempExtractDir, includingPropertiesForKeys: nil)
+            guard let newAppBundle = contents.first(where: { $0.pathExtension == "app" }) else {
+                throw NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find .app in update package"])
+            }
+            
+            // 准备更新脚本
+            let scriptPath = FileManager.default.temporaryDirectory.appendingPathComponent("install_update.sh").path
+            let script = """
+            #!/bin/bash
+            sleep 1
+            rm -rf "\(appPath)"
+            cp -R "\(newAppBundle.path)" "\(appPath)"
+            open "\(appPath)"
+            """
+            
+            try script.write(toFile: scriptPath, atomically: true, encoding: .utf8)
+            try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: scriptPath)
+            
+            // 运行更新脚本并退出
+            let scriptProcess = Process()
+            scriptProcess.executableURL = URL(fileURLWithPath: "/bin/bash")
+            scriptProcess.arguments = [scriptPath]
+            try scriptProcess.run()
+            
+            NSApplication.shared.terminate(nil)
+            
+        } catch {
+            self.isDownloading = false
+            self.lastError = error
+            self.showErrorAlert(error: error)
+        }
     }
     
     /// 检查更新 (异步版本)
@@ -156,12 +264,18 @@ class UpdateManager: NSObject, ObservableObject {
         alert.messageText = String(format: NSLocalizedString("update_available_title", comment: ""), release.version)
         alert.informativeText = "\(NSLocalizedString("update_available_msg", comment: ""))\n\n\(NSLocalizedString("release_notes_label", comment: ""))\n\(release.releaseNotes)"
         alert.alertStyle = .informational
-        alert.addButton(withTitle: NSLocalizedString("download_now", comment: ""))
+        
+        let updateTitle = release.downloadUrl.pathExtension == "zip" ? NSLocalizedString("update_now", comment: "") : NSLocalizedString("download_now", comment: "")
+        alert.addButton(withTitle: updateTitle)
         alert.addButton(withTitle: NSLocalizedString("later", comment: ""))
         
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
-            NSWorkspace.shared.open(release.downloadUrl)
+            if release.downloadUrl.pathExtension == "zip" {
+                downloadAndInstallUpdate(release: release)
+            } else {
+                NSWorkspace.shared.open(release.downloadUrl)
+            }
         }
     }
     

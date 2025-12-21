@@ -144,6 +144,11 @@
 "no_env_vars" = "無環境變數";
 
 /* New Keys */
+"download_now" = "立即下載";
+"update_now" = "立即更新";
+"downloading" = "正在下載...";
+"installing" = "正在安裝...";
+"later" = "以後再说";
 "open_system_settings" = "打開系統設定";
 "allow_notifications" = "允許通知";
 "show_vendors_in_menu" = "在選單中顯示這些項目：";

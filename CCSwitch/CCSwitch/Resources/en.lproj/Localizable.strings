@@ -249,6 +249,9 @@
 "update_available_msg" = "A new version of CCSwitch is available.";
 "release_notes_label" = "Release Notes:";
 "download_now" = "Download Now";
+"update_now" = "Update Now";
+"downloading" = "Downloading...";
+"installing" = "Installing...";
 "later" = "Later";
 "up_to_date_title" = "Up to Date";
 "up_to_date_msg" = "You are currently using the latest version of CCSwitch.";

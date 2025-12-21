@@ -249,6 +249,9 @@
 "update_available_msg" = "CCSwitch 有新版本可供下载。";
 "release_notes_label" = "更新日志：";
 "download_now" = "立即下载";
+"update_now" = "立即更新";
+"downloading" = "正在下载...";
+"installing" = "正在安装...";
 "later" = "以后再说";
 "up_to_date_title" = "已是最新版本";
 "up_to_date_msg" = "您当前使用的是最新版本的 CCSwitch。";

@@ -7,6 +7,7 @@ struct GeneralSettingsView: View {
     @AppStorage("autoBackup") private var autoBackup = true
     
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @ObservedObject private var updateManager = UpdateManager.shared
 
     var body: some View {
         Form {
@@ -138,9 +139,9 @@ struct GeneralSettingsView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Button {
-                                UpdateManager.shared.checkForUpdates(isManual: true)
+                                updateManager.checkForUpdates(isManual: true)
                             } label: {
-                                if UpdateManager.shared.isChecking {
+                                if updateManager.isChecking {
                                     HStack(spacing: 4) {
                                         ProgressView().controlSize(.small)
                                         Text("check_for_updates_now")
@@ -150,9 +151,9 @@ struct GeneralSettingsView: View {
                                 }
                             }
                             .buttonStyle(.bordered)
-                            .disabled(UpdateManager.shared.isChecking)
+                            .disabled(updateManager.isChecking || updateManager.isDownloading)
                             
-                            if let lastDate = UpdateManager.shared.lastUpdateCheckDate {
+                            if let lastDate = updateManager.lastUpdateCheckDate {
                                 Text(String(format: NSLocalizedString("last_checked_format", comment: ""), lastDate.formatted()))
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
@@ -164,6 +165,23 @@ struct GeneralSettingsView: View {
                         Text("\(NSLocalizedString("version_info", comment: "")) \(AppInfo.fullVersion)")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                    }
+
+                    if updateManager.isDownloading {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(updateManager.installationStatus ?? "")
+                                    .font(.caption)
+                                Spacer()
+                                Text("\(Int(updateManager.downloadProgress * 100))%")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            ProgressView(value: updateManager.downloadProgress)
+                                .progressViewStyle(.linear)
+                                .controlSize(.small)
+                        }
+                        .padding(.top, 4)
                     }
                 }
                 .padding(.vertical, 4)
