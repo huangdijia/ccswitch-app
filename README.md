@@ -18,7 +18,7 @@
 
 3. **配置管理**
    - 自动读取和写入 `~/.claude/settings.json`
-   - 集中管理供应商配置（`~/.ccswitch/ccswitch.json`）
+   - 集中管理供应商配置（`~/.ccswitch/vendors.json`）
    - 配置自动备份机制
 
 4. **设置界面**
@@ -103,7 +103,7 @@ cd ccswitch-app
 
 ## 配置文件格式
 
-### CCSwitch 配置 (~/.ccswitch/ccs.json)
+### CCSwitch 配置 (~/.ccswitch/vendors.json)
 
 ```json
 {
@@ -129,7 +129,7 @@ cd ccswitch-app
 }
 ```
 
-> **注意**：配置文件路径为 `~/.ccswitch/ccs.json`，参考示例文件 `CCSwitch/ccswitch.json.example`
+> **注意**：配置文件路径为 `~/.ccswitch/vendors.json`，参考示例文件 `CCSwitch/vendors.json.example`
 
 ### Claude 配置 (~/.claude/settings.json)
 
@@ -149,7 +149,7 @@ ccswitch-app/
 └── CCSwitch/
     ├── CCSwitch.xcodeproj            # Xcode 项目文件
     ├── CCSwitch.xcworkspace          # Xcode 工作空间
-    ├── ccswitch.json.example         # 配置文件示例
+    ├── vendors.json.example         # 配置文件示例
     ├── CCSwitch/
     │   ├── App/
     │   │   ├── CCSwitchApp.swift        # 应用入口

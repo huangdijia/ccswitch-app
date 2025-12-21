@@ -19,7 +19,7 @@
 /* Vendor Management */
 "vendor_management_title" = "Vendor Management";
 "vendor_management_subtitle" = "Manage your available Claude Code vendors. Switch between them instantly.";
-"config_path_label" = "Config: ~/.ccswitch/ccswitch.json";
+"config_path_label" = "Config: ~/.ccswitch/vendors.json";
 "switch_button" = "Switch";
 "active_badge" = "Active";
 "currently_active" = "Currently Active";
