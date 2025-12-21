@@ -322,6 +322,14 @@
 				01000012 /* VendorManagementView.swift in Sources */,
 				01000013 /* VendorEditView.swift in Sources */,
 				01000014 /* AdvancedSettingsView.swift in Sources */,
+				03000002 /* VendorSwitcher.swift in Sources */,
+				03000003 /* ConfigurationRepository.swift in Sources */,
+				03000004 /* SettingsWriter.swift in Sources */,
+				03000005 /* BackupService.swift in Sources */,
+				03000006 /* NotificationService.swift in Sources */,
+				03000007 /* SettingsRepository.swift in Sources */,
+				03000008 /* ServiceContainer.swift in Sources */,
+				03000009 /* VendorTemplate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
