@@ -84,6 +84,20 @@ struct VendorManagementView: View {
                 .listStyle(.sidebar)
                 .scrollContentBackground(.hidden)
                 .frame(minWidth: 200)
+                // Attach Unsaved Changes Alert here
+                .alert(isPresented: $showUnsavedChangesAlert) {
+                    let vendorName = vendors.first(where: { $0.id == selectedVendorId })?.displayName ?? "Item"
+                    return Alert(
+                        title: Text("unsaved_changes"),
+                        message: Text(String(format: NSLocalizedString("unsaved_changes_msg", comment: ""), vendorName)),
+                        primaryButton: .destructive(Text("discard_changes")) {
+                            discardAndSwitch()
+                        },
+                        secondaryButton: .cancel(Text("keep_editing")) {
+                            pendingVendorId = nil
+                        }
+                    )
+                }
                 
                 // Bottom Toolbar
                 HStack(spacing: 0) {
@@ -115,6 +129,19 @@ struct VendorManagementView: View {
                         .foregroundColor(Color(NSColor.separatorColor)),
                     alignment: .top
                 )
+                // Attach Delete Confirmation Alert here
+                .alert(isPresented: $showDeleteConfirmation) {
+                    Alert(
+                        title: Text("delete_vendor"),
+                        message: Text(String(format: NSLocalizedString("delete_vendor_confirmation", comment: ""), vendorToDelete?.displayName ?? "")),
+                        primaryButton: .destructive(Text("delete")) {
+                            if let v = vendorToDelete {
+                                deleteVendor(v)
+                            }
+                        },
+                        secondaryButton: .cancel()
+                    )
+                }
             }
             .frame(width: 200)
             .background(Color(NSColor.controlBackgroundColor))
@@ -124,14 +151,13 @@ struct VendorManagementView: View {
             // MARK: - Right Detail View
             Group {
                 if let selectedId = selectedVendorId, let vendor = vendors.first(where: { $0.id == selectedId }) {
-                    // We pass a Binding to isDetailDirty so the parent knows the state
                     VendorDetailView(
                         vendor: vendor,
                         isActive: vendor.id == currentVendorId,
                         isDirtyBinding: $isDetailDirty,
                         onSave: handleSave
                     )
-                    .id(selectedId) // Important: Identity ensures view rebuilds on switch
+                    .id(selectedId)
                 } else {
                     VStack(spacing: 16) {
                         Image(systemName: "server.rack")
@@ -151,6 +177,14 @@ struct VendorManagementView: View {
                 }
             }
             .frame(maxWidth: .infinity)
+            // Attach Error Alert here
+            .alert(isPresented: $showErrorAlert) {
+                Alert(
+                    title: Text("error"),
+                    message: Text(errorMessage ?? "Unknown error"),
+                    dismissButton: .default(Text("ok"))
+                )
+            }
         }
         .onAppear {
             loadVendors()
@@ -160,42 +194,6 @@ struct VendorManagementView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .configDidChange)) { _ in
             loadVendors()
-        }
-        // Delete Alert
-        .alert(isPresented: $showDeleteConfirmation) {
-            Alert(
-                title: Text("delete_vendor"),
-                message: Text(String(format: NSLocalizedString("delete_vendor_confirmation", comment: ""), vendorToDelete?.displayName ?? "")),
-                primaryButton: .destructive(Text("delete")) {
-                    if let v = vendorToDelete {
-                        deleteVendor(v)
-                    }
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        // Unsaved Changes Alert
-        .alert(isPresented: $showUnsavedChangesAlert) {
-            let vendorName = vendors.first(where: { $0.id == selectedVendorId })?.displayName ?? "Item"
-            return Alert(
-                title: Text("unsaved_changes"),
-                message: Text(String(format: NSLocalizedString("unsaved_changes_msg", comment: ""), vendorName)),
-                primaryButton: .destructive(Text("discard_changes")) {
-                    discardAndSwitch()
-                },
-                secondaryButton: .cancel(Text("keep_editing")) {
-                    // Do nothing, stay on current
-                    pendingVendorId = nil
-                }
-            )
-        }
-        // Error Alert
-        .alert(isPresented: $showErrorAlert) {
-            Alert(
-                title: Text("error"),
-                message: Text(errorMessage ?? "Unknown error"),
-                dismissButton: .default(Text("ok"))
-            )
         }
     }
     
@@ -214,7 +212,7 @@ struct VendorManagementView: View {
     
     private func discardAndSwitch() {
         if let newId = pendingVendorId {
-            isDetailDirty = false // Reset dirty flag
+            isDetailDirty = false
             selectedVendorId = newId
             pendingVendorId = nil
         }
@@ -230,7 +228,6 @@ struct VendorManagementView: View {
     private func addNewVendor() {
         if isDetailDirty {
              pendingVendorId = nil
-             // Ideally we should block adding if dirty, but let's just let the user fix it first.
         }
         
         let newVendor = Vendor(
@@ -240,7 +237,6 @@ struct VendorManagementView: View {
         )
         try? ConfigManager.shared.addVendor(newVendor)
         loadVendors()
-        // Select the new one
         attemptSelectionChange(to: newVendor.id)
     }
     
@@ -307,7 +303,59 @@ struct VendorManagementView: View {
     }
 }
 
-// MARK: - Vendor Detail View (Unchanged from previous turn, but included for completeness)
+// MARK: - Subviews (Unchanged)
+struct VendorRowView: View {
+    let vendor: Vendor
+    let isActive: Bool
+    @State private var isHovered = false
+    
+    var body: some View {
+        HStack {
+            if isActive {
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 8, height: 8)
+            } else {
+                Circle()
+                    .strokeBorder(Color.secondary, lineWidth: 1)
+                    .frame(width: 8, height: 8)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(vendor.displayName)
+                    .font(.body)
+                    .lineLimit(1)
+                
+                if let url = vendor.env["ANTHROPIC_BASE_URL"] ?? vendor.env["NTHROPIC_BASE_URL"],
+                   let host = URL(string: url)?.host {
+                    Text(host)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            
+            Spacer()
+            
+            if ConfigManager.shared.isFavorite(vendor.id) {
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                    .font(.caption)
+            } else if isHovered {
+                Image(systemName: "star")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+                    .onTapGesture {
+                        ConfigManager.shared.toggleFavorite(vendor.id)
+                    }
+            }
+        }
+        .padding(.vertical, 4)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+}
 
 struct VendorDetailView: View {
     let vendor: Vendor
@@ -534,7 +582,7 @@ struct VendorDetailView: View {
             .background(Color(NSColor.controlBackgroundColor))
         }
         .onAppear {
-            validate(quiet: true) // Initial validation check without showing errors
+            validate(quiet: true)
         }
     }
     
@@ -596,7 +644,6 @@ struct VendorDetailView: View {
             }
         }
         
-        // Update fields
         update("ANTHROPIC_BASE_URL", baseURL)
         update("NTHROPIC_BASE_URL", baseURL) 
         update("ANTHROPIC_AUTH_TOKEN", authToken)
@@ -608,11 +655,7 @@ struct VendorDetailView: View {
         update("ANTHROPIC_SMALL_FAST_MODEL", smallFastModel)
         
         let updatedVendor = Vendor(id: vendor.id, name: name, env: env)
-        
-        // Call parent save
         onSave(updatedVendor)
-        
-        // Update original to current to clear dirty state
         originalVendor = updatedVendor
     }
     
@@ -654,59 +697,5 @@ struct VendorDetailView: View {
                 }
             }
         }.resume()
-    }
-}
-
-// MARK: - Subviews (Unchanged)
-struct VendorRowView: View {
-    let vendor: Vendor
-    let isActive: Bool
-    @State private var isHovered = false
-    
-    var body: some View {
-        HStack {
-            if isActive {
-                Circle()
-                    .fill(Color.green)
-                    .frame(width: 8, height: 8)
-            } else {
-                Circle()
-                    .strokeBorder(Color.secondary, lineWidth: 1)
-                    .frame(width: 8, height: 8)
-            }
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(vendor.displayName)
-                    .font(.body)
-                    .lineLimit(1)
-                
-                if let url = vendor.env["ANTHROPIC_BASE_URL"] ?? vendor.env["NTHROPIC_BASE_URL"],
-                   let host = URL(string: url)?.host {
-                    Text(host)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
-            }
-            
-            Spacer()
-            
-            if ConfigManager.shared.isFavorite(vendor.id) {
-                Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
-                    .font(.caption)
-            } else if isHovered {
-                Image(systemName: "star")
-                    .foregroundColor(.secondary)
-                    .font(.caption)
-                    .onTapGesture {
-                        ConfigManager.shared.toggleFavorite(vendor.id)
-                    }
-            }
-        }
-        .padding(.vertical, 4)
-        .onHover { hovering in
-            isHovered = hovering
-        }
     }
 }
