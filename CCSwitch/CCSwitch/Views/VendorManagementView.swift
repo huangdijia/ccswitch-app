@@ -43,8 +43,8 @@ struct VendorManagementView: View {
                     TextField("search_vendors", text: $searchText).textFieldStyle(.plain)
                 }
                 .padding(8)
-                .background(Color(NSColor.controlBackgroundColor))
-                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor)), alignment: .bottom)
+                .background(Color.clear)
+                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor).opacity(0.5)), alignment: .bottom)
                 
                 let selectionBinding = Binding<String?>(
                     get: { selectedVendorId },
@@ -92,11 +92,11 @@ struct VendorManagementView: View {
                     
                     Spacer()
                 }
-                .background(Color(NSColor.controlBackgroundColor))
-                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor)), alignment: .top)
+                .background(Color.clear)
+                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor).opacity(0.5)), alignment: .top)
             }
             .frame(width: 200)
-            .background(Color(NSColor.controlBackgroundColor))
+            .background(SidebarMaterialView())
             
             Divider()
             
@@ -425,4 +425,16 @@ struct VendorRowView: View {
             else if isHovered { Image(systemName: "star").foregroundColor(.secondary).font(.caption).onTapGesture { ConfigManager.shared.toggleFavorite(vendor.id) } }
         }.padding(.vertical, 4).onHover { isHovered = $0 }
     }
+}
+
+// MARK: - AppKit Helpers
+struct SidebarMaterialView: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.blendingMode = .behindWindow
+        view.material = .sidebar
+        view.state = .followsWindowActiveState
+        return view
+    }
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }
