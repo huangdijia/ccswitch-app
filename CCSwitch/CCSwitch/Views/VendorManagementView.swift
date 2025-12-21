@@ -7,6 +7,7 @@ struct VendorManagementView: View {
     @State private var showImportError: Bool = false
     @State private var importErrorMessage: String = ""
     @State private var showImportSuccess: Bool = false
+    @State private var importedCount: Int = 0
     @State private var activeSheet: SheetState?
     @State private var currentVendorId: String = ""
     @State private var showDeleteConfirmation: Bool = false
@@ -45,20 +46,6 @@ struct VendorManagementView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.bottom, DesignSystem.Spacing.large)
-                .alert(isPresented: $showImportError) {
-                    Alert(
-                        title: Text("error"),
-                        message: Text(importErrorMessage),
-                        dismissButton: .default(Text("ok"))
-                    )
-                }
-                .alert(isPresented: $showImportSuccess) {
-                    Alert(
-                        title: Text("success"),
-                        message: Text("migration_success"),
-                        dismissButton: .default(Text("ok"))
-                    )
-                }
             }
 
             ModernSection(title: "vendors") {
@@ -184,6 +171,20 @@ struct VendorManagementView: View {
                 secondaryButton: .cancel()
             )
         }
+        .alert(isPresented: $showImportError) {
+            Alert(
+                title: Text("error"),
+                message: Text(importErrorMessage),
+                dismissButton: .default(Text("ok"))
+            )
+        }
+        .alert(isPresented: $showImportSuccess) {
+            Alert(
+                title: Text("success"),
+                message: Text(String(format: NSLocalizedString("import_success_count", comment: ""), importedCount)),
+                dismissButton: .default(Text("ok"))
+            )
+        }
     }
 
     private func loadVendors() {
@@ -194,7 +195,7 @@ struct VendorManagementView: View {
     
     private func importLegacyConfig() {
         do {
-            try ConfigManager.shared.migrateFromLegacy()
+            importedCount = try ConfigManager.shared.migrateFromLegacy()
             showImportSuccess = true
             loadVendors()
         } catch {
@@ -314,7 +315,7 @@ struct VendorDetailView: View {
                     ModernSection(title: "environment_variables") {
                         let sortedKeys = vendor.env.keys.sorted()
                         if sortedKeys.isEmpty {
-                            Text("No environment variables")
+                            Text("no_env_vars")
                                 .font(DesignSystem.Fonts.body)
                                 .foregroundColor(DesignSystem.Colors.textTertiary)
                                 .padding(DesignSystem.Spacing.medium)

@@ -14,24 +14,6 @@ struct CCSConfig: Codable {
                     id: "default",
                     name: "Default",
                     env: [:]
-                ),
-                Vendor(
-                    id: "anyrouter",
-                    name: "AnyRouter",
-                    env: [
-                        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
-                        "ANTHROPIC_BASE_URL": "https://anyrouter.top"
-                    ]
-                ),
-                Vendor(
-                    id: "deepseek",
-                    name: "DeepSeek",
-                    env: [
-                        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
-                        "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
-                        "ANTHROPIC_MODEL": "deepseek-chat",
-                        "ANTHROPIC_SMALL_FAST_MODEL": "deepseek-chat"
-                    ]
                 )
             ]
         )
@@ -65,7 +47,7 @@ struct CCSConfig: Codable {
 }
 
 // MARK: - Legacy Configuration (For migration)
-struct LegacyCCSConfig: Codable {
+struct LegacyCCSConfig: Decodable {
     let settingsPath: String?
     var `default`: String?
     var version: Int?
@@ -74,12 +56,52 @@ struct LegacyCCSConfig: Codable {
     let descriptions: [String: String]?
     let vendors: [LegacyVendor]?
 
-    struct LegacyVendor: Codable {
+    struct LegacyVendor: Decodable {
         let id: String
         let displayName: String?
         let name: String?
         let env: [String: String]?
         let claudeSettingsPatch: [String: String]?
+        
+        enum CodingKeys: String, CodingKey {
+            case id, displayName, name, env, claudeSettingsPatch
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(String.self, forKey: .id)
+            displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+            name = try container.decodeIfPresent(String.self, forKey: .name)
+            claudeSettingsPatch = try container.decodeIfPresent([String: String].self, forKey: .claudeSettingsPatch)
+            
+            // Handle env with mixed types
+            if let envContainer = try? container.decode([String: AnyDecodable].self, forKey: .env) {
+                env = envContainer.mapValues { $0.description }
+            } else {
+                env = try container.decodeIfPresent([String: String].self, forKey: .env)
+            }
+        }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case settingsPath, `default`, version, current, profiles, descriptions, vendors
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        settingsPath = try container.decodeIfPresent(String.self, forKey: .settingsPath)
+        `default` = try container.decodeIfPresent(String.self, forKey: .default)
+        version = try container.decodeIfPresent(Int.self, forKey: .version)
+        current = try container.decodeIfPresent(String.self, forKey: .current)
+        descriptions = try container.decodeIfPresent([String: String].self, forKey: .descriptions)
+        vendors = try container.decodeIfPresent([LegacyVendor].self, forKey: .vendors)
+        
+        // Handle profiles with mixed types
+        if let profilesContainer = try? container.decode([String: [String: AnyDecodable]].self, forKey: .profiles) {
+            profiles = profilesContainer.mapValues { $0.mapValues { $0.description } }
+        } else {
+            profiles = try container.decodeIfPresent([String: [String: String]].self, forKey: .profiles)
+        }
     }
 
     func toNewConfig() -> CCSConfig {
@@ -122,5 +144,26 @@ extension CCSConfig {
             at: configDirectory,
             withIntermediateDirectories: true
         )
+    }
+}
+
+// MARK: - Helper Types
+private struct AnyDecodable: Decodable, CustomStringConvertible {
+    let value: Any
+    
+    var description: String {
+        return String(describing: value)
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(String.self) { value = x }
+        else if let x = try? container.decode(Int.self) { value = x }
+        else if let x = try? container.decode(Double.self) { value = x }
+        else if let x = try? container.decode(Bool.self) { value = x }
+        else if container.decodeNil() { value = "" }
+        else {
+            throw DecodingError.typeMismatch(AnyDecodable.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unsupported type"))
+        }
     }
 }

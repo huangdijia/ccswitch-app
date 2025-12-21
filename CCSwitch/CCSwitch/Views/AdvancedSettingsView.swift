@@ -105,7 +105,7 @@ struct AdvancedSettingsView: View {
 
     private func restoreBackup(_ backup: URL) {
         do {
-            try BackupManager.shared.restoreFromBackup(backupURL: backup)
+            try BackupManager.shared.restoreFromBackup(backup)
             showAlert(title: NSLocalizedString("success", comment: ""), message: NSLocalizedString("restore_success_msg", comment: ""))
             loadBackups()
         } catch {
@@ -115,7 +115,7 @@ struct AdvancedSettingsView: View {
 
     private func deleteBackup(_ backup: URL) {
         do {
-            try BackupManager.shared.deleteBackup(backupURL: backup)
+            try BackupManager.shared.deleteBackup(backup)
             loadBackups()
         } catch {
             showAlert(title: NSLocalizedString("error", comment: ""), message: error.localizedDescription)

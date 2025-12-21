@@ -2,28 +2,35 @@ import Foundation
 import Cocoa
 import UserNotifications
 
-// MARK: - Configuration Manager
+// MARK: - Configuration Manager (Refactored to use Protocol-based Architecture)
 class ConfigManager {
     static let shared = ConfigManager()
 
-    private var currentConfig: CCSConfig?
     private var observers: [ConfigObserver] = []
+    
+    // Service dependencies
+    private let configRepository: ConfigurationRepository
+    private let vendorSwitcher: VendorSwitcher
+    private let notificationService: NotificationService
+    private let settingsRepository: SettingsRepository
 
-    private init() {
+    private init(
+        configRepository: ConfigurationRepository? = nil,
+        vendorSwitcher: VendorSwitcher? = nil,
+        notificationService: NotificationService? = nil,
+        settingsRepository: SettingsRepository? = nil
+    ) {
+        // Use dependency injection with fallback to ServiceContainer
+        self.configRepository = configRepository ?? ServiceContainer.shared.configRepository
+        self.vendorSwitcher = vendorSwitcher ?? ServiceContainer.shared.vendorSwitcher
+        self.notificationService = notificationService ?? ServiceContainer.shared.notificationService
+        self.settingsRepository = settingsRepository ?? ServiceContainer.shared.settingsRepository
     }
 
     // MARK: - Initialization
     func initialize() {
-        requestNotificationPermission()
+        notificationService.requestPermission()
         loadOrCreateConfig()
-    }
-
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
-            if let error = error {
-                Logger.shared.error("Failed to request notification permission: \(error)")
-            }
-        }
     }
 
     func cleanup() {
@@ -36,27 +43,25 @@ class ConfigManager {
             // 确保配置目录存在
             try CCSConfig.ensureConfigDirectoryExists()
 
-            // 尝试加载现有配置
-            if let config = CCSConfig.loadFromFile() {
-                currentConfig = config
-                Logger.shared.logConfigLoad(config.current ?? "none")
+            // Initialize repository (loads or creates config)
+            if let fileRepo = configRepository as? FileConfigurationRepository {
+                try fileRepo.loadConfiguration()
+            }
+            
+            if configRepository.hasConfiguration() {
+                let currentVendorId = (try? configRepository.getCurrentVendor()?.id) ?? "none"
+                Logger.shared.logConfigLoad(currentVendorId)
                 notifyObservers(.configLoaded)
             } else if !hasLegacyConfig {
-                // 如果没有 legacy 配置，生成默认配置
-                let defaultConfig = CCSConfig.createDefault()
-                try saveConfig(defaultConfig)
-                currentConfig = defaultConfig
                 Logger.shared.info("Created default configuration")
                 notifyObservers(.configLoaded)
             } else {
                 // 有 legacy 配置但没有新配置，且还未迁移
                 Logger.shared.warn("New configuration file not found, legacy config available for migration")
-                currentConfig = nil
                 notifyObservers(.configLoaded)
             }
         } catch {
             Logger.shared.error("Failed to load or create configuration: \(error)")
-            currentConfig = nil
             notifyObservers(.configLoaded)
         }
     }
@@ -67,155 +72,64 @@ class ConfigManager {
     }
 
     var isConfigLoaded: Bool {
-        return currentConfig != nil
+        return configRepository.hasConfiguration()
     }
 
-    func migrateFromLegacy() throws {
+    func migrateFromLegacy() throws -> Int {
         guard let legacyConfig = CCSConfig.loadFromFile(url: CCSConfig.legacyConfigFile) else {
             throw ConfigError.configNotLoaded
         }
 
-        try saveConfig(legacyConfig)
-        currentConfig = legacyConfig
+        var importedCount = 0
+        // Save all vendors from legacy config
+        for vendor in legacyConfig.vendors {
+            do {
+                try configRepository.addVendor(vendor)
+                importedCount += 1
+            } catch {
+                // Ignore duplicates or errors
+            }
+        }
+        
+        // Set current vendor
+        if let current = legacyConfig.current {
+            try? configRepository.setCurrentVendor(current)
+        }
+        
         notifyObservers(.configLoaded)
-        Logger.shared.info("Migrated configuration from legacy file")
-    }
-
-    // MARK: - Configuration Saving
-    private func saveConfig(_ config: CCSConfig) throws {
-        try CCSConfig.ensureConfigDirectoryExists()
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
-        let data = try encoder.encode(config)
-        try data.write(to: CCSConfig.configFile)
+        Logger.shared.info("Migrated configuration from legacy file: \(importedCount) vendors")
+        return importedCount
     }
 
     // MARK: - Public Interface
     var currentVendor: Vendor? {
-        guard let config = currentConfig, let current = config.current else { return nil }
-        return config.vendors.first { $0.id == current }
+        return try? configRepository.getCurrentVendor()
     }
 
     var allVendors: [Vendor] {
-        return currentConfig?.vendors ?? []
+        return (try? configRepository.getAllVendors()) ?? []
     }
 
     func switchToVendor(with id: String) throws {
-        guard var config = currentConfig else {
-            throw ConfigError.configNotLoaded
-        }
-
-        guard let vendor = config.vendors.first(where: { $0.id == id }) else {
-            throw ConfigError.vendorNotFound
-        }
-
-        // 备份当前 Claude 配置
-        if UserDefaults.standard.bool(forKey: "autoBackup") {
-            try BackupManager.shared.backupCurrentSettings()
-        }
-
-        // 更新 Claude 设置
-        try updateClaudeSettings(with: vendor.env)
-
-        // 更新当前供应商并保存
-        config.current = id
-        try saveConfig(config)
-        currentConfig = config
-
-        // 记录日志
-        Logger.shared.logVendorSwitch(from: config.current, to: id)
-
-        // 显示通知
-        if UserDefaults.standard.bool(forKey: "showSwitchNotification") {
-            showNotification(title: "供应商已切换", message: "已切换至 \(vendor.name)")
-        }
-
+        try vendorSwitcher.switchToVendor(with: id)
         notifyObservers(.vendorChanged)
-    }
-
-    // MARK: - Claude Settings Management
-    private func updateClaudeSettings(with env: [String: String]) throws {
-        let claudeConfigUrl = ClaudeSettings.configFile
-        var claudeSettings: ClaudeSettings
-
-        // 读取现有配置或创建新配置
-        if FileManager.default.fileExists(atPath: claudeConfigUrl.path) {
-            let data = try Data(contentsOf: claudeConfigUrl)
-            claudeSettings = try JSONDecoder().decode(ClaudeSettings.self, from: data)
-        } else {
-            claudeSettings = ClaudeSettings()
-        }
-
-        // 仅替换 env 字段
-        claudeSettings.env = env
-
-        // 确保目录存在
-        try ClaudeSettings.configDirectory.ensureDirectoryExists()
-
-        // 写入配置
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
-        let data = try encoder.encode(claudeSettings)
-        try data.write(to: claudeConfigUrl)
     }
 
     // MARK: - Vendor Management
     func addVendor(_ vendor: Vendor) throws {
-        guard var config = currentConfig else {
-            throw ConfigError.configNotLoaded
-        }
-
-        if config.vendors.contains(where: { $0.id == vendor.id }) {
-            throw ConfigError.vendorAlreadyExists
-        }
-
-        config.vendors.append(vendor)
-        try saveConfig(config)
-        currentConfig = config
-        
+        try configRepository.addVendor(vendor)
         Logger.shared.info("Added new vendor: \(vendor.id)")
         notifyObservers(.vendorsUpdated)
     }
 
     func updateVendor(_ vendor: Vendor) throws {
-        guard var config = currentConfig else {
-            throw ConfigError.configNotLoaded
-        }
-
-        guard let index = config.vendors.firstIndex(where: { $0.id == vendor.id }) else {
-            throw ConfigError.vendorNotFound
-        }
-
-        config.vendors[index] = vendor
-        try saveConfig(config)
-        currentConfig = config
-        
+        try configRepository.updateVendor(vendor)
         Logger.shared.info("Updated vendor: \(vendor.id)")
         notifyObservers(.vendorsUpdated)
     }
 
     func removeVendor(with id: String) throws {
-        guard var config = currentConfig else {
-            throw ConfigError.configNotLoaded
-        }
-
-        guard config.vendors.contains(where: { $0.id == id }) else {
-            throw ConfigError.vendorNotFound
-        }
-        
-        if config.vendors.count <= 1 {
-            throw ConfigError.cannotRemoveLastVendor
-        }
-        
-        config.vendors.removeAll { $0.id == id }
-        
-        if config.current == id {
-             config.current = config.vendors.first?.id
-        }
-
-        try saveConfig(config)
-        currentConfig = config
-        
+        try configRepository.removeVendor(with: id)
         Logger.shared.info("Removed vendor: \(id)")
         notifyObservers(.vendorsUpdated)
     }
@@ -232,26 +146,6 @@ class ConfigManager {
     private func notifyObservers(_ event: ConfigEvent) {
         observers.forEach { $0.configDidChange(event) }
         NotificationCenter.default.post(name: .configDidChange, object: nil)
-    }
-
-    // MARK: - Helper Methods
-    private func showNotification(title: String, message: String) {
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = message
-        content.sound = .default
-        
-        let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: nil
-        )
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                Logger.shared.error("Failed to show notification: \(error)")
-            }
-        }
     }
 }
 

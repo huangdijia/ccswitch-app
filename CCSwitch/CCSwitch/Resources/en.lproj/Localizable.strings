@@ -125,3 +125,12 @@
 "paste_clipboard" = "Paste from Clipboard";
 "more" = "More";
 "less" = "Less";
+
+/* Missing Keys */
+"vendor_switched" = "Vendor Switched";
+"switched_to_vendor" = "Switched to %@";
+"switching_failed_with_error" = "Switching failed: %@";
+"missing_required_variable" = "Missing required variable: %@";
+"template_not_found" = "Template not found: %@";
+"import_success_count" = "Successfully imported %d vendors.";
+"no_env_vars" = "No environment variables";

@@ -69,6 +69,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let menu = NSMenu()
         
+        // Add Vendors
+        let vendors = ConfigManager.shared.allVendors
+        let currentVendor = ConfigManager.shared.currentVendor
+        
+        if !vendors.isEmpty {
+            for vendor in vendors {
+                let item = NSMenuItem(title: vendor.displayName, action: #selector(switchVendor(_:)), keyEquivalent: "")
+                item.target = self
+                item.representedObject = vendor.id
+                item.state = vendor.id == currentVendor?.id ? .on : .off
+                menu.addItem(item)
+            }
+            menu.addItem(NSMenuItem.separator())
+        }
+        
         let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "i")
         menu.addItem(aboutItem)
         
@@ -82,6 +97,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(quitItem)
         
         return menu
+    }
+    
+    @objc func switchVendor(_ sender: NSMenuItem) {
+        guard let vendorId = sender.representedObject as? String else { return }
+        do {
+            try ConfigManager.shared.switchToVendor(with: vendorId)
+        } catch {
+            print("Failed to switch vendor from Dock menu: \(error)")
+        }
     }
     
     private func setupMainMenu() {

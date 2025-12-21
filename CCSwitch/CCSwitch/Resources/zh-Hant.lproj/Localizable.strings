@@ -19,7 +19,7 @@
 /* Vendor Management */
 "vendor_management_title" = "供應商管理";
 "vendor_management_subtitle" = "管理您的 Claude Code 供應商。在它們之間即時切換。";
-"config_path_label" = "配置: ~/.ccswitch/vendors.json";
+"config_path_label" = "配置: ~.ccswitch/vendors.json";
 "switch_button" = "切換";
 "active_badge" = "當前使用";
 "currently_active" = "當前使用中";
@@ -32,7 +32,7 @@
 "switch_to_vendor_button" = "切換至該供應商";
 "details_tooltip" = "詳情";
 "no_vendors_found" = "未找到供應商";
-"check_config_msg" = "請檢查您的配置檔案 ~/.ccswitch/ccs.json";
+"check_config_msg" = "請檢查您的配置檔案 ~.ccswitch/ccs.json";
 "configuration" = "配置資訊";
 "general_settings" = "一般設定";
 "advanced_options" = "進階選項";
@@ -125,3 +125,12 @@
 "paste_clipboard" = "從剪貼板貼上";
 "more" = "更多";
 "less" = "摺疊";
+
+/* Missing Keys */
+"vendor_switched" = "供應商已切換";
+"switched_to_vendor" = "已切換至 %@";
+"switching_failed_with_error" = "切換失敗：%@";
+"missing_required_variable" = "缺失必要變數：%@";
+"template_not_found" = "未找到模板：%@";
+"import_success_count" = "成功匯入 %d 個供應商。";
+"no_env_vars" = "無環境變數";
