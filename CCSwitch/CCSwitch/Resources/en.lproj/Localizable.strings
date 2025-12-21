@@ -40,7 +40,7 @@
 "open_config_dir" = "Open Config Directory";
 "show_logs" = "View Logs";
 "about_title" = "About CCSwitch";
-"about_message" = "CCSwitch v%@\n\nA macOS status bar tool for quickly switching Claude Code vendors.\n\nConfig Dir: %@\nClaude Config: %@";
+"about_message" = "CCSwitch v%@\n\nA macOS status bar tool for quickly switching Claude Code vendors.";
 "ok" = "OK";
 "switch_failed" = "Switch Failed";
 "window_title_settings" = "CCSwitch Settings";

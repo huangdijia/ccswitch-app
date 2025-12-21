@@ -76,19 +76,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         alert.messageText = NSLocalizedString("about_title", comment: "")
         alert.informativeText = String(
             format: NSLocalizedString("about_message", comment: ""),
-            AppInfo.version,
-            CCSConfig.configFile.path,
-            ClaudeSettings.configFile.path
+            AppInfo.version
         )
         alert.alertStyle = .informational
         alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
-        alert.addButton(withTitle: NSLocalizedString("open_config_dir", comment: ""))
 
         NSApp.activate(ignoringOtherApps: true)
-        let response = alert.runModal()
-        if response == .alertSecondButtonReturn {
-            openConfigDirectory()
-        }
+        alert.runModal()
     }
 
     @objc func openConfigDirectory() {
