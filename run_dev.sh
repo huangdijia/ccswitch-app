@@ -25,12 +25,4 @@ echo ""
 echo "🚀 启动应用..."
 
 # 运行应用
-"$PROJECT_DIR/CCSwitch.app/Contents/MacOS/CCSwitch" &
-
-echo ""
-echo "✅ 应用已启动！"
-echo "📍 查看状态栏中的 'CC' 图标"
-echo ""
-echo "提示：如果菜单项仍然是灰色，请："
-echo "1. 确保 '辅助功能' 权限已授予终端"
-echo "2. 或者在系统偏好设置中手动允许应用运行"
+open "$PROJECT_DIR/CCSwitch.app"
