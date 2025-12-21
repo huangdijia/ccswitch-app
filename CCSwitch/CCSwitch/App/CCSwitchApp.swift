@@ -143,7 +143,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     @objc func openGitHub() {
-        if let url = URL(string: "https://github.com/huangdijia/ccswitch-mac") {
+        if let url = URL(string: "https://github.com/huangdijia/ccswitch-app") {
             NSWorkspace.shared.open(url)
         }
     }
