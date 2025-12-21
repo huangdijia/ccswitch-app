@@ -22,7 +22,7 @@
    - 配置自动备份机制
 
 4. **设置界面**
-   - General：通用设置、路径显示
+   - General：通用设置、路径显示、通知权限管理
    - 供应商管理：增删改查供应商，支持从旧配置导入
    - Advanced：备份管理、高级操作
 
@@ -33,9 +33,11 @@
 
 6. **用户体验**
    - 状态栏联动切换
-   - 切换成功通知
+   - 切换成功通知（需授予通知权限）
+   - 通知权限检测和引导
    - 详细的错误提示
    - 日志记录和问题报告
+   - 多语言支持（简体中文、繁体中文、英文）
 
 ## 安装使用
 
@@ -53,23 +55,38 @@
 
 #### 构建要求
 
-- macOS 11.0+
-- Xcode 12.0+
-- Swift 5.3+
+- macOS 14.6+
+- Xcode 15.0+
+- Swift 5.9+
 
 ### 构建步骤
 
 1. 克隆项目：
 
 ```bash
-git clone https://github.com/huangdijia/ccswitch-mac.git
-cd ccswitch-mac
+git clone https://github.com/huangdijia/ccswitch-app.git
+cd ccswitch-app
 ```
 
-1. 运行构建脚本：
+2. 运行构建脚本：
 
 ```bash
 ./build.sh
+```
+
+#### 开发构建和调试
+
+项目提供了多个辅助脚本用于开发：
+
+- **compile_swift.sh** - 使用 Swift 编译器直接编译（无需 Xcode）
+- **run_dev.sh** - 开发模式运行（自动解除安全限制）
+- **test_app.sh** - 测试应用基本功能
+- **fix_and_run.sh** - 修复并运行应用（适用于首次运行）
+
+快速开发运行：
+
+```bash
+./run_dev.sh
 ```
 
 ### 配置供应商
@@ -86,32 +103,33 @@ cd ccswitch-mac
 
 ## 配置文件格式
 
-### CCSwitch 配置 (~/.ccswitch/ccswitch.json)
+### CCSwitch 配置 (~/.ccswitch/ccs.json)
 
 ```json
 {
+  "version": 1,
   "current": "anthropic",
   "vendors": [
     {
-      "id": "anthropic",
-      "name": "Anthropic",
-      "env": {
-        "ANTHROPIC_MODEL": "claude-3-5-sonnet",
-        "ANTHROPIC_API_KEY": "sk-xxxxxx"
-      }
+      "id": "default",
+      "displayName": "Default",
+      "claudeSettingsPatch": {}
     },
     {
       "id": "deepseek",
-      "name": "DeepSeek",
-      "env": {
+      "displayName": "DeepSeek",
+      "claudeSettingsPatch": {
+        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
         "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
         "ANTHROPIC_MODEL": "deepseek-chat",
-        "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx"
+        "ANTHROPIC_SMALL_FAST_MODEL": "deepseek-chat"
       }
     }
   ]
 }
 ```
+
+> **注意**：配置文件路径为 `~/.ccswitch/ccs.json`，参考示例文件 `CCSwitch/ccswitch.json.example`
 
 ### Claude 配置 (~/.claude/settings.json)
 
@@ -120,30 +138,43 @@ cd ccswitch-mac
 ## 项目结构
 
 ```
-CCSwitch/
-├── CCSwitch.xcodeproj
-├── CCSwitch/
-│   ├── App/
-│   │   ├── CCSwitchApp.swift        # 应用入口
-│   │   └── MenuBarController.swift  # 状态栏控制器
-│   ├── Models/
-│   │   ├── Vendor.swift             # 供应商模型
-│   │   ├── CCSConfig.swift          # CCSwitch 配置
-│   │   └── ClaudeSettings.swift     # Claude 配置模型
-│   ├── Services/
-│   │   ├── ConfigManager.swift      # 配置管理服务
-│   │   ├── BackupManager.swift      # 备份管理
-│   │   ├── Logger.swift            # 日志系统
-│   │   └── ErrorHandler.swift      # 错误处理
-│   ├── Views/
-│   │   ├── SettingsView.swift       # 设置窗口主视图
-│   │   ├── GeneralSettingsView.swift
-│   │   ├── VendorManagementView.swift
-│   │   ├── VendorEditView.swift
-│   │   └── AdvancedSettingsView.swift
-│   └── Resources/
-│       └── Info.plist
-└── Tests/
+ccswitch-app/
+├── build.sh                          # 主构建脚本
+├── compile_swift.sh                  # Swift 编译脚本
+├── run_dev.sh                        # 开发运行脚本
+├── test_app.sh                       # 应用测试脚本
+├── fix_and_run.sh                    # 修复并运行脚本
+├── README.md                         # 项目说明
+├── README_XCODE.md                   # Xcode 使用指南
+└── CCSwitch/
+    ├── CCSwitch.xcodeproj            # Xcode 项目文件
+    ├── CCSwitch.xcworkspace          # Xcode 工作空间
+    ├── ccswitch.json.example         # 配置文件示例
+    ├── CCSwitch/
+    │   ├── App/
+    │   │   ├── CCSwitchApp.swift        # 应用入口
+    │   │   └── MenuBarController.swift  # 状态栏控制器
+    │   ├── Models/
+    │   │   ├── Vendor.swift             # 供应商模型
+    │   │   ├── CCSConfig.swift          # CCSwitch 配置
+    │   │   └── ClaudeSettings.swift     # Claude 配置模型
+    │   ├── Services/
+    │   │   ├── ConfigManager.swift      # 配置管理服务
+    │   │   ├── BackupManager.swift      # 备份管理
+    │   │   ├── Logger.swift            # 日志系统
+    │   │   └── ErrorHandler.swift      # 错误处理
+    │   ├── Views/
+    │   │   ├── SettingsView.swift       # 设置窗口主视图
+    │   │   ├── GeneralSettingsView.swift    # 通用设置（含通知权限）
+    │   │   ├── VendorManagementView.swift   # 供应商管理
+    │   │   ├── VendorEditView.swift         # 供应商编辑
+    │   │   └── AdvancedSettingsView.swift   # 高级设置
+    │   └── Resources/
+    │       ├── Info.plist
+    │       ├── AppIcon.icns
+    │       ├── en.lproj/                # 英文本地化
+    │       ├── zh-Hans.lproj/           # 简体中文本地化
+    │       └── zh-Hant.lproj/           # 繁体中文本地化
     └── CCSwitchTests/
         ├── ConfigManagerTests.swift
         └── ModelTests.swift
@@ -154,7 +185,14 @@ CCSwitch/
 运行单元测试：
 
 ```bash
-xcodebuild test -scheme CCSwitch
+cd CCSwitch
+xcodebuild test -project CCSwitch.xcodeproj -scheme CCSwitch -destination 'platform=macOS'
+```
+
+或使用测试脚本：
+
+```bash
+./test_app.sh
 ```
 
 ## 贡献
@@ -167,8 +205,11 @@ MIT License
 
 ## 更新日志
 
-### v1.0.0 (2025-12-20)
+### v1.0.0 (2025-12-21)
 
 - 初始版本发布
 - 实现所有核心功能
 - 支持供应商切换和配置管理
+- 支持通知权限检测和引导
+- 多语言支持（简体中文、繁体中文、英文）
+- 提供多个开发辅助脚本
