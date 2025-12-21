@@ -7,6 +7,7 @@ struct VendorManagementView: View {
     @State private var showImportError: Bool = false
     @State private var importErrorMessage: String = ""
     @State private var showImportSuccess: Bool = false
+    @State private var importedCount: Int = 0
     @State private var activeSheet: SheetState?
     @State private var currentVendorId: String = ""
     @State private var showDeleteConfirmation: Bool = false
@@ -55,7 +56,7 @@ struct VendorManagementView: View {
                 .alert(isPresented: $showImportSuccess) {
                     Alert(
                         title: Text("success"),
-                        message: Text("migration_success"),
+                        message: Text("Successfully imported \(importedCount) vendors."),
                         dismissButton: .default(Text("ok"))
                     )
                 }
@@ -194,7 +195,7 @@ struct VendorManagementView: View {
     
     private func importLegacyConfig() {
         do {
-            try ConfigManager.shared.migrateFromLegacy()
+            importedCount = try ConfigManager.shared.migrateFromLegacy()
             showImportSuccess = true
             loadVendors()
         } catch {

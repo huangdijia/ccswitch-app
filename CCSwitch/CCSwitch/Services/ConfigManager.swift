@@ -75,23 +75,30 @@ class ConfigManager {
         return configRepository.hasConfiguration()
     }
 
-    func migrateFromLegacy() throws {
+    func migrateFromLegacy() throws -> Int {
         guard let legacyConfig = CCSConfig.loadFromFile(url: CCSConfig.legacyConfigFile) else {
             throw ConfigError.configNotLoaded
         }
 
+        var importedCount = 0
         // Save all vendors from legacy config
         for vendor in legacyConfig.vendors {
-            try? configRepository.addVendor(vendor)
+            do {
+                try configRepository.addVendor(vendor)
+                importedCount += 1
+            } catch {
+                // Ignore duplicates or errors
+            }
         }
         
         // Set current vendor
         if let current = legacyConfig.current {
-            try configRepository.setCurrentVendor(current)
+            try? configRepository.setCurrentVendor(current)
         }
         
         notifyObservers(.configLoaded)
-        Logger.shared.info("Migrated configuration from legacy file")
+        Logger.shared.info("Migrated configuration from legacy file: \(importedCount) vendors")
+        return importedCount
     }
 
     // MARK: - Public Interface

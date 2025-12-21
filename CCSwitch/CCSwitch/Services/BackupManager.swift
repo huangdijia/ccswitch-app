@@ -37,7 +37,7 @@ class BackupManager {
         print("Configuration backed up to: \(backupURL.lastPathComponent)")
     }
 
-    func restoreFromBackup(backupURL: URL) throws {
+    func restoreFromBackup(_ backupURL: URL) throws {
         // 验证备份文件
         guard backupURL.lastPathComponent.hasPrefix("settings.json.bak-") else {
             throw BackupError.invalidBackupFile
@@ -85,7 +85,7 @@ class BackupManager {
         return sortedBackups
     }
 
-    func deleteBackup(backupURL: URL) throws {
+    func deleteBackup(_ backupURL: URL) throws {
         guard backupURL.lastPathComponent.hasPrefix("settings.json.bak-") else {
             throw BackupError.invalidBackupFile
         }
