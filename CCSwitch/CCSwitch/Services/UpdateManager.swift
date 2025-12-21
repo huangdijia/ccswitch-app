@@ -11,6 +11,7 @@ class UpdateManager: NSObject, ObservableObject {
     @Published var lastUpdateCheckDate: Date?
     @Published var isChecking = false
     @Published var latestRelease: UpdateInfo?
+    @Published var lastError: Error?
     
     // 配置项
     @AppStorage("SUEnableAutomaticChecks") var automaticallyChecksForUpdates = true
@@ -27,14 +28,18 @@ class UpdateManager: NSObject, ObservableObject {
         guard !isChecking else { return }
         
         isChecking = true
+        lastError = nil
         defer { isChecking = false }
         
         let urlString = "https://api.github.com/repos/\(githubRepo)/releases/latest"
-        guard let url = URL(string: urlString) else { return }
+        guard let url = URL(string: urlString) else { 
+            lastError = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
+            return 
+        }
         
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
-        request.setValue("CCSwitch/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")", forHTTPHeaderField: "User-Agent")
+        request.setValue("CCSwitch/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 15
         
         do {
@@ -43,16 +48,19 @@ class UpdateManager: NSObject, ObservableObject {
             
             if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 if let message = json["message"] as? String, (response as? HTTPURLResponse)?.statusCode != 200 {
+                    let error = NSError(domain: "UpdateManager", code: (response as? HTTPURLResponse)?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: message])
+                    self.lastError = error
                     Logger.shared.error("Update check API error: \(message)")
                     return
                 }
                 
                 guard let tagName = json["tag_name"] as? String else {
+                    lastError = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No tag_name found in response"])
                     return
                 }
                 
                 let version = tagName.replacingOccurrences(of: "v", with: "")
-                let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+                let currentVersion = AppInfo.version
                 
                 if version.compare(currentVersion, options: .numeric) == .orderedDescending {
                     let body = json["body"] as? String ?? ""
@@ -83,6 +91,7 @@ class UpdateManager: NSObject, ObservableObject {
                 }
             }
         } catch {
+            self.lastError = error
             Logger.shared.error("Update check failed", error: error)
         }
     }
@@ -92,7 +101,9 @@ class UpdateManager: NSObject, ObservableObject {
         Task {
             await checkForUpdates()
             if isManual {
-                if let release = latestRelease {
+                if let error = lastError {
+                    showErrorAlert(error: error)
+                } else if let release = latestRelease {
                     showUpdateAlert(release: release)
                 } else {
                     showNoUpdateAlert()
@@ -120,6 +131,15 @@ class UpdateManager: NSObject, ObservableObject {
         alert.messageText = NSLocalizedString("up_to_date_title", comment: "")
         alert.informativeText = NSLocalizedString("up_to_date_msg", comment: "")
         alert.alertStyle = .informational
+        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
+        alert.runModal()
+    }
+
+    private func showErrorAlert(error: Error) {
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("update_check_failed", comment: "")
+        alert.informativeText = error.localizedDescription
+        alert.alertStyle = .warning
         alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
         alert.runModal()
     }

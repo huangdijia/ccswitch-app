@@ -206,7 +206,7 @@ extension ErrorHandler {
 
     private func collectSystemInfo() -> String {
         let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let appVersion = AppInfo.version
 
         return """
         macOS Version: \(osVersion)

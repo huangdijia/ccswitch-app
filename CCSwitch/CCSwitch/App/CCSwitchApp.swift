@@ -18,6 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // 初始化配置管理器
         ConfigManager.shared.initialize()
+        
+        // 记录启动信息
+        Logger.shared.info("CCSwitch \(AppInfo.fullVersion) starting...")
 
         // 创建状态栏控制器
         statusBarController = MenuBarController()
@@ -105,7 +108,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     private func setupMainMenu() {
         let mainMenu = NSMenu()
-        let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "CCSwitch"
+        let appName = AppInfo.name
 
         // 1. App Menu
         let appMenuItem = NSMenuItem()
@@ -162,7 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     @objc func openGitHub() {
-        if let url = URL(string: "https://github.com/huangdijia/ccswitch-app") {
+        if let url = URL(string: "https://github.com/huangdijia/ccswitch-mac") {
             NSWorkspace.shared.open(url)
         }
     }

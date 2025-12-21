@@ -32,9 +32,8 @@ struct SettingsView: View {
                 }
             }
             .frame(width: 600)
-            .fixedSize(horizontal: true, vertical: true) // 关键：强制垂直方向紧贴内容
+            .fixedSize(horizontal: true, vertical: true)
         }
-        .background(Color(NSColor.windowBackgroundColor))
     }
 }
 

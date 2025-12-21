@@ -161,9 +161,7 @@ struct GeneralSettingsView: View {
                         
                         Spacer()
                         
-                        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-                        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-                        Text("\(NSLocalizedString("version_info", comment: "")) \(version) (\(build))")
+                        Text("\(NSLocalizedString("version_info", comment: "")) \(AppInfo.fullVersion)")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }

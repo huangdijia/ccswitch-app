@@ -93,10 +93,10 @@ struct VendorManagementView: View {
                     Spacer()
                 }
                 .background(Color.clear)
-                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor).opacity(0.5)), alignment: .top)
+                .overlay(Rectangle().frame(height: 1).foregroundColor(Color(NSColor.separatorColor).opacity(0.3)), alignment: .top)
             }
             .frame(width: 200)
-            .background(SidebarMaterialView())
+            .background(.thinMaterial)
             
             Divider()
             

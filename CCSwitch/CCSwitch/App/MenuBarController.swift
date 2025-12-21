@@ -107,7 +107,7 @@ class MenuBarController: NSObject, ConfigObserver {
         alert.messageText = NSLocalizedString("about_title", comment: "")
         alert.informativeText = String(
             format: NSLocalizedString("about_message", comment: ""),
-            getVersion(),
+            AppInfo.version,
             CCSConfig.configFile.path,
             ClaudeSettings.configFile.path
         )
@@ -166,8 +166,8 @@ class MenuBarController: NSObject, ConfigObserver {
     }
 
     // MARK: - Helper Methods
-    private func getVersion() -> String {
-        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+    private var currentVersion: String {
+        return AppInfo.version
     }
 
     private func updateStatusBarTitle() {
