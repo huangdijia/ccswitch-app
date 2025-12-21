@@ -71,6 +71,30 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    @objc func showAbout() {
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("about_title", comment: "")
+        alert.informativeText = String(
+            format: NSLocalizedString("about_message", comment: ""),
+            AppInfo.version,
+            CCSConfig.configFile.path,
+            ClaudeSettings.configFile.path
+        )
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("open_config_dir", comment: ""))
+
+        NSApp.activate(ignoringOtherApps: true)
+        let response = alert.runModal()
+        if response == .alertSecondButtonReturn {
+            openConfigDirectory()
+        }
+    }
+
+    @objc func openConfigDirectory() {
+        NSWorkspace.shared.selectFile(CCSConfig.configFile.path, inFileViewerRootedAtPath: "")
+    }
+
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let menu = NSMenu()
         
@@ -89,7 +113,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             menu.addItem(NSMenuItem.separator())
         }
         
-        let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "i")
+        let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: ""), action: #selector(showAbout), keyEquivalent: "i")
+        aboutItem.target = self
         menu.addItem(aboutItem)
         
         let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
@@ -123,7 +148,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let appMenu = NSMenu()
         appMenuItem.submenu = appMenu
 
-        appMenu.addItem(withTitle: NSLocalizedString("about", comment: "") + " \(appName)", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: NSLocalizedString("about", comment: "") + " \(appName)", action: #selector(showAbout), keyEquivalent: "")
+        aboutItem.target = self
+        appMenu.addItem(aboutItem)
+        
         appMenu.addItem(NSMenuItem.separator())
         
         let settingsItem = NSMenuItem(title: NSLocalizedString("settings", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")

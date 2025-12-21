@@ -103,35 +103,9 @@ class MenuBarController: NSObject, ConfigObserver {
 
     // MARK: - Menu Actions
     @objc private func showAbout() {
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("about_title", comment: "")
-        alert.informativeText = String(
-            format: NSLocalizedString("about_message", comment: ""),
-            AppInfo.version,
-            CCSConfig.configFile.path,
-            ClaudeSettings.configFile.path
-        )
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: NSLocalizedString("ok", comment: ""))
-        alert.addButton(withTitle: NSLocalizedString("open_config_dir", comment: ""))
-
-        let response = alert.runModal()
-        if response == .alertSecondButtonReturn {
-            openConfigDirectory()
+        if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+            appDelegate.showAbout()
         }
-    }
-
-    @objc private func openConfigDirectory() {
-        NSWorkspace.shared.selectFile(CCSConfig.configFile.path, inFileViewerRootedAtPath: "")
-    }
-
-    @objc private func showLogs() {
-        // TODO: 实现日志查看功能
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("show_logs", comment: "")
-        alert.informativeText = "Log viewing is not yet implemented."
-        alert.alertStyle = .informational
-        alert.runModal()
     }
 
     @objc private func showSettings() {
