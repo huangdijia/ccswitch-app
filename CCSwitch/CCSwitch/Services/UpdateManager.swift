@@ -34,6 +34,7 @@ class UpdateManager: NSObject, ObservableObject {
         
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+        request.setValue("CCSwitch/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 15
         
         do {
