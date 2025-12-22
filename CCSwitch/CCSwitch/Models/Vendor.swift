@@ -5,20 +5,27 @@ struct Vendor: Codable, Identifiable {
     let id: String
     let name: String
     let env: [String: String]
+    var isPreset: Bool = false
 
-    init(id: String, name: String, env: [String: String]) {
+    init(id: String, name: String, env: [String: String], isPreset: Bool = false) {
         self.id = id
         self.name = name
         self.env = env
+        self.isPreset = isPreset
     }
 
     var displayName: String { name }
     
+    enum CodingKeys: String, CodingKey {
+        case id, name, env, isPreset
+    }
+
     // Custom decoding to handle non-string values in env
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
+        isPreset = try container.decodeIfPresent(Bool.self, forKey: .isPreset) ?? false
         
         // Try decoding as strict [String: String] first
         if let stringEnv = try? container.decode([String: String].self, forKey: .env) {

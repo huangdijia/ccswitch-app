@@ -44,6 +44,53 @@ struct CCSConfig: Codable {
             return nil
         }
     }
+
+    // 从 Bundle 加载预设配置
+    static func loadPresets() -> [Vendor] {
+        // Hardcoded fallback in case the file is missing from Bundle Resources
+        let fallbackPresets = [
+            Vendor(
+                id: "default",
+                name: "Default",
+                env: [:],
+                isPreset: true
+            ),
+            Vendor(
+                id: "anyrouter",
+                name: "AnyRouter",
+                env: [
+                    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
+                    "ANTHROPIC_BASE_URL": "https://anyrouter.top"
+                ],
+                isPreset: true
+            ),
+            Vendor(
+                id: "deepseek",
+                name: "DeepSeek",
+                env: [
+                    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
+                    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+                    "ANTHROPIC_MODEL": "deepseek-chat",
+                    "ANTHROPIC_SMALL_FAST_MODEL": "deepseek-chat"
+                ],
+                isPreset: true
+            )
+        ]
+
+        guard let url = Bundle.main.url(forResource: "presets", withExtension: "json") else {
+            Logger.shared.warn("Presets file not found in bundle, using hardcoded fallback")
+            return fallbackPresets
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let config = try JSONDecoder().decode(CCSConfig.self, from: data)
+            return config.vendors.map { var v = $0; v.isPreset = true; return v }
+        } catch {
+            Logger.shared.error("Failed to load presets from bundle: \(error), using hardcoded fallback")
+            return fallbackPresets
+        }
+    }
 }
 
 // MARK: - Legacy Configuration (For migration)

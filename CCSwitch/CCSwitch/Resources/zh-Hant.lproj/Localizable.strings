@@ -229,7 +229,7 @@
 "network_settings" = "網路";
 "test_connection_btn" = "測試連線";
 "auth_token_hint" = "留空則使用全域環境變數。";
-"preset_label" = "預設";
+"preset_label" = "推薦";
 "preset_anthropic" = "Anthropic";
 "preset_openai" = "OpenAI 相容";
 "preset_custom" = "自訂";

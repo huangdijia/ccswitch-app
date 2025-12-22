@@ -224,7 +224,7 @@
 "network_settings" = "Network";
 "test_connection_btn" = "Test Connection";
 "auth_token_hint" = "Leave empty to use global environment variable.";
-"preset_label" = "Preset";
+"preset_label" = "Recommended";
 "preset_anthropic" = "Anthropic";
 "preset_openai" = "OpenAI Compatible";
 "preset_custom" = "Custom";

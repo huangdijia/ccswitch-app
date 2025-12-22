@@ -59,8 +59,14 @@ class FileConfigurationRepository: ConfigurationRepository {
     }
     
     func loadConfiguration() throws {
-        guard fileManager.fileExists(atPath: configURL.path) else {
-            config = CCSConfig.createDefault()
+        if !fileManager.fileExists(atPath: configURL.path) {
+            // First launch: sync presets to vendors.json
+            let presets = CCSConfig.loadPresets()
+            if !presets.isEmpty {
+                config = CCSConfig(current: presets.first?.id, vendors: presets)
+            } else {
+                config = CCSConfig.createDefault()
+            }
             try saveConfiguration()
             return
         }
@@ -111,7 +117,12 @@ class FileConfigurationRepository: ConfigurationRepository {
         guard let index = config?.vendors.firstIndex(where: { $0.id == vendor.id }) else {
             throw ConfigurationError.vendorNotFound
         }
-        config?.vendors[index] = vendor
+        
+        // When a vendor is updated (e.g. user adds Auth Token), it's no longer a "Recommended" preset
+        var updatedVendor = vendor
+        updatedVendor.isPreset = false
+        
+        config?.vendors[index] = updatedVendor
         try saveConfiguration()
     }
     
@@ -167,6 +178,7 @@ enum ConfigurationError: Error, LocalizedError {
     case vendorAlreadyExists
     case cannotRemoveLastVendor
     case saveFailed
+    case operationNotSupported
     
     var errorDescription: String? {
         switch self {
@@ -182,6 +194,8 @@ enum ConfigurationError: Error, LocalizedError {
             return NSLocalizedString("cannot_remove_last_vendor", comment: "")
         case .saveFailed:
             return NSLocalizedString("config_save_failed", comment: "")
+        case .operationNotSupported:
+            return NSLocalizedString("operation_not_supported", comment: "")
         }
     }
 }
