@@ -165,6 +165,21 @@ class ConfigManager {
         }
         favoriteVendorIds = current
     }
+
+    // MARK: - Presets Management
+    var presetVendorIds: Set<String> {
+        get {
+            return (try? configRepository.getPresets()) ?? []
+        }
+        set {
+            try? configRepository.setPresets(newValue)
+            notifyObservers(.vendorsUpdated)
+        }
+    }
+
+    func isPreset(_ id: String) -> Bool {
+        return presetVendorIds.contains(id)
+    }
     
     private func migrateFavoritesFromUserDefaults() {
         let defaults = UserDefaults.standard

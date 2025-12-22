@@ -132,11 +132,15 @@ final class ConfigManagerTests: XCTestCase {
     // MARK: - Vendor Switching Tests
     
     func testSwitchVendor() throws {
+        // Mock setting for auto backup (default is usually false in mock unless set)
+        mockSettingsRepository.setBool(true, for: .autoBackup)
+
         let switcher = DefaultVendorSwitcher(
             configRepository: mockRepository,
             settingsWriter: mockSettingsWriter,
             backupService: mockBackupService,
-            notificationService: mockNotificationService
+            notificationService: mockNotificationService,
+            settingsRepository: mockSettingsRepository
         )
         
         try switcher.switchToVendor(with: "test2")
@@ -146,6 +150,26 @@ final class ConfigManagerTests: XCTestCase {
         XCTAssertEqual(mockSettingsWriter.lastWrittenSettings?["KEY2"], "VALUE2")
         XCTAssertEqual(mockBackupService.backupCallCount, 1)
         XCTAssertNotNil(mockNotificationService.lastNotification)
+    }
+
+    func testSwitchVendorWithBackupDisabled() throws {
+        // Disable auto backup
+        mockSettingsRepository.setBool(false, for: .autoBackup)
+        
+        let switcher = DefaultVendorSwitcher(
+            configRepository: mockRepository,
+            settingsWriter: mockSettingsWriter,
+            backupService: mockBackupService,
+            notificationService: mockNotificationService,
+            settingsRepository: mockSettingsRepository
+        )
+        
+        try switcher.switchToVendor(with: "test2")
+        
+        XCTAssertEqual(mockRepository.currentVendorId, "test2")
+        // Should write settings but NOT backup
+        XCTAssertEqual(mockSettingsWriter.writeCallCount, 1)
+        XCTAssertEqual(mockBackupService.backupCallCount, 0)
     }
     
     func testSwitchToNonExistentVendor() {

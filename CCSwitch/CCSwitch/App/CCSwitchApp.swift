@@ -16,6 +16,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // 注册默认设置
+        UserDefaults.standard.register(defaults: [
+            "autoBackup": true,
+            "showSwitchNotification": true,
+            "autoLoadConfig": true,
+            "automaticallyChecksForUpdates": true,
+            "automaticallyDownloadsAndInstallsUpdates": true
+        ])
+
         // 初始化配置管理器
         ConfigManager.shared.initialize()
         

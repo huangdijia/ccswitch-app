@@ -52,6 +52,16 @@ protocol ConfigurationRepository {
     /// - Parameter ids: Set of favorite vendor IDs
     /// - Throws: Error if saving fails
     func setFavorites(_ ids: Set<String>) throws
+
+    /// Get preset vendor IDs
+    /// - Returns: Set of preset vendor IDs
+    /// - Throws: Error if retrieval fails
+    func getPresets() throws -> Set<String>
+    
+    /// Set preset vendor IDs
+    /// - Parameter ids: Set of preset vendor IDs
+    /// - Throws: Error if saving fails
+    func setPresets(_ ids: Set<String>) throws
 }
 
 /// Default implementation using CCSConfig file storage
@@ -73,7 +83,7 @@ class FileConfigurationRepository: ConfigurationRepository {
             // First launch: sync presets to vendors.json
             let presets = CCSConfig.loadPresets()
             if !presets.isEmpty {
-                config = CCSConfig(current: presets.first?.id, vendors: presets, favorites: [])
+                config = CCSConfig(current: presets.first?.id, vendors: presets, favorites: [], presets: presets.map { $0.id })
             } else {
                 config = CCSConfig.createDefault()
             }
@@ -129,10 +139,12 @@ class FileConfigurationRepository: ConfigurationRepository {
         }
         
         // When a vendor is updated (e.g. user adds Auth Token), it's no longer a "Recommended" preset
-        var updatedVendor = vendor
-        updatedVendor.isPreset = nil
+        if var presets = config?.presets {
+            presets.removeAll { $0 == vendor.id }
+            config?.presets = presets
+        }
         
-        config?.vendors[index] = updatedVendor
+        config?.vendors[index] = vendor
         try saveConfiguration()
     }
     
@@ -146,6 +158,7 @@ class FileConfigurationRepository: ConfigurationRepository {
         }
         
         config?.vendors.removeAll { $0.id == vendorId }
+        config?.presets?.removeAll { $0 == vendorId }
         
         // If we removed the current vendor, switch to the first available
         if config?.current == vendorId {
@@ -167,6 +180,17 @@ class FileConfigurationRepository: ConfigurationRepository {
     func setFavorites(_ ids: Set<String>) throws {
         try ensureConfigLoaded()
         config?.favorites = Array(ids)
+        try saveConfiguration()
+    }
+
+    func getPresets() throws -> Set<String> {
+        try ensureConfigLoaded()
+        return Set(config?.presets ?? [])
+    }
+    
+    func setPresets(_ ids: Set<String>) throws {
+        try ensureConfigLoaded()
+        config?.presets = Array(ids)
         try saveConfiguration()
     }
     

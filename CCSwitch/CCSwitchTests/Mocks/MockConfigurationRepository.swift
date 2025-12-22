@@ -103,4 +103,20 @@ class MockConfigurationRepository: ConfigurationRepository {
         }
         favorites = ids
     }
+
+    var presets: Set<String> = []
+    
+    func getPresets() throws -> Set<String> {
+        if shouldThrowError {
+            throw ConfigurationError.loadFailed
+        }
+        return presets
+    }
+    
+    func setPresets(_ ids: Set<String>) throws {
+        if shouldThrowError {
+            throw ConfigurationError.saveFailed
+        }
+        presets = ids
+    }
 }

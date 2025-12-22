@@ -5,6 +5,7 @@ struct CCSConfig: Codable {
     var current: String?
     var vendors: [Vendor]
     var favorites: [String]?
+    var presets: [String]?
 
     // Default configuration
     static func createDefault() -> CCSConfig {
@@ -17,7 +18,8 @@ struct CCSConfig: Codable {
                     env: [:]
                 )
             ],
-            favorites: []
+            favorites: [],
+            presets: ["default"]
         )
     }
 
@@ -56,8 +58,7 @@ struct CCSConfig: Codable {
             Vendor(
                 id: "default",
                 name: "Default",
-                env: [:],
-                isPreset: true
+                env: [:]
             )
         ]
 
@@ -69,7 +70,7 @@ struct CCSConfig: Codable {
         do {
             let data = try Data(contentsOf: url)
             let config = try JSONDecoder().decode(CCSConfig.self, from: data)
-            return config.vendors.map { var v = $0; v.isPreset = true; return v }
+            return config.vendors
         } catch {
             Logger.shared.error("Failed to load presets from bundle: \(error), using hardcoded fallback")
             return fallbackPresets
@@ -159,7 +160,8 @@ struct LegacyCCSConfig: Decodable {
         return CCSConfig(
             current: current ?? `default`,
             vendors: newVendors,
-            favorites: []
+            favorites: [],
+            presets: []
         )
     }
 }
