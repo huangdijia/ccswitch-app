@@ -6,7 +6,7 @@
 
 一个用于快速切换 Claude Code 供应商的 macOS 状态栏工具。
 
-![CCSwitch Screenshot](Screenshots/01.png)
+![CCSwitch Screenshot](Screenshots/01.jpg)
 
 ## 功能特性
 
