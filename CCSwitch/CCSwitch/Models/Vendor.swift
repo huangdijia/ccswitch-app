@@ -14,6 +14,10 @@ struct Vendor: Codable, Identifiable {
 
     var displayName: String { name }
     
+    enum CodingKeys: String, CodingKey {
+        case id, name, env
+    }
+
     // Custom decoding to handle non-string values in env
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

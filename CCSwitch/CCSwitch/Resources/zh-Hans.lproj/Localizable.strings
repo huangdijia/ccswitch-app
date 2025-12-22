@@ -83,6 +83,7 @@
 "confirm_reset_msg" = "这将清除应用的缓存状态，但不会删除您的配置文件。继续？";
 "reset_button" = "重置";
 "success" = "成功";
+"reset_success_msg" = "应用状态已重置。";
 "restore_success_msg" = "配置已成功恢复。";
 "error" = "错误";
 "reloaded" = "已重新加载";
@@ -148,16 +149,16 @@
 "allow_notifications" = "允许通知";
 "show_vendors_in_menu" = "在菜单中显示这些项目：";
 "set_active" = "设为当前";
-"favorite_vendors" = "常用供应商";
-"drag_favorite_hint" = "将您常用的供应商拖动到下方区域以便快速访问。";
+"favorite_vendors" = "收藏的供应商";
+"drag_favorite_hint" = "将您收藏的供应商拖动到下方区域以便快速访问。";
 "show_debug_logs" = "显示调试日志";
 "confirm_backup_deletion" = "删除备份时确认";
 "manage_backups" = "管理备份...";
 "done" = "完成";
 "restore" = "恢复";
 "system" = "系统";
-"add_to_favorites" = "添加到常用";
-"remove_from_favorites" = "从常用移除";
+"add_to_favorites" = "添加到收藏";
+"remove_from_favorites" = "取消收藏";
 "vendor_list" = "供应商列表";
 "system_behavior" = "系统行为";
 "debug_logs_desc" = "故障排查时使用。日志将输出到系统控制台。";
@@ -219,12 +220,13 @@
 "vendor_already_exists" = "供应商已存在。";
 "cannot_remove_last_vendor" = "无法删除最后一个供应商。";
 "config_save_failed" = "无法保存配置。";
+"operation_not_supported" = "不支持此操作";
 "advanced_model_mapping_desc" = "用于快捷指令或特殊任务的特定模型。";
 "connection_and_auth" = "连接与认证";
 "network_settings" = "网络";
 "test_connection_btn" = "测试连接";
 "auth_token_hint" = "留空则使用全局环境变量。";
-"preset_label" = "预设";
+"preset_label" = "推荐";
 "preset_anthropic" = "Anthropic";
 "preset_openai" = "OpenAI 兼容";
 "preset_custom" = "自定义";
@@ -273,3 +275,20 @@
 "update_check_failed" = "检查更新失败";
 "error_rate_limit" = "请求过于频繁（GitHub API 频率限制），请稍后再试。";
 "ok" = "确定";
+
+/* Migration Refactor */
+"migration_found_vendors" = "发现：%d 个供应商";
+"migration_default_vendor_label" = "默认供应商：%@";
+"migration_dont_show_again_checkbox" = "不再提示（仅针对此配置文件）";
+"migration_view_vendor_list" = "查看供应商列表 (%d)";
+
+/* Toast Messages */
+"vendor_added_success" = "供应商添加成功。";
+"vendor_updated_success" = "供应商更新成功。";
+"vendor_deleted_success" = "供应商删除成功。";
+"vendor_duplicated_success" = "供应商复制成功。";
+
+/* Additional Toast Messages */
+"backup_deleted_success" = "备份已删除。";
+"added_to_favorites_msg" = "已添加到收藏。";
+"removed_from_favorites_msg" = "已取消收藏。";

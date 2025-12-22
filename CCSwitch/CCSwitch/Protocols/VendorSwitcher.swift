@@ -19,17 +19,20 @@ class DefaultVendorSwitcher: VendorSwitcher {
     private let settingsWriter: SettingsWriter
     private let backupService: BackupService?
     private let notificationService: NotificationService?
+    private let settingsRepository: SettingsRepository?
     
     init(
         configRepository: ConfigurationRepository,
         settingsWriter: SettingsWriter,
         backupService: BackupService? = nil,
-        notificationService: NotificationService? = nil
+        notificationService: NotificationService? = nil,
+        settingsRepository: SettingsRepository? = nil
     ) {
         self.configRepository = configRepository
         self.settingsWriter = settingsWriter
         self.backupService = backupService
         self.notificationService = notificationService
+        self.settingsRepository = settingsRepository
     }
     
     func switchToVendor(with vendorId: String) throws {
@@ -39,7 +42,10 @@ class DefaultVendorSwitcher: VendorSwitcher {
         
         // Backup current settings if enabled
         if let backupService = backupService {
-            try? backupService.backupCurrentSettings()
+            let shouldBackup = settingsRepository?.getBool(for: .autoBackup) ?? true
+            if shouldBackup {
+                try? backupService.backupCurrentSettings()
+            }
         }
         
         // Write new settings

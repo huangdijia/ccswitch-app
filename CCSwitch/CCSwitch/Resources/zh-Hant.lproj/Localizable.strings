@@ -224,12 +224,13 @@
 "vendor_already_exists" = "供應商已存在。";
 "cannot_remove_last_vendor" = "無法刪除最後一個供應商。";
 "config_save_failed" = "無法儲存配置。";
+"operation_not_supported" = "不支援此操作";
 "advanced_model_mapping_desc" = "用於快捷指令或特殊任務的特定模型。";
 "connection_and_auth" = "連線與認證";
 "network_settings" = "網路";
 "test_connection_btn" = "測試連線";
 "auth_token_hint" = "留空則使用全域環境變數。";
-"preset_label" = "預設";
+"preset_label" = "推薦";
 "preset_anthropic" = "Anthropic";
 "preset_openai" = "OpenAI 相容";
 "preset_custom" = "自訂";

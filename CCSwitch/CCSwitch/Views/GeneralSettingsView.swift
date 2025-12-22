@@ -52,26 +52,27 @@ struct GeneralSettingsView: View {
                     }
                     .buttonStyle(.link)
 
-                    // Legacy Migration
-                    VStack(spacing: 0) {
-                        Divider().padding(.vertical, 8)
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("legacy_migration_title")
-                                    .font(.body)
-                                Text("legacy_migration_desc")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Button("migrate_now") {
-                                // 在 MainActor 环境下触发
-                                Task { @MainActor in
-                                    MigrationManager.shared.checkMigration(force: true)
+                    if ConfigManager.shared.hasLegacyConfig {
+                        // Legacy Migration
+                        VStack(spacing: 0) {
+                            Divider().padding(.vertical, 8)
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("legacy_migration_title")
+                                        .font(.body)
+                                    Text("legacy_migration_desc")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
                                 }
+                                Spacer()
+                                Button("migrate_now") {
+                                    // 在 MainActor 环境下触发
+                                    Task { @MainActor in
+                                        MigrationManager.shared.checkMigration(force: true)
+                                    }
+                                }
+                                .controlSize(.small)
                             }
-                            .controlSize(.small)
-                            .disabled(!ConfigManager.shared.hasLegacyConfig)
                         }
                     }
                 }
@@ -246,7 +247,7 @@ struct GeneralSettingsView: View {
     }
     
     private func openBackupFolder() {
-        let folderURL = CCSConfig.configDirectory
+        let folderURL = ClaudeSettings.configDirectory
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: folderURL.path)
     }
 }

@@ -6,6 +6,8 @@
 
 一个用于快速切换 Claude Code 供应商的 macOS 状态栏工具。
 
+![CCSwitch Screenshot](Screenshots/01.jpg)
+
 ## 功能特性
 
 ### ✅ 已实现功能
@@ -86,9 +88,10 @@ git clone https://github.com/huangdijia/ccswitch-app.git
 cd ccswitch-app
 ```
 
-2. 运行构建脚本（多种方式）：
+1. 运行构建脚本（多种方式）：
 
 使用 Makefile（推荐）：
+
 ```bash
 make build      # 完整构建（需要 Xcode）
 make fast-build # 快速构建（仅需 Swift 命令行工具）
@@ -97,6 +100,7 @@ make test       # 运行单元测试（需要 Xcode）
 ```
 
 或使用 shell 脚本：
+
 ```bash
 ./build.sh
 ```
@@ -231,12 +235,14 @@ ccswitch-app/
 运行单元测试：
 
 使用 Makefile：
+
 ```bash
 make test       # 运行单元测试（需要 Xcode）
 make test-app   # 运行手动测试脚本
 ```
 
 或使用命令行：
+
 ```bash
 cd CCSwitch
 xcodebuild test -project CCSwitch.xcodeproj -scheme CCSwitch -destination 'platform=macOS'
@@ -258,6 +264,7 @@ CCSwitch 采用**协议导向架构**（Protocol-Oriented Architecture）配合*
 - ✅ **易扩展**：新增供应商、存储后端、通知渠道等无需修改核心代码
 
 详细架构文档请参考：
+
 - [ARCHITECTURE.md](ARCHITECTURE.md) - 架构设计详解
 - [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - 扩展开发指南
 - [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
@@ -267,6 +274,7 @@ CCSwitch 采用**协议导向架构**（Protocol-Oriented Architecture）配合*
 欢迎提交 Issue 和 Pull Request！
 
 在贡献之前，请阅读：
+
 - [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
 - [ARCHITECTURE.md](ARCHITECTURE.md) - 了解项目架构
 - [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - 学习如何扩展功能

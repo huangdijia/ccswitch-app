@@ -6,7 +6,6 @@ struct AdvancedSettingsView: View {
     
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
-    @State private var showingReloadSuccess = false
     
     var body: some View {
         Form {
@@ -91,18 +90,12 @@ struct AdvancedSettingsView: View {
                 secondaryButton: .cancel()
             )
         }
-        .alert(isPresented: $showingReloadSuccess) {
-            Alert(
-                title: Text("reloaded"),
-                message: Text("reload_success_msg"),
-                dismissButton: .default(Text("ok"))
-            )
-        }
     }
 
     private func reloadConfiguration() {
         ConfigManager.shared.initialize()
-        showingReloadSuccess = true
+        let msg = NSLocalizedString("reload_success_msg", comment: "Configuration reloaded.")
+        ToastManager.shared.show(message: msg, type: .success)
     }
 
     private func openConfigFolder() {
@@ -116,8 +109,11 @@ struct AdvancedSettingsView: View {
         ConfigManager.shared.cleanup()
         ConfigManager.shared.initialize()
         
-        // Note: In a real app, you might want to force restart or notify the user 
-        // that defaults have been restored.
+        // Defer the state update to ensure the previous alert is fully dismissed
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let msg = NSLocalizedString("reset_success_msg", comment: "App state reset.")
+            ToastManager.shared.show(message: msg, type: .success)
+        }
     }
 }
 
@@ -228,8 +224,9 @@ struct BackupListView: View {
         do {
             try BackupManager.shared.restoreFromBackup(backup)
             loadBackups()
+            ToastManager.shared.show(message: NSLocalizedString("restore_success_msg", comment: ""), type: .success)
         } catch {
-            print("Error restoring backup: \(error)")
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
         }
     }
 
@@ -237,8 +234,9 @@ struct BackupListView: View {
         do {
             try BackupManager.shared.deleteBackup(backup)
             loadBackups()
+            ToastManager.shared.show(message: NSLocalizedString("backup_deleted_success", comment: ""), type: .success)
         } catch {
-            print("Error deleting backup: \(error)")
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
         }
     }
 }

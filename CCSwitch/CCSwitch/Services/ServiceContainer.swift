@@ -31,8 +31,9 @@ class ServiceContainer {
         return DefaultVendorSwitcher(
             configRepository: configRepository,
             settingsWriter: settingsWriter,
-            backupService: settingsRepository.getBool(for: .autoBackup) ? backupService : nil,
-            notificationService: notificationService
+            backupService: backupService,
+            notificationService: notificationService,
+            settingsRepository: settingsRepository
         )
     }()
     

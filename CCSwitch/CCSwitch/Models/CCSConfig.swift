@@ -4,6 +4,8 @@ import Foundation
 struct CCSConfig: Codable {
     var current: String?
     var vendors: [Vendor]
+    var favorites: [String]?
+    var presets: [String]?
 
     // Default configuration
     static func createDefault() -> CCSConfig {
@@ -15,7 +17,9 @@ struct CCSConfig: Codable {
                     name: "Default",
                     env: [:]
                 )
-            ]
+            ],
+            favorites: [],
+            presets: ["default"]
         )
     }
 
@@ -42,6 +46,34 @@ struct CCSConfig: Codable {
         } catch {
             Logger.shared.error("Failed to load CCS config from \(url.path): \(error)")
             return nil
+        }
+    }
+
+    // 从 Bundle 加载预设配置
+    /// Load preset vendors from the app bundle
+    /// - Returns: An array of `Vendor` objects loaded from `presets.json` or fallback
+    static func loadPresets() -> [Vendor] {
+        // Hardcoded fallback in case the file is missing from Bundle Resources
+        let fallbackPresets = [
+            Vendor(
+                id: "default",
+                name: "Default",
+                env: [:]
+            )
+        ]
+
+        guard let url = Bundle.main.url(forResource: "presets", withExtension: "json") else {
+            Logger.shared.warn("Presets file not found in bundle, using hardcoded fallback")
+            return fallbackPresets
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let config = try JSONDecoder().decode(CCSConfig.self, from: data)
+            return config.vendors
+        } catch {
+            Logger.shared.error("Failed to load presets from bundle: \(error), using hardcoded fallback")
+            return fallbackPresets
         }
     }
 }
@@ -127,7 +159,9 @@ struct LegacyCCSConfig: Decodable {
         
         return CCSConfig(
             current: current ?? `default`,
-            vendors: newVendors
+            vendors: newVendors,
+            favorites: [],
+            presets: []
         )
     }
 }

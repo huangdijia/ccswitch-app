@@ -5,6 +5,7 @@ struct VendorManagementView: View {
     @State private var selectedVendorId: String?
     @State private var searchText = ""
     @State private var currentVendorId: String = ""
+    @State private var favoriteIds: Set<String> = []
 
     // Navigation Guard & Alert State
     @State private var isDetailDirty: Bool = false
@@ -30,8 +31,8 @@ struct VendorManagementView: View {
         else { return vendors.filter { $0.displayName.localizedCaseInsensitiveContains(searchText) } }
     }
     
-    var favoriteVendors: [Vendor] { filteredVendors.filter { ConfigManager.shared.isFavorite($0.id) } }
-    var otherVendors: [Vendor] { filteredVendors.filter { !ConfigManager.shared.isFavorite($0.id) } }
+    var favoriteVendors: [Vendor] { filteredVendors.filter { favoriteIds.contains($0.id) } }
+    var otherVendors: [Vendor] { filteredVendors.filter { !favoriteIds.contains($0.id) } }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -55,18 +56,32 @@ struct VendorManagementView: View {
                     if !favoriteVendors.isEmpty {
                         Section("favorites") {
                             ForEach(favoriteVendors) { vendor in
-                                VendorRowView(vendor: vendor, isActive: vendor.id == currentVendorId)
-                                    .tag(vendor.id)
-                                    .contextMenu { vendorContextMenu(vendor) }
+                                VendorRowView(
+                                    vendor: vendor, 
+                                    isActive: vendor.id == currentVendorId,
+                                    isFavorite: true,
+                                    onToggleFavorite: {
+                                        toggleFavorite(for: vendor.id)
+                                    }
+                                )
+                                .tag(vendor.id)
+                                .contextMenu { vendorContextMenu(vendor) }
                             }
                         }
                     }
                     
                     Section("all_vendors") {
                         ForEach(otherVendors) { vendor in
-                            VendorRowView(vendor: vendor, isActive: vendor.id == currentVendorId)
-                                .tag(vendor.id)
-                                .contextMenu { vendorContextMenu(vendor) }
+                            VendorRowView(
+                                vendor: vendor, 
+                                isActive: vendor.id == currentVendorId,
+                                isFavorite: false,
+                                onToggleFavorite: {
+                                    toggleFavorite(for: vendor.id)
+                                }
+                            )
+                            .tag(vendor.id)
+                            .contextMenu { vendorContextMenu(vendor) }
                         }
                     }
                 }
@@ -88,7 +103,9 @@ struct VendorManagementView: View {
                         }
                     }) {
                         Image(systemName: "minus").contentShape(Rectangle()).frame(width: 30, height: 28)
-                    }.buttonStyle(.plain).disabled(selectedVendorId == nil || selectedVendorId == currentVendorId).help("Delete Vendor")
+                    }.buttonStyle(.plain)
+                    .disabled(selectedVendorId == nil || selectedVendorId == currentVendorId)
+                    .help("Delete Vendor")
                     
                     Spacer()
                 }
@@ -178,6 +195,7 @@ struct VendorManagementView: View {
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
         currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
+        favoriteIds = ConfigManager.shared.favoriteVendorIds
     }
     
     private func addNewVendor() {
@@ -186,13 +204,19 @@ struct VendorManagementView: View {
             try ConfigManager.shared.addVendor(newVendor)
             // UI reloads via notification
             attemptSelectionChange(to: newVendor.id)
-        } catch { activeAlert = .error(error.localizedDescription) }
+            ToastManager.shared.show(message: NSLocalizedString("vendor_added_success", comment: ""), type: .success)
+        } catch { 
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
+        }
     }
     
     private func handleSave(_ updatedVendor: Vendor) {
         do {
             try ConfigManager.shared.updateVendor(updatedVendor)
-        } catch { activeAlert = .error(error.localizedDescription) }
+            ToastManager.shared.show(message: NSLocalizedString("vendor_updated_success", comment: ""), type: .success)
+        } catch { 
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
+        }
     }
     
     private func deleteVendor(_ vendor: Vendor) {
@@ -204,8 +228,14 @@ struct VendorManagementView: View {
                     isDetailDirty = false
                 }
             }
+            // Delay toast to show after alert dismisses
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                ToastManager.shared.show(message: NSLocalizedString("vendor_deleted_success", comment: ""), type: .success)
+            }
         } catch {
-            DispatchQueue.main.async { self.activeAlert = .error(error.localizedDescription) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                ToastManager.shared.show(message: error.localizedDescription, type: .error)
+            }
         }
     }
     
@@ -215,18 +245,29 @@ struct VendorManagementView: View {
         do {
             try ConfigManager.shared.addVendor(newVendor)
             attemptSelectionChange(to: newId)
-        } catch { activeAlert = .error(error.localizedDescription) }
+            ToastManager.shared.show(message: NSLocalizedString("vendor_duplicated_success", comment: ""), type: .success)
+        } catch { 
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
+        }
     }
     
     @ViewBuilder
     private func vendorContextMenu(_ vendor: Vendor) -> some View {
         Button {
-            ConfigManager.shared.toggleFavorite(vendor.id)
-        } label: { Text(ConfigManager.shared.isFavorite(vendor.id) ? "remove_from_favorites" : "add_to_favorites") }
+            toggleFavorite(for: vendor.id)
+        } label: { Text(favoriteIds.contains(vendor.id) ? "remove_from_favorites" : "add_to_favorites") }
         Button { duplicateVendor(vendor) } label: { Text("duplicate_vendor") }
         Divider()
         Button { activeAlert = .deleteConfirmation(vendor) } label: { Text("delete") }
         .disabled(vendor.id == currentVendorId)
+    }
+
+    private func toggleFavorite(for vendorId: String) {
+        let wasFavorite = favoriteIds.contains(vendorId)
+        ConfigManager.shared.toggleFavorite(vendorId)
+        
+        let msgKey = wasFavorite ? "removed_from_favorites_msg" : "added_to_favorites_msg"
+        ToastManager.shared.show(message: NSLocalizedString(msgKey, comment: ""), type: .info)
     }
 }
 
@@ -245,7 +286,7 @@ struct VendorDetailView: View {
         self.vendor = vendor; self.isActive = isActive; self._isDirtyBinding = isDirtyBinding; self.onSave = onSave
         _originalVendor = State(initialValue: vendor); _name = State(initialValue: vendor.name)
         let env = vendor.env
-        _baseURL = State(initialValue: env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? "")
+        _baseURL = State(initialValue: env["ANTHROPIC_BASE_URL"] ?? "")
         _authToken = State(initialValue: env["ANTHROPIC_AUTH_TOKEN"] ?? "")
         _timeout = State(initialValue: env["API_TIMEOUT_MS"] ?? "")
         _defaultModel = State(initialValue: env["ANTHROPIC_MODEL"] ?? "")
@@ -257,7 +298,7 @@ struct VendorDetailView: View {
     
     private var isDirty: Bool {
         name != originalVendor.name ||
-        baseURL != (originalVendor.env["ANTHROPIC_BASE_URL"] ?? originalVendor.env["NTHROPIC_BASE_URL"] ?? "") ||
+        baseURL != (originalVendor.env["ANTHROPIC_BASE_URL"] ?? "") ||
         authToken != (originalVendor.env["ANTHROPIC_AUTH_TOKEN"] ?? "") ||
         timeout != (originalVendor.env["API_TIMEOUT_MS"] ?? "") ||
         defaultModel != (originalVendor.env["ANTHROPIC_MODEL"] ?? "") ||
@@ -348,7 +389,7 @@ struct VendorDetailView: View {
     
     private func revertChanges() {
         name = originalVendor.name; let env = originalVendor.env
-        baseURL = env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? ""
+        baseURL = env["ANTHROPIC_BASE_URL"] ?? ""
         authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? ""; timeout = env["API_TIMEOUT_MS"] ?? ""
         defaultModel = env["ANTHROPIC_MODEL"] ?? ""; opusModel = env["ANTHROPIC_DEFAULT_OPUS_MODEL"] ?? ""
         sonnetModel = env["ANTHROPIC_DEFAULT_SONNET_MODEL"] ?? ""; haikuModel = env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] ?? ""
@@ -377,7 +418,7 @@ struct VendorDetailView: View {
             if value.trimmingCharacters(in: .whitespaces).isEmpty { env.removeValue(forKey: key) }
             else { env[key] = value.trimmingCharacters(in: .whitespaces) }
         }
-        update("ANTHROPIC_BASE_URL", baseURL); update("NTHROPIC_BASE_URL", baseURL) 
+        update("ANTHROPIC_BASE_URL", baseURL)
         update("ANTHROPIC_AUTH_TOKEN", authToken); update("API_TIMEOUT_MS", timeout)
         update("ANTHROPIC_MODEL", defaultModel); update("ANTHROPIC_DEFAULT_OPUS_MODEL", opusModel)
         update("ANTHROPIC_DEFAULT_SONNET_MODEL", sonnetModel); update("ANTHROPIC_DEFAULT_HAIKU_MODEL", haikuModel)
@@ -408,21 +449,43 @@ struct VendorDetailView: View {
 
 // MARK: - VendorRowView (Unchanged)
 struct VendorRowView: View {
-    let vendor: Vendor; let isActive: Bool; @State private var isHovered = false
+    let vendor: Vendor; let isActive: Bool; let isFavorite: Bool; let onToggleFavorite: () -> Void
+    @State private var isHovered = false
     var body: some View {
         HStack {
             if isActive { Circle().fill(Color.green).frame(width: 8, height: 8) }
             else { Circle().strokeBorder(Color.secondary, lineWidth: 1).frame(width: 8, height: 8) }
             VStack(alignment: .leading, spacing: 2) {
-                Text(vendor.displayName).font(.body).lineLimit(1)
-                if let url = vendor.env["ANTHROPIC_BASE_URL"] ?? vendor.env["NTHROPIC_BASE_URL"],
+                HStack(spacing: 4) {
+                    Text(vendor.displayName).font(.body).lineLimit(1)
+                    if ConfigManager.shared.isPreset(vendor.id) {
+                        Text("preset_label")
+                            .font(.system(size: 8, weight: .bold))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.blue.opacity(0.1))
+                            .foregroundColor(.blue)
+                            .cornerRadius(6)
+                    }
+                }
+                if let url = vendor.env["ANTHROPIC_BASE_URL"],
                    let host = URL(string: url)?.host {
                     Text(host).font(.caption).foregroundColor(.secondary).lineLimit(1)
                 }
             }
             Spacer()
-            if ConfigManager.shared.isFavorite(vendor.id) { Image(systemName: "star.fill").foregroundColor(.yellow).font(.caption) }
-            else if isHovered { Image(systemName: "star").foregroundColor(.secondary).font(.caption).onTapGesture { ConfigManager.shared.toggleFavorite(vendor.id) } }
+            if isFavorite { 
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                    .font(.caption)
+                    .onTapGesture { onToggleFavorite() }
+            }
+            else if isHovered { 
+                Image(systemName: "star")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+                    .onTapGesture { onToggleFavorite() } 
+            }
         }.padding(.vertical, 4).onHover { isHovered = $0 }
     }
 }

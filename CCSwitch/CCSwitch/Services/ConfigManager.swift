@@ -31,6 +31,7 @@ class ConfigManager {
     func initialize() {
         notificationService.requestPermission()
         loadOrCreateConfig()
+        migrateFavoritesFromUserDefaults()
     }
 
     func cleanup() {
@@ -136,11 +137,10 @@ class ConfigManager {
     // MARK: - Favorites Management
     var favoriteVendorIds: Set<String> {
         get {
-            let list = UserDefaults.standard.stringArray(forKey: favoritesKey) ?? []
-            return Set(list)
+            return (try? configRepository.getFavorites()) ?? []
         }
         set {
-            UserDefaults.standard.set(Array(newValue), forKey: favoritesKey)
+            try? configRepository.setFavorites(newValue)
             notifyObservers(.vendorsUpdated) // Notify UI to refresh
         }
     }
@@ -164,6 +164,34 @@ class ConfigManager {
             current.insert(id)
         }
         favoriteVendorIds = current
+    }
+
+    // MARK: - Presets Management
+    var presetVendorIds: Set<String> {
+        get {
+            return (try? configRepository.getPresets()) ?? []
+        }
+        set {
+            try? configRepository.setPresets(newValue)
+            notifyObservers(.vendorsUpdated)
+        }
+    }
+
+    func isPreset(_ id: String) -> Bool {
+        return presetVendorIds.contains(id)
+    }
+    
+    private func migrateFavoritesFromUserDefaults() {
+        let defaults = UserDefaults.standard
+        guard let legacyFavorites = defaults.stringArray(forKey: favoritesKey), !legacyFavorites.isEmpty else { return }
+        
+        // Only migrate if repository favorites are empty
+        let repoFavorites = (try? configRepository.getFavorites()) ?? []
+        if repoFavorites.isEmpty {
+            try? configRepository.setFavorites(Set(legacyFavorites))
+            Logger.shared.info("Migrated favorites from UserDefaults to Config")
+            defaults.removeObject(forKey: favoritesKey)
+        }
     }
 
     // MARK: - Vendor Management
@@ -337,62 +365,60 @@ class MigrationManager: ObservableObject {
 
     
 
-    func performMigration() async -> MigrationResult {
-
-        self.isMigrating = true
-
-        
-
-        do {
-
-            try backupLegacyConfig()
-
-            let count = try ConfigManager.shared.migrateFromLegacy()
-
-            UserDefaults.standard.set(true, forKey: migrationKey)
-
-            self.isMigrating = false
-
-            return .success(count: count)
-
-        } catch {
-
-            Logger.shared.error("Migration failed", error: error)
-
-            self.isMigrating = false
-
-            return .failure(error.localizedDescription)
-
-        }
-
-    }
+        func performMigration() async -> MigrationResult {
 
     
 
-    private func backupLegacyConfig() throws {
+            self.isMigrating = true
 
-        let fileManager = FileManager.default
+    
 
-        let legacyURL = CCSConfig.legacyConfigFile
+            
 
-        guard fileManager.fileExists(atPath: legacyURL.path) else { return }
+    
 
-        let formatter = DateFormatter()
+            do {
 
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
+    
 
-        let backupURL = legacyURL.deletingPathExtension().appendingPathExtension("bak-\(formatter.string(from: Date())).json")
+                let count = try ConfigManager.shared.migrateFromLegacy()
 
-        if fileManager.fileExists(atPath: backupURL.path) {
+    
 
-            try fileManager.removeItem(at: backupURL)
+                UserDefaults.standard.set(true, forKey: migrationKey)
+
+    
+
+                self.isMigrating = false
+
+    
+
+                return .success(count: count)
+
+    
+
+            } catch {
+
+    
+
+                Logger.shared.error("Migration failed", error: error)
+
+    
+
+                self.isMigrating = false
+
+    
+
+                return .failure(error.localizedDescription)
+
+    
+
+            }
+
+    
 
         }
 
-        try fileManager.copyItem(at: legacyURL, to: backupURL)
-
-        Logger.shared.info("Created legacy config backup at \(backupURL.path)")
+    
 
     }
-
-}

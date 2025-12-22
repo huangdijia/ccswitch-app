@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
     @ObservedObject var migrationManager = MigrationManager.shared
+    @ObservedObject var toastManager = ToastManager.shared
 
     var body: some View {
         VStack(spacing: 0) {
@@ -38,6 +39,7 @@ struct SettingsView: View {
         .sheet(isPresented: $migrationManager.showMigrationPrompt) {
             MigrationAlertView()
         }
+        .toast(isPresented: $toastManager.isPresented, message: toastManager.message, type: toastManager.type)
     }
 }
 
@@ -88,215 +90,129 @@ enum SettingsTab: Hashable {
 // MARK: - Migration View
 
 struct MigrationAlertView: View {
-
     @ObservedObject var manager = MigrationManager.shared
-
     @State private var resultMessage: String?
-
     @State private var migrationFinished = false
-
     @State private var isSuccess = false
-
+    @State private var dontShowAgain = false
     
-
     var body: some View {
-
-        VStack(spacing: DesignSystem.Spacing.large) {
-
-            VStack(spacing: DesignSystem.Spacing.small) {
-
-                Image(systemName: migrationFinished ? (isSuccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill") : "arrow.triangle.2.circlepath.doc.on.clipboard")
-
-                    .font(.system(size: 40))
-
-                    .foregroundColor(migrationFinished ? (isSuccess ? .green : .red) : DesignSystem.Colors.accent)
-
-                
-
-                Text(migrationFinished ? NSLocalizedString("migration_completed", comment: "迁移完成") : NSLocalizedString("migration_title", comment: "检测到旧版配置"))
-
-                    .font(DesignSystem.Fonts.title)
-
-            }
-
+        VStack(alignment: .leading, spacing: 0) {
             
-
-            VStack(spacing: DesignSystem.Spacing.medium) {
-
-                if migrationFinished {
-
+            if migrationFinished && !isSuccess {
+                // Error State (Keep error message in sheet)
+                VStack(spacing: 20) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 48))
+                        .foregroundColor(.red)
+                    
                     Text(resultMessage ?? "")
-
                         .multilineTextAlignment(.center)
-
                         .font(DesignSystem.Fonts.body)
-
-                } else {
-
-                    Text(String(format: NSLocalizedString("migration_message", comment: "发现旧版配置文件中包含 %d 个供应商，是否现在迁移到新版格式？"), manager.legacyVendorsCount))
-
-                        .multilineTextAlignment(.center)
-
-                        .font(DesignSystem.Fonts.body)
-
-                        .foregroundColor(DesignSystem.Colors.textSecondary)
-
                     
-
-                    if let defaultVendor = manager.legacyDefaultVendor {
-
-                        Text(String(format: NSLocalizedString("migration_default_vendor", comment: "默认供应商: %@"), defaultVendor))
-
-                            .font(DesignSystem.Fonts.caption)
-
-                            .foregroundColor(DesignSystem.Colors.textPrimary)
-
-                    }
-
-                    
-
-                    Text(NSLocalizedString("migration_note", comment: "迁移过程中会自动创建备份，不会影响旧版文件的使用。"))
-
-                        .font(DesignSystem.Fonts.caption)
-
-                        .foregroundColor(DesignSystem.Colors.textTertiary)
-
-                        .multilineTextAlignment(.center)
-
-                }
-
-            }
-
-            .padding(.horizontal)
-
-            
-
-            if manager.isMigrating {
-
-                VStack(spacing: DesignSystem.Spacing.medium) {
-
-                    ProgressView()
-
-                    Text(NSLocalizedString("migrating", comment: "正在迁移..."))
-
-                        .font(DesignSystem.Fonts.caption)
-
-                }
-
-            } else if migrationFinished {
-
-                Button(action: {
-
-                    manager.showMigrationPrompt = false
-
-                }) {
-
-                    Text(NSLocalizedString("ok", comment: "确定"))
-
-                        .frame(maxWidth: .infinity)
-
-                }
-
-                .buttonStyle(PrimaryButtonStyle())
-
-            } else {
-
-                VStack(spacing: DesignSystem.Spacing.small) {
-
                     Button(action: {
-
-                        Task {
-
-                            let result = await manager.performMigration()
-
-                            await MainActor.run {
-
-                                handleResult(result)
-
-                            }
-
-                        }
-
+                        manager.showMigrationPrompt = false
                     }) {
-
-                        Text(NSLocalizedString("migrate_now", comment: "立即迁移"))
-
+                        Text(NSLocalizedString("ok", comment: "确定"))
                             .frame(maxWidth: .infinity)
-
                     }
-
                     .buttonStyle(PrimaryButtonStyle())
-
-                    
-
-                    HStack(spacing: DesignSystem.Spacing.medium) {
-
-                        Button(action: {
-
-                            manager.showMigrationPrompt = false
-
-                        }) {
-
-                            Text(NSLocalizedString("migrate_later", comment: "稍后"))
-
-                                .frame(maxWidth: .infinity)
-
-                        }
-
-                        .buttonStyle(SecondaryButtonStyle())
-
-                        
-
-                        Button(action: {
-
-                            manager.skipMigration()
-
-                        }) {
-
-                            Text(NSLocalizedString("dont_show_again", comment: "不再提示"))
-
-                                .frame(maxWidth: .infinity)
-
-                        }
-
-                        .buttonStyle(SecondaryButtonStyle())
-
-                    }
-
+                    .frame(width: 120)
                 }
-
+                .frame(maxWidth: .infinity)
+                .padding(24)
+                
+            } else {
+                // Migration Prompt State
+                
+                // 1. Title
+                Text(NSLocalizedString("migration_title", comment: "检测到旧版配置"))
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 12)
+                
+                // 2. Summary
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(String(format: NSLocalizedString("migration_found_vendors", comment: "发现：%d 个供应商"), manager.legacyVendorsCount))
+                        .font(.body)
+                }
+                .padding(.bottom, 16)
+                
+                // 3. Description
+                Text(NSLocalizedString("migration_note", comment: "迁移过程中会自动创建备份，不会影响旧版文件的使用。"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 24)
+                
+                // 4. Actions
+                if manager.isMigrating {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text(NSLocalizedString("migrating", comment: "正在迁移..."))
+                            .font(.caption)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.bottom, 12)
+                } else {
+                    HStack(alignment: .center) {
+                        // Checkbox
+                        Toggle(isOn: $dontShowAgain) {
+                            Text(NSLocalizedString("migration_dont_show_again_checkbox", comment: "不再提示"))
+                                .font(.caption)
+                        }
+                        .toggleStyle(.checkbox)
+                        
+                        Spacer()
+                        
+                        // Buttons
+                        Button(action: {
+                            if dontShowAgain {
+                                manager.skipMigration()
+                            }
+                            manager.showMigrationPrompt = false
+                        }) {
+                            Text(NSLocalizedString("migrate_later", comment: "稍后"))
+                                .frame(width: 80)
+                        }
+                        .keyboardShortcut(.cancelAction)
+                        .buttonStyle(SecondaryButtonStyle())
+                        
+                        Button(action: {
+                            Task {
+                                let result = await manager.performMigration()
+                                await MainActor.run {
+                                    handleResult(result)
+                                }
+                            }
+                        }) {
+                            Text(NSLocalizedString("migrate_now", comment: "立即迁移"))
+                                .frame(width: 100)
+                        }
+                        .keyboardShortcut(.defaultAction)
+                        .buttonStyle(PrimaryButtonStyle())
+                    }
+                }
             }
-
         }
-
-        .padding(DesignSystem.Spacing.xLarge)
-
-        .frame(width: 400)
-
+        .padding(24)
+        .frame(width: 450)
     }
-
     
-
     private func handleResult(_ result: MigrationResult) {
-
         switch result {
-
         case .success(let count):
-
             isSuccess = true
-
-            resultMessage = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
-
+            // Show toast and close sheet immediately for success
+            let msg = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
+            ToastManager.shared.show(message: msg, type: .success)
+            manager.showMigrationPrompt = false
+            
         case .failure(let errorMessage):
-
             isSuccess = false
-
             resultMessage = String(format: NSLocalizedString("migration_failure_msg", comment: "迁移失败: %@"), errorMessage)
-
+            migrationFinished = true
         }
-
-        migrationFinished = true
-
     }
-
 }

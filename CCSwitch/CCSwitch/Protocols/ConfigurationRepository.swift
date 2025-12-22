@@ -42,6 +42,26 @@ protocol ConfigurationRepository {
     /// Check if configuration exists
     /// - Returns: true if configuration is loaded, false otherwise
     func hasConfiguration() -> Bool
+    
+    /// Get favorite vendor IDs
+    /// - Returns: Set of favorite vendor IDs
+    /// - Throws: Error if retrieval fails
+    func getFavorites() throws -> Set<String>
+    
+    /// Set favorite vendor IDs
+    /// - Parameter ids: Set of favorite vendor IDs
+    /// - Throws: Error if saving fails
+    func setFavorites(_ ids: Set<String>) throws
+
+    /// Get preset vendor IDs
+    /// - Returns: Set of preset vendor IDs
+    /// - Throws: Error if retrieval fails
+    func getPresets() throws -> Set<String>
+    
+    /// Set preset vendor IDs
+    /// - Parameter ids: Set of preset vendor IDs
+    /// - Throws: Error if saving fails
+    func setPresets(_ ids: Set<String>) throws
 }
 
 /// Default implementation using CCSConfig file storage
@@ -59,8 +79,14 @@ class FileConfigurationRepository: ConfigurationRepository {
     }
     
     func loadConfiguration() throws {
-        guard fileManager.fileExists(atPath: configURL.path) else {
-            config = CCSConfig.createDefault()
+        if !fileManager.fileExists(atPath: configURL.path) {
+            // First launch: sync presets to vendors.json
+            let presets = CCSConfig.loadPresets()
+            if !presets.isEmpty {
+                config = CCSConfig(current: presets.first?.id, vendors: presets, favorites: [], presets: presets.map { $0.id })
+            } else {
+                config = CCSConfig.createDefault()
+            }
             try saveConfiguration()
             return
         }
@@ -111,6 +137,13 @@ class FileConfigurationRepository: ConfigurationRepository {
         guard let index = config?.vendors.firstIndex(where: { $0.id == vendor.id }) else {
             throw ConfigurationError.vendorNotFound
         }
+        
+        // When a vendor is updated (e.g. user adds Auth Token), it's no longer a "Recommended" preset
+        if var presets = config?.presets {
+            presets.removeAll { $0 == vendor.id }
+            config?.presets = presets
+        }
+        
         config?.vendors[index] = vendor
         try saveConfiguration()
     }
@@ -125,6 +158,7 @@ class FileConfigurationRepository: ConfigurationRepository {
         }
         
         config?.vendors.removeAll { $0.id == vendorId }
+        config?.presets?.removeAll { $0 == vendorId }
         
         // If we removed the current vendor, switch to the first available
         if config?.current == vendorId {
@@ -136,6 +170,28 @@ class FileConfigurationRepository: ConfigurationRepository {
     
     func hasConfiguration() -> Bool {
         return config != nil
+    }
+    
+    func getFavorites() throws -> Set<String> {
+        try ensureConfigLoaded()
+        return Set(config?.favorites ?? [])
+    }
+    
+    func setFavorites(_ ids: Set<String>) throws {
+        try ensureConfigLoaded()
+        config?.favorites = Array(ids)
+        try saveConfiguration()
+    }
+
+    func getPresets() throws -> Set<String> {
+        try ensureConfigLoaded()
+        return Set(config?.presets ?? [])
+    }
+    
+    func setPresets(_ ids: Set<String>) throws {
+        try ensureConfigLoaded()
+        config?.presets = Array(ids)
+        try saveConfiguration()
     }
     
     // MARK: - Private Methods
@@ -161,12 +217,20 @@ class FileConfigurationRepository: ConfigurationRepository {
 
 /// Errors related to configuration operations
 enum ConfigurationError: Error, LocalizedError {
+    /// Failed to load configuration from storage
     case loadFailed
+    /// Configuration has not been loaded yet
     case configNotLoaded
+    /// The specified vendor was not found
     case vendorNotFound
+    /// The vendor already exists
     case vendorAlreadyExists
+    /// Cannot remove the last remaining vendor
     case cannotRemoveLastVendor
+    /// Failed to save configuration to storage
     case saveFailed
+    /// The requested operation is not supported
+    case operationNotSupported
     
     var errorDescription: String? {
         switch self {
@@ -182,6 +246,8 @@ enum ConfigurationError: Error, LocalizedError {
             return NSLocalizedString("cannot_remove_last_vendor", comment: "")
         case .saveFailed:
             return NSLocalizedString("config_save_failed", comment: "")
+        case .operationNotSupported:
+            return NSLocalizedString("operation_not_supported", comment: "")
         }
     }
 }

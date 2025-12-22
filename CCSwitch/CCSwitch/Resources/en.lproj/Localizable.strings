@@ -83,6 +83,7 @@
 "confirm_reset_msg" = "This will clear the app's cached state but will NOT delete your configuration files. Continue?";
 "reset_button" = "Reset";
 "success" = "Success";
+"reset_success_msg" = "Application state has been reset.";
 "restore_success_msg" = "Configuration restored successfully.";
 "error" = "Error";
 "reloaded" = "Reloaded";
@@ -219,12 +220,13 @@
 "vendor_already_exists" = "Vendor already exists.";
 "cannot_remove_last_vendor" = "Cannot remove the last vendor.";
 "config_save_failed" = "Failed to save configuration.";
+"operation_not_supported" = "Operation not supported";
 "advanced_model_mapping_desc" = "Specific models used for shortcuts or specialized tasks.";
 "connection_and_auth" = "Connection & Auth";
 "network_settings" = "Network";
 "test_connection_btn" = "Test Connection";
 "auth_token_hint" = "Leave empty to use global environment variable.";
-"preset_label" = "Preset";
+"preset_label" = "Recommended";
 "preset_anthropic" = "Anthropic";
 "preset_openai" = "OpenAI Compatible";
 "preset_custom" = "Custom";
@@ -270,3 +272,20 @@
 "update_check_failed" = "Update Check Failed";
 "error_rate_limit" = "Request too frequent (GitHub API rate limit exceeded). Please try again later.";
 "ok" = "OK";
+
+/* Migration Refactor */
+"migration_found_vendors" = "Found: %d vendors";
+"migration_default_vendor_label" = "Default vendor: %@";
+"migration_dont_show_again_checkbox" = "Don't ask again (for this config file)";
+"migration_view_vendor_list" = "View vendor list (%d)";
+
+/* Toast Messages */
+"vendor_added_success" = "Vendor added successfully.";
+"vendor_updated_success" = "Vendor updated successfully.";
+"vendor_deleted_success" = "Vendor deleted successfully.";
+"vendor_duplicated_success" = "Vendor duplicated successfully.";
+
+/* Additional Toast Messages */
+"backup_deleted_success" = "Backup deleted successfully.";
+"added_to_favorites_msg" = "Added to favorites.";
+"removed_from_favorites_msg" = "Removed from favorites.";
