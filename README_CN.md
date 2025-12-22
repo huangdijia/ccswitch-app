@@ -179,6 +179,7 @@ ccswitch-app/
 ├── fix_and_run.sh                    # 修复并运行脚本
 ├── Makefile                          # Make 构建系统 🆕
 ├── README.md                         # 项目说明
+├── README_CN.md                      # 中文文档
 ├── README_XCODE.md                   # Xcode 使用指南
 ├── ARCHITECTURE.md                   # 架构文档 🆕
 ├── EXTENSION_GUIDE.md                # 扩展指南 🆕
