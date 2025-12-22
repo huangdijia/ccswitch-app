@@ -205,14 +205,18 @@ struct VendorManagementView: View {
             // UI reloads via notification
             attemptSelectionChange(to: newVendor.id)
             ToastManager.shared.show(message: NSLocalizedString("vendor_added_success", comment: ""), type: .success)
-        } catch { activeAlert = .error(error.localizedDescription) }
+        } catch { 
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
+        }
     }
     
     private func handleSave(_ updatedVendor: Vendor) {
         do {
             try ConfigManager.shared.updateVendor(updatedVendor)
             ToastManager.shared.show(message: NSLocalizedString("vendor_updated_success", comment: ""), type: .success)
-        } catch { activeAlert = .error(error.localizedDescription) }
+        } catch { 
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
+        }
     }
     
     private func deleteVendor(_ vendor: Vendor) {
@@ -224,9 +228,14 @@ struct VendorManagementView: View {
                     isDetailDirty = false
                 }
             }
-            ToastManager.shared.show(message: NSLocalizedString("vendor_deleted_success", comment: ""), type: .success)
+            // Delay toast to show after alert dismisses
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                ToastManager.shared.show(message: NSLocalizedString("vendor_deleted_success", comment: ""), type: .success)
+            }
         } catch {
-            DispatchQueue.main.async { self.activeAlert = .error(error.localizedDescription) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                ToastManager.shared.show(message: error.localizedDescription, type: .error)
+            }
         }
     }
     
@@ -237,7 +246,9 @@ struct VendorManagementView: View {
             try ConfigManager.shared.addVendor(newVendor)
             attemptSelectionChange(to: newId)
             ToastManager.shared.show(message: NSLocalizedString("vendor_duplicated_success", comment: ""), type: .success)
-        } catch { activeAlert = .error(error.localizedDescription) }
+        } catch { 
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
+        }
     }
     
     @ViewBuilder
