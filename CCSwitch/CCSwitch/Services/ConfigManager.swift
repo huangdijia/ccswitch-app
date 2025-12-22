@@ -337,62 +337,60 @@ class MigrationManager: ObservableObject {
 
     
 
-    func performMigration() async -> MigrationResult {
-
-        self.isMigrating = true
-
-        
-
-        do {
-
-            try backupLegacyConfig()
-
-            let count = try ConfigManager.shared.migrateFromLegacy()
-
-            UserDefaults.standard.set(true, forKey: migrationKey)
-
-            self.isMigrating = false
-
-            return .success(count: count)
-
-        } catch {
-
-            Logger.shared.error("Migration failed", error: error)
-
-            self.isMigrating = false
-
-            return .failure(error.localizedDescription)
-
-        }
-
-    }
+        func performMigration() async -> MigrationResult {
 
     
 
-    private func backupLegacyConfig() throws {
+            self.isMigrating = true
 
-        let fileManager = FileManager.default
+    
 
-        let legacyURL = CCSConfig.legacyConfigFile
+            
 
-        guard fileManager.fileExists(atPath: legacyURL.path) else { return }
+    
 
-        let formatter = DateFormatter()
+            do {
 
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
+    
 
-        let backupURL = legacyURL.deletingPathExtension().appendingPathExtension("bak-\(formatter.string(from: Date())).json")
+                let count = try ConfigManager.shared.migrateFromLegacy()
 
-        if fileManager.fileExists(atPath: backupURL.path) {
+    
 
-            try fileManager.removeItem(at: backupURL)
+                UserDefaults.standard.set(true, forKey: migrationKey)
+
+    
+
+                self.isMigrating = false
+
+    
+
+                return .success(count: count)
+
+    
+
+            } catch {
+
+    
+
+                Logger.shared.error("Migration failed", error: error)
+
+    
+
+                self.isMigrating = false
+
+    
+
+                return .failure(error.localizedDescription)
+
+    
+
+            }
+
+    
 
         }
 
-        try fileManager.copyItem(at: legacyURL, to: backupURL)
-
-        Logger.shared.info("Created legacy config backup at \(backupURL.path)")
+    
 
     }
-
-}
