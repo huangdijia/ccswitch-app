@@ -31,6 +31,7 @@ class ConfigManager {
     func initialize() {
         notificationService.requestPermission()
         loadOrCreateConfig()
+        migrateFavoritesFromUserDefaults()
     }
 
     func cleanup() {
@@ -136,11 +137,10 @@ class ConfigManager {
     // MARK: - Favorites Management
     var favoriteVendorIds: Set<String> {
         get {
-            let list = UserDefaults.standard.stringArray(forKey: favoritesKey) ?? []
-            return Set(list)
+            return (try? configRepository.getFavorites()) ?? []
         }
         set {
-            UserDefaults.standard.set(Array(newValue), forKey: favoritesKey)
+            try? configRepository.setFavorites(newValue)
             notifyObservers(.vendorsUpdated) // Notify UI to refresh
         }
     }
@@ -164,6 +164,19 @@ class ConfigManager {
             current.insert(id)
         }
         favoriteVendorIds = current
+    }
+    
+    private func migrateFavoritesFromUserDefaults() {
+        let defaults = UserDefaults.standard
+        guard let legacyFavorites = defaults.stringArray(forKey: favoritesKey), !legacyFavorites.isEmpty else { return }
+        
+        // Only migrate if repository favorites are empty
+        let repoFavorites = (try? configRepository.getFavorites()) ?? []
+        if repoFavorites.isEmpty {
+            try? configRepository.setFavorites(Set(legacyFavorites))
+            Logger.shared.info("Migrated favorites from UserDefaults to Config")
+            defaults.removeObject(forKey: favoritesKey)
+        }
     }
 
     // MARK: - Vendor Management

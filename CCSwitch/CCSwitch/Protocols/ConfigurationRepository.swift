@@ -42,6 +42,16 @@ protocol ConfigurationRepository {
     /// Check if configuration exists
     /// - Returns: true if configuration is loaded, false otherwise
     func hasConfiguration() -> Bool
+    
+    /// Get favorite vendor IDs
+    /// - Returns: Set of favorite vendor IDs
+    /// - Throws: Error if retrieval fails
+    func getFavorites() throws -> Set<String>
+    
+    /// Set favorite vendor IDs
+    /// - Parameter ids: Set of favorite vendor IDs
+    /// - Throws: Error if saving fails
+    func setFavorites(_ ids: Set<String>) throws
 }
 
 /// Default implementation using CCSConfig file storage
@@ -63,7 +73,7 @@ class FileConfigurationRepository: ConfigurationRepository {
             // First launch: sync presets to vendors.json
             let presets = CCSConfig.loadPresets()
             if !presets.isEmpty {
-                config = CCSConfig(current: presets.first?.id, vendors: presets)
+                config = CCSConfig(current: presets.first?.id, vendors: presets, favorites: [])
             } else {
                 config = CCSConfig.createDefault()
             }
@@ -147,6 +157,17 @@ class FileConfigurationRepository: ConfigurationRepository {
     
     func hasConfiguration() -> Bool {
         return config != nil
+    }
+    
+    func getFavorites() throws -> Set<String> {
+        try ensureConfigLoaded()
+        return Set(config?.favorites ?? [])
+    }
+    
+    func setFavorites(_ ids: Set<String>) throws {
+        try ensureConfigLoaded()
+        config?.favorites = Array(ids)
+        try saveConfiguration()
     }
     
     // MARK: - Private Methods

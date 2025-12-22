@@ -4,6 +4,7 @@ import Foundation
 struct CCSConfig: Codable {
     var current: String?
     var vendors: [Vendor]
+    var favorites: [String]?
 
     // Default configuration
     static func createDefault() -> CCSConfig {
@@ -15,7 +16,8 @@ struct CCSConfig: Codable {
                     name: "Default",
                     env: [:]
                 )
-            ]
+            ],
+            favorites: []
         )
     }
 
@@ -156,7 +158,8 @@ struct LegacyCCSConfig: Decodable {
         
         return CCSConfig(
             current: current ?? `default`,
-            vendors: newVendors
+            vendors: newVendors,
+            favorites: []
         )
     }
 }
