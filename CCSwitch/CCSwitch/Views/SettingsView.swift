@@ -3,11 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
     @ObservedObject var migrationManager = MigrationManager.shared
-    
-    // Toast State
-    @State private var showToast = false
-    @State private var toastMessage = ""
-    @State private var toastType: ToastView.ToastType = .success
+    @ObservedObject var toastManager = ToastManager.shared
 
     var body: some View {
         VStack(spacing: 0) {
@@ -41,13 +37,9 @@ struct SettingsView: View {
             .fixedSize(horizontal: true, vertical: true)
         }
         .sheet(isPresented: $migrationManager.showMigrationPrompt) {
-            MigrationAlertView(
-                showToast: $showToast,
-                toastMessage: $toastMessage,
-                toastType: $toastType
-            )
+            MigrationAlertView()
         }
-        .toast(isPresented: $showToast, message: toastMessage, type: toastType)
+        .toast(isPresented: $toastManager.isPresented, message: toastManager.message, type: toastManager.type)
     }
 }
 
@@ -104,11 +96,6 @@ struct MigrationAlertView: View {
     @State private var isSuccess = false
     @State private var dontShowAgain = false
     
-    // Toast Bindings
-    @Binding var showToast: Bool
-    @Binding var toastMessage: String
-    @Binding var toastType: ToastView.ToastType
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
@@ -218,11 +205,8 @@ struct MigrationAlertView: View {
         case .success(let count):
             isSuccess = true
             // Show toast and close sheet immediately for success
-            toastMessage = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
-            toastType = .success
-            withAnimation {
-                showToast = true
-            }
+            let msg = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
+            ToastManager.shared.show(message: msg, type: .success)
             manager.showMigrationPrompt = false
             
         case .failure(let errorMessage):

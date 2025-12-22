@@ -7,11 +7,6 @@ struct AdvancedSettingsView: View {
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
     
-    // Toast State
-    @State private var showToast = false
-    @State private var toastMessage = ""
-    @State private var toastType: ToastView.ToastType = .success
-    
     var body: some View {
         Form {
             // MARK: - Section 1: System Behavior
@@ -95,16 +90,12 @@ struct AdvancedSettingsView: View {
                 secondaryButton: .cancel()
             )
         }
-        .toast(isPresented: $showToast, message: toastMessage, type: toastType)
     }
 
     private func reloadConfiguration() {
         ConfigManager.shared.initialize()
-        toastMessage = NSLocalizedString("reload_success_msg", comment: "Configuration reloaded.")
-        toastType = .success
-        withAnimation {
-            showToast = true
-        }
+        let msg = NSLocalizedString("reload_success_msg", comment: "Configuration reloaded.")
+        ToastManager.shared.show(message: msg, type: .success)
     }
 
     private func openConfigFolder() {
@@ -120,11 +111,8 @@ struct AdvancedSettingsView: View {
         
         // Defer the state update to ensure the previous alert is fully dismissed
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.toastMessage = NSLocalizedString("reset_success_msg", comment: "App state reset.")
-            self.toastType = .success
-            withAnimation {
-                self.showToast = true
-            }
+            let msg = NSLocalizedString("reset_success_msg", comment: "App state reset.")
+            ToastManager.shared.show(message: msg, type: .success)
         }
     }
 }
