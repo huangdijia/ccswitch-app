@@ -124,7 +124,10 @@ struct AdvancedSettingsView: View {
         ConfigManager.shared.cleanup()
         ConfigManager.shared.initialize()
         
-        showingResetSuccess = true
+        // Defer the state update to ensure the previous alert is fully dismissed
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.showingResetSuccess = true
+        }
     }
 }
 
