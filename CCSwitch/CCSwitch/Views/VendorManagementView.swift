@@ -5,6 +5,7 @@ struct VendorManagementView: View {
     @State private var selectedVendorId: String?
     @State private var searchText = ""
     @State private var currentVendorId: String = ""
+    @State private var favoriteIds: Set<String> = []
 
     // Navigation Guard & Alert State
     @State private var isDetailDirty: Bool = false
@@ -30,8 +31,8 @@ struct VendorManagementView: View {
         else { return vendors.filter { $0.displayName.localizedCaseInsensitiveContains(searchText) } }
     }
     
-    var favoriteVendors: [Vendor] { filteredVendors.filter { ConfigManager.shared.isFavorite($0.id) } }
-    var otherVendors: [Vendor] { filteredVendors.filter { !ConfigManager.shared.isFavorite($0.id) } }
+    var favoriteVendors: [Vendor] { filteredVendors.filter { favoriteIds.contains($0.id) } }
+    var otherVendors: [Vendor] { filteredVendors.filter { !favoriteIds.contains($0.id) } }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -55,18 +56,32 @@ struct VendorManagementView: View {
                     if !favoriteVendors.isEmpty {
                         Section("favorites") {
                             ForEach(favoriteVendors) { vendor in
-                                VendorRowView(vendor: vendor, isActive: vendor.id == currentVendorId)
-                                    .tag(vendor.id)
-                                    .contextMenu { vendorContextMenu(vendor) }
+                                VendorRowView(
+                                    vendor: vendor, 
+                                    isActive: vendor.id == currentVendorId,
+                                    isFavorite: true,
+                                    onToggleFavorite: {
+                                        ConfigManager.shared.toggleFavorite(vendor.id)
+                                    }
+                                )
+                                .tag(vendor.id)
+                                .contextMenu { vendorContextMenu(vendor) }
                             }
                         }
                     }
                     
                     Section("all_vendors") {
                         ForEach(otherVendors) { vendor in
-                            VendorRowView(vendor: vendor, isActive: vendor.id == currentVendorId)
-                                .tag(vendor.id)
-                                .contextMenu { vendorContextMenu(vendor) }
+                            VendorRowView(
+                                vendor: vendor, 
+                                isActive: vendor.id == currentVendorId,
+                                isFavorite: false,
+                                onToggleFavorite: {
+                                    ConfigManager.shared.toggleFavorite(vendor.id)
+                                }
+                            )
+                            .tag(vendor.id)
+                            .contextMenu { vendorContextMenu(vendor) }
                         }
                     }
                 }
@@ -180,6 +195,7 @@ struct VendorManagementView: View {
     private func loadVendors() {
         vendors = ConfigManager.shared.allVendors
         currentVendorId = ConfigManager.shared.currentVendor?.id ?? ""
+        favoriteIds = ConfigManager.shared.favoriteVendorIds
     }
     
     private func addNewVendor() {
@@ -224,7 +240,7 @@ struct VendorManagementView: View {
     private func vendorContextMenu(_ vendor: Vendor) -> some View {
         Button {
             ConfigManager.shared.toggleFavorite(vendor.id)
-        } label: { Text(ConfigManager.shared.isFavorite(vendor.id) ? "remove_from_favorites" : "add_to_favorites") }
+        } label: { Text(favoriteIds.contains(vendor.id) ? "remove_from_favorites" : "add_to_favorites") }
         Button { duplicateVendor(vendor) } label: { Text("duplicate_vendor") }
         Divider()
         Button { activeAlert = .deleteConfirmation(vendor) } label: { Text("delete") }
@@ -410,7 +426,8 @@ struct VendorDetailView: View {
 
 // MARK: - VendorRowView (Unchanged)
 struct VendorRowView: View {
-    let vendor: Vendor; let isActive: Bool; @State private var isHovered = false
+    let vendor: Vendor; let isActive: Bool; let isFavorite: Bool; let onToggleFavorite: () -> Void
+    @State private var isHovered = false
     var body: some View {
         HStack {
             if isActive { Circle().fill(Color.green).frame(width: 8, height: 8) }
@@ -434,8 +451,18 @@ struct VendorRowView: View {
                 }
             }
             Spacer()
-            if ConfigManager.shared.isFavorite(vendor.id) { Image(systemName: "star.fill").foregroundColor(.yellow).font(.caption) }
-            else if isHovered { Image(systemName: "star").foregroundColor(.secondary).font(.caption).onTapGesture { ConfigManager.shared.toggleFavorite(vendor.id) } }
+            if isFavorite { 
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                    .font(.caption)
+                    .onTapGesture { onToggleFavorite() }
+            }
+            else if isHovered { 
+                Image(systemName: "star")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+                    .onTapGesture { onToggleFavorite() } 
+            }
         }.padding(.vertical, 4).onHover { isHovered = $0 }
     }
 }
