@@ -70,19 +70,16 @@ if [ ! -f ~/.ccswitch/ccs.json ]; then
     {
       "id": "anthropic",
       "displayName": "Anthropic",
-      "claudeSettingsPatch": {
-        "provider": "anthropic",
-        "model": "claude-3-5-sonnet",
-        "apiKeyEnv": "ANTHROPIC_API_KEY"
+      "env": {
+        "ANTHROPIC_MODEL": "claude-3-5-sonnet"
       }
     },
     {
       "id": "deepseek",
       "displayName": "DeepSeek",
-      "claudeSettingsPatch": {
-        "provider": "deepseek",
-        "model": "deepseek-chat",
-        "apiKeyEnv": "DEEPSEEK_API_KEY"
+      "env": {
+        "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+        "ANTHROPIC_MODEL": "deepseek-chat"
       }
     }
   ]
