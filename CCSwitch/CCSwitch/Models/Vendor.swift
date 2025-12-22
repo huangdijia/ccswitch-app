@@ -5,9 +5,9 @@ struct Vendor: Codable, Identifiable {
     let id: String
     let name: String
     let env: [String: String]
-    var isPreset: Bool = false
+    var isPreset: Bool?
 
-    init(id: String, name: String, env: [String: String], isPreset: Bool = false) {
+    init(id: String, name: String, env: [String: String], isPreset: Bool? = nil) {
         self.id = id
         self.name = name
         self.env = env
@@ -25,7 +25,7 @@ struct Vendor: Codable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
-        isPreset = try container.decodeIfPresent(Bool.self, forKey: .isPreset) ?? false
+        isPreset = try container.decodeIfPresent(Bool.self, forKey: .isPreset)
         
         // Try decoding as strict [String: String] first
         if let stringEnv = try? container.decode([String: String].self, forKey: .env) {

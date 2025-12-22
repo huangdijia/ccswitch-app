@@ -130,7 +130,7 @@ class FileConfigurationRepository: ConfigurationRepository {
         
         // When a vendor is updated (e.g. user adds Auth Token), it's no longer a "Recommended" preset
         var updatedVendor = vendor
-        updatedVendor.isPreset = false
+        updatedVendor.isPreset = nil
         
         config?.vendors[index] = updatedVendor
         try saveConfiguration()

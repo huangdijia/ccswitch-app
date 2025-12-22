@@ -450,7 +450,7 @@ struct VendorRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
                     Text(vendor.displayName).font(.body).lineLimit(1)
-                    if vendor.isPreset {
+                    if vendor.isPreset == true {
                         Text("preset_label")
                             .font(.system(size: 8, weight: .bold))
                             .padding(.horizontal, 6)
