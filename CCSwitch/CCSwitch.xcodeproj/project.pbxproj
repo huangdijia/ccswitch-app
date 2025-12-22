@@ -13,9 +13,9 @@
 		01000004 /* CCSConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000004 /* CCSConfig.swift */; };
 		01000005 /* ClaudeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000005 /* ClaudeSettings.swift */; };
 		01000006 /* ConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000006 /* ConfigManager.swift */; };
-		                01000007 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000007 /* BackupManager.swift */; };
-		                01000030 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000030 /* ToastManager.swift */; };
-		                01000008 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000008 /* Logger.swift */; };		01000009 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000009 /* ErrorHandler.swift */; };
+		01000007 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000007 /* BackupManager.swift */; };
+		01000008 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000008 /* Logger.swift */; };
+		01000009 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000009 /* ErrorHandler.swift */; };
 		01000010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000010 /* SettingsView.swift */; };
 		01000011 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000011 /* GeneralSettingsView.swift */; };
 		01000012 /* VendorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000012 /* VendorManagementView.swift */; };
@@ -53,9 +53,9 @@
                 02000003 /* Vendor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vendor.swift; sourceTree = "<group>"; };		02000004 /* CCSConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSConfig.swift; sourceTree = "<group>"; };
 		02000005 /* ClaudeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeSettings.swift; sourceTree = "<group>"; };
 		02000006 /* ConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManager.swift; sourceTree = "<group>"; };
-		                02000007 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
-		                02000030 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
-		                02000008 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };		02000009 /* ErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
+		02000007 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		02000008 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		02000009 /* ErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		02000010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		02000011 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		02000012 /* VendorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorManagementView.swift; sourceTree = "<group>"; };
@@ -159,13 +159,13 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		                06000007 /* Services */ = {
-		                        isa = PBXGroup;
-		                        children = (
-		                                02000006 /* ConfigManager.swift */,
-		                                02000007 /* BackupManager.swift */,
-		                                02000030 /* ToastManager.swift */,
-		                                02000008 /* Logger.swift */,				02000020 /* UpdateManager.swift */,
+		06000007 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				02000006 /* ConfigManager.swift */,
+				02000007 /* BackupManager.swift */,
+				02000008 /* Logger.swift */,
+				02000020 /* UpdateManager.swift */,
 				02000009 /* ErrorHandler.swift */,
 				16000007 /* ServiceContainer.swift */,
 			);
@@ -323,10 +323,10 @@
 				01000003 /* Vendor.swift in Sources */,
 				01000004 /* CCSConfig.swift in Sources */,
 				01000005 /* ClaudeSettings.swift in Sources */,
-				                                01000006 /* ConfigManager.swift in Sources */,
-				                                01000007 /* BackupManager.swift in Sources */,
-				                                01000030 /* ToastManager.swift in Sources */,
-				                                01000008 /* Logger.swift in Sources */,				01000009 /* ErrorHandler.swift in Sources */,
+				01000006 /* ConfigManager.swift in Sources */,
+				01000007 /* BackupManager.swift in Sources */,
+				01000008 /* Logger.swift in Sources */,
+				01000009 /* ErrorHandler.swift in Sources */,
 				01000010 /* SettingsView.swift in Sources */,
 				01000011 /* GeneralSettingsView.swift in Sources */,
 				01000012 /* VendorManagementView.swift in Sources */,
