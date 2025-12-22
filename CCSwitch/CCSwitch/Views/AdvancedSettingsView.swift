@@ -6,8 +6,11 @@ struct AdvancedSettingsView: View {
     
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
-    @State private var showingReloadSuccess = false
-    @State private var showingResetSuccess = false
+    
+    // Toast State
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastType: ToastView.ToastType = .success
     
     var body: some View {
         Form {
@@ -92,25 +95,16 @@ struct AdvancedSettingsView: View {
                 secondaryButton: .cancel()
             )
         }
-        .alert(isPresented: $showingReloadSuccess) {
-            Alert(
-                title: Text("reloaded"),
-                message: Text("reload_success_msg"),
-                dismissButton: .default(Text("ok"))
-            )
-        }
-        .alert(isPresented: $showingResetSuccess) {
-            Alert(
-                title: Text("success"),
-                message: Text("reset_success_msg"),
-                dismissButton: .default(Text("ok"))
-            )
-        }
+        .toast(isPresented: $showToast, message: toastMessage, type: toastType)
     }
 
     private func reloadConfiguration() {
         ConfigManager.shared.initialize()
-        showingReloadSuccess = true
+        toastMessage = NSLocalizedString("reload_success_msg", comment: "Configuration reloaded.")
+        toastType = .success
+        withAnimation {
+            showToast = true
+        }
     }
 
     private func openConfigFolder() {
@@ -126,7 +120,11 @@ struct AdvancedSettingsView: View {
         
         // Defer the state update to ensure the previous alert is fully dismissed
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.showingResetSuccess = true
+            self.toastMessage = NSLocalizedString("reset_success_msg", comment: "App state reset.")
+            self.toastType = .success
+            withAnimation {
+                self.showToast = true
+            }
         }
     }
 }
