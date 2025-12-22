@@ -12,68 +12,69 @@ struct GeneralSettingsView: View {
     var body: some View {
         Form {
             // Section 1: Configuration Management
-            Section {
-                // Auto Reload Config
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("auto_reload_config")
-                            .font(.body)
-                        Text("auto_reload_config_desc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Toggle("", isOn: $autoLoadConfig)
-                        .labelsHidden()
-                }
-                
-                // Auto Backup
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("auto_backup")
-                            .font(.body)
-                        Text("auto_backup_desc_refined")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Toggle("", isOn: $autoBackup)
-                        .labelsHidden()
-                }
-                
-                Button {
-                    openBackupFolder()
-                } label: {
-                    HStack {
-                        Image(systemName: "folder")
-                        Text("show_backup_files")
-                    }
-                }
-                .buttonStyle(.link)
-                .padding(.leading, 0)
-                .padding(.top, 4)
-
-                // Legacy Migration
-                VStack(spacing: 0) {
-                    Divider().padding(.vertical, 8)
+            Section(header: Text("config_management")) {
+                VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
+                    // Auto Reload Config
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("legacy_migration_title")
+                            Text("auto_reload_config")
                                 .font(.body)
-                            Text("legacy_migration_desc")
+                            Text("auto_reload_config_desc")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        Button("migrate_now") {
-                            MigrationManager.shared.checkMigration(force: true)
+                        Toggle("", isOn: $autoLoadConfig)
+                            .labelsHidden()
+                    }
+                    
+                    // Auto Backup
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("auto_backup")
+                                .font(.body)
+                            Text("auto_backup_desc_refined")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
-                        .controlSize(.small)
-                        .disabled(!ConfigManager.shared.hasLegacyConfig)
+                        Spacer()
+                        Toggle("", isOn: $autoBackup)
+                            .labelsHidden()
+                    }
+                    
+                    Button {
+                        openBackupFolder()
+                    } label: {
+                        HStack {
+                            Image(systemName: "folder")
+                            Text("show_backup_files")
+                        }
+                    }
+                    .buttonStyle(.link)
+
+                    // Legacy Migration
+                    VStack(spacing: 0) {
+                        Divider().padding(.vertical, 8)
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("legacy_migration_title")
+                                    .font(.body)
+                                Text("legacy_migration_desc")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Button("migrate_now") {
+                                // 在 MainActor 环境下触发
+                                Task { @MainActor in
+                                    MigrationManager.shared.checkMigration(force: true)
+                                }
+                            }
+                            .controlSize(.small)
+                            .disabled(!ConfigManager.shared.hasLegacyConfig)
+                        }
                     }
                 }
-            } header: {
-                Text("config_management")
             }
 
             // Section 2: Notifications

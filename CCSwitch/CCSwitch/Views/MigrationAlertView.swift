@@ -103,9 +103,9 @@ struct MigrationAlertView: View {
         case .success(let count):
             isSuccess = true
             resultMessage = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
-        case .failure(let error):
+        case .failure(let errorMessage):
             isSuccess = false
-            resultMessage = String(format: NSLocalizedString("migration_failure_msg", comment: "迁移失败: %@"), error.localizedDescription)
+            resultMessage = String(format: NSLocalizedString("migration_failure_msg", comment: "迁移失败: %@"), errorMessage)
         }
         migrationFinished = true
     }

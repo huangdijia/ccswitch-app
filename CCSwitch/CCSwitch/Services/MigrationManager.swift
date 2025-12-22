@@ -1,11 +1,12 @@
 import Foundation
 import SwiftUI
 
-enum MigrationResult {
+enum MigrationResult: Sendable {
     case success(count: Int)
-    case failure(Error)
+    case failure(String)
 }
 
+@MainActor
 class MigrationManager: ObservableObject {
     static let shared = MigrationManager()
     
@@ -18,23 +19,19 @@ class MigrationManager: ObservableObject {
     
     private init() {}
     
-    var hasLegacyConfig: Bool {
+    nonisolated var hasLegacyConfig: Bool {
+        let migrationKey = "has_migrated_from_legacy"
         return ConfigManager.shared.hasLegacyConfig && !UserDefaults.standard.bool(forKey: migrationKey)
     }
     
     func checkMigration(force: Bool = false) {
         if force || hasLegacyConfig {
-            // Try to peek into legacy config to show count
             if let legacy = CCSConfig.loadFromFile(url: CCSConfig.legacyConfigFile) {
-                DispatchQueue.main.async {
-                    self.legacyVendorsCount = legacy.vendors.count
-                    if let defaultId = legacy.current {
-                        self.legacyDefaultVendor = legacy.vendors.first(where: { $0.id == defaultId })?.name ?? defaultId
-                    }
-                    self.showMigrationPrompt = true
+                self.legacyVendorsCount = legacy.vendors.count
+                if let defaultId = legacy.current {
+                    self.legacyDefaultVendor = legacy.vendors.first(where: { $0.id == defaultId })?.name ?? defaultId
                 }
-            } else if force {
-                Logger.shared.error("Manual migration triggered but legacy file could not be loaded")
+                self.showMigrationPrompt = true
             }
         }
     }
@@ -44,37 +41,28 @@ class MigrationManager: ObservableObject {
         showMigrationPrompt = false
     }
     
-    @MainActor
     func performMigration() async -> MigrationResult {
-        isMigrating = true
-        
-        // Give UI a moment to show loading if needed
-        try? await Task.sleep(nanoseconds: 500_000_000)
+        self.isMigrating = true
         
         do {
-            // 1. Create Backup
+            // 1. Create Backup (In background if needed, but here simple file op)
             try backupLegacyConfig()
             
-                    // 2. Perform migration via ConfigManager
-                    let count = try await Task { @MainActor in
-                        try ConfigManager.shared.migrateFromLegacy()
-                    }.value
-                        // 3. Mark as migrated
+            // 2. Perform migration
+            let count = try ConfigManager.shared.migrateFromLegacy()
+            
+            // 3. Mark as migrated
             UserDefaults.standard.set(true, forKey: migrationKey)
             
-            DispatchQueue.main.async {
-                self.isMigrating = false
-            }
-            
+            self.isMigrating = false
             return .success(count: count)
         } catch {
             Logger.shared.error("Migration failed", error: error)
-            DispatchQueue.main.async {
-                self.isMigrating = false
-            }
-            return .failure(error)
+            self.isMigrating = false
+            return .failure(error.localizedDescription)
         }
     }
+
     
     private func backupLegacyConfig() throws {
         let fileManager = FileManager.default
