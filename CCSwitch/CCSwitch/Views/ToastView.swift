@@ -39,7 +39,7 @@ struct ToastView: View {
         .background(Material.ultraThin)
         .cornerRadius(20)
         .shadow(radius: 4)
-        .padding(.top, 20)
+        .padding(.top, 10)
     }
 }
 
