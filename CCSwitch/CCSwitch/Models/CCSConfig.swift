@@ -54,26 +54,6 @@ struct CCSConfig: Codable {
                 name: "Default",
                 env: [:],
                 isPreset: true
-            ),
-            Vendor(
-                id: "anyrouter",
-                name: "AnyRouter",
-                env: [
-                    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
-                    "ANTHROPIC_BASE_URL": "https://anyrouter.top"
-                ],
-                isPreset: true
-            ),
-            Vendor(
-                id: "deepseek",
-                name: "DeepSeek",
-                env: [
-                    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxx",
-                    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
-                    "ANTHROPIC_MODEL": "deepseek-chat",
-                    "ANTHROPIC_SMALL_FAST_MODEL": "deepseek-chat"
-                ],
-                isPreset: true
             )
         ]
 

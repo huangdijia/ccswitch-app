@@ -61,6 +61,12 @@ if [ -f "$PROJECT_DIR/CCSwitch/Resources/AppIcon.icns" ]; then
     cp "$PROJECT_DIR/CCSwitch/Resources/AppIcon.icns" "$APP_BUNDLE/Contents/Resources/"
 fi
 
+# 复制 presets.json
+if [ -f "$PROJECT_DIR/CCSwitch/Resources/presets.json" ]; then
+    echo "📄 复制 presets.json..."
+    cp "$PROJECT_DIR/CCSwitch/Resources/presets.json" "$APP_BUNDLE/Contents/Resources/"
+fi
+
 # 复制本地化资源
 echo "🌍 复制本地化文件..."
 for lproj in "$PROJECT_DIR/CCSwitch/Resources"/*.lproj; do
