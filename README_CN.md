@@ -90,7 +90,7 @@ git clone https://github.com/huangdijia/ccswitch-app.git
 cd ccswitch-app
 ```
 
-1. 运行构建脚本（多种方式）：
+2. 运行构建脚本（多种方式）：
 
 使用 Makefile（推荐）：
 
