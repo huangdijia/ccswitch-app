@@ -34,8 +34,9 @@ struct SettingsView: View {
                 }
             }
             .frame(width: 600)
-            .fixedSize(horizontal: true, vertical: true)
         }
+        .fixedSize(horizontal: false, vertical: true)
+        .animation(.easeInOut(duration: 0.3), value: selectedTab)
         .sheet(isPresented: $migrationManager.showMigrationPrompt) {
             MigrationAlertView()
         }

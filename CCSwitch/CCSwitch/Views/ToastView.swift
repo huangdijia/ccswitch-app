@@ -4,28 +4,6 @@ struct ToastView: View {
     let message: String
     let type: ToastType
     
-    enum ToastType {
-        case success
-        case info
-        case error
-        
-        var icon: String {
-            switch self {
-            case .success: return "checkmark.circle.fill"
-            case .info: return "info.circle.fill"
-            case .error: return "exclamationmark.triangle.fill"
-            }
-        }
-        
-        var color: Color {
-            switch self {
-            case .success: return .green
-            case .info: return .blue
-            case .error: return .red
-            }
-        }
-    }
-    
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: type.icon)
@@ -46,7 +24,7 @@ struct ToastView: View {
 struct ToastModifier: ViewModifier {
     @Binding var isPresented: Bool
     let message: String
-    let type: ToastView.ToastType
+    let type: ToastType
     
     func body(content: Content) -> some View {
         ZStack(alignment: .top) {
@@ -68,7 +46,7 @@ struct ToastModifier: ViewModifier {
 }
 
 extension View {
-    func toast(isPresented: Binding<Bool>, message: String, type: ToastView.ToastType = .success) -> some View {
+    func toast(isPresented: Binding<Bool>, message: String, type: ToastType = .success) -> some View {
         modifier(ToastModifier(isPresented: isPresented, message: message, type: type))
     }
 }
