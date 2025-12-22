@@ -50,8 +50,26 @@ struct GeneralSettingsView: View {
                     }
                 }
                 .buttonStyle(.link)
-                .padding(.leading, 0) // Align with text, no extra indent needed in Form usually, or minimal
+                .padding(.leading, 0)
                 .padding(.top, 4)
+
+                // Legacy Migration
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("legacy_migration_title")
+                            .font(.body)
+                        Text("legacy_migration_desc")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Button("migrate_now") {
+                        MigrationManager.shared.checkMigration(force: true)
+                    }
+                    .controlSize(.small)
+                    .disabled(!ConfigManager.shared.hasLegacyConfig)
+                }
+                .padding(.top, 8)
             } header: {
                 Text("config_management")
             }

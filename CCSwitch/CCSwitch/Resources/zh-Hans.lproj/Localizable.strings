@@ -98,7 +98,7 @@
 "confirm_delete_msg" = "确定要删除此供应商吗？此操作无法撤销。";
 "delete" = "删除";
 "github" = "GitHub";
-"community" = "社区";
+"feedback" = "反馈";
 "help" = "帮助";
 "open_github" = "打开 GitHub 仓库";
 
@@ -235,6 +235,21 @@
 "status_success" = "连接成功 (200 OK)";
 "status_auth_failed" = "鉴权失败 (401) - 请检查 Token";
 "status_network_error" = "网络错误 - 请检查 URL";
+
+/* Migration */
+"legacy_migration_title" = "旧版配置迁移";
+"legacy_migration_desc" = "从旧版 ~/.ccswitch/ccs.json 导入供应商";
+"migration_title" = "检测到旧版配置";
+"migration_message" = "在您的旧配置文件中发现 %d 个供应商。是否要将它们迁移到新格式？";
+"migration_default_vendor" = "默认供应商: %@";
+"migration_note" = "迁移过程中会自动创建备份，不会影响旧版文件的使用。";
+"migrate_now" = "立即迁移";
+"migrate_later" = "稍后";
+"dont_show_again" = "不再提示";
+"migration_completed" = "迁移完成";
+"migration_success_msg" = "成功导入了 %d 个供应商。";
+"migration_failure_msg" = "迁移失败: %@";
+"migrating" = "正在迁移...";
 
 /* Software Update */
 "software_update" = "软件更新";

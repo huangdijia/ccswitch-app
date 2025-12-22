@@ -81,23 +81,39 @@ class ConfigManager {
         }
 
         var importedCount = 0
+        
         // Save all vendors from legacy config
-        for vendor in legacyConfig.vendors {
-            do {
-                try configRepository.addVendor(vendor)
-                importedCount += 1
-            } catch {
-                // Ignore duplicates or errors
+        for legacyVendor in legacyConfig.vendors {
+            // Find existing vendor by ID or Name
+            if let existingVendor = allVendors.first(where: { $0.id == legacyVendor.id || $0.name == legacyVendor.name }) {
+                // Merge logic: Combine env vars, legacy values take precedence in case of conflict
+                let mergedEnv = existingVendor.env.merging(legacyVendor.env) { (_, new) in new }
+                let updatedVendor = Vendor(id: existingVendor.id, name: existingVendor.name, env: mergedEnv)
+                
+                do {
+                    try configRepository.updateVendor(updatedVendor)
+                    importedCount += 1
+                } catch {
+                    Logger.shared.error("Failed to merge vendor \(legacyVendor.name)", error: error)
+                }
+            } else {
+                // No conflict, add as new
+                do {
+                    try configRepository.addVendor(legacyVendor)
+                    importedCount += 1
+                } catch {
+                    Logger.shared.error("Failed to add vendor \(legacyVendor.name)", error: error)
+                }
             }
         }
         
-        // Set current vendor
-        if let current = legacyConfig.current {
-            try? configRepository.setCurrentVendor(current)
+        // Set current vendor if it was part of the migration
+        if let currentId = legacyConfig.current {
+            try? configRepository.setCurrentVendor(currentId)
         }
         
         notifyObservers(.configLoaded)
-        Logger.shared.info("Migrated configuration from legacy file: \(importedCount) vendors")
+        Logger.shared.info("Migrated configuration from legacy file: \(importedCount) vendors processed (merged or added)")
         return importedCount
     }
 

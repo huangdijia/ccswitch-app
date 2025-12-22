@@ -39,14 +39,13 @@ class MenuBarController: NSObject, ConfigObserver {
         menu.addItem(NSMenuItem.separator())
 
         // 2. Links
-        let githubItem = NSMenuItem(title: NSLocalizedString("community", comment: ""), action: #selector(openGitHub), keyEquivalent: "")
-        githubItem.title = "GitHub"
+        let githubItem = NSMenuItem(title: "GitHub", action: #selector(openGitHub), keyEquivalent: "")
         githubItem.target = self
         menu.addItem(githubItem)
 
-        let communityItem = NSMenuItem(title: NSLocalizedString("community", comment: ""), action: #selector(openCommunity), keyEquivalent: "")
-        communityItem.target = self
-        menu.addItem(communityItem)
+        let feedbackItem = NSMenuItem(title: NSLocalizedString("feedback", comment: ""), action: #selector(openFeedback), keyEquivalent: "")
+        feedbackItem.target = self
+        menu.addItem(feedbackItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -120,8 +119,8 @@ class MenuBarController: NSObject, ConfigObserver {
         }
     }
 
-    @objc private func openCommunity() {
-        if let url = URL(string: "https://github.com/huangdijia/ccswitch-app/discussions") {
+    @objc private func openFeedback() {
+        if let url = URL(string: "https://github.com/huangdijia/ccswitch-app/issues/new") {
             NSWorkspace.shared.open(url)
         }
     }

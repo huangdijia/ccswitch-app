@@ -98,9 +98,9 @@
 "confirm_delete_msg" = "Are you sure you want to delete this vendor? This action cannot be undone.";
 "delete" = "Delete";
 "github" = "GitHub";
-"community" = "Community";
+"feedback" = "Feedback";
 "help" = "Help";
-"open_github" = "Open GitHub Repo";
+"open_github" = "Open GitHub Repository";
 
 /* Vendor Edit View */
 "basic_info" = "Basic Info";
@@ -238,13 +238,25 @@
 
 /* Software Update */
 "software_update" = "Software Update";
-"auto_check_updates" = "Automatically check for updates";
-"auto_check_updates_desc" = "Periodically check GitHub for new versions.";
-"auto_install_updates" = "Automatically download and install";
-"auto_install_updates_desc" = "Install updates in the background (requires relaunch).";
 "check_for_updates_now" = "Check for Updates...";
 "last_checked_format" = "Last checked: %@";
 "version_info" = "Version";
+
+// Migration
+"legacy_migration_title" = "Legacy Migration";
+"legacy_migration_desc" = "Import vendors from old ~/.ccswitch/ccs.json";
+"migration_title" = "Legacy Config Detected";
+"migration_message" = "Found %d vendors in your old configuration. Would you like to migrate them to the new format?";
+"migration_default_vendor" = "Default Vendor: %@";
+"migration_note" = "A backup will be created automatically. Your old files will remain untouched.";
+"migrate_now" = "Migrate Now";
+"migrate_later" = "Later";
+"dont_show_again" = "Don't Show Again";
+"migration_completed" = "Migration Completed";
+"migration_success_msg" = "Successfully imported %d vendors.";
+"migration_failure_msg" = "Migration failed: %@";
+"migrating" = "Migrating...";
+
 "update_available_title" = "New Version Available: %@";
 "update_available_msg" = "A new version of CCSwitch is available.";
 "release_notes_label" = "Release Notes:";

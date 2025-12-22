@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
+    @ObservedObject var migrationManager = MigrationManager.shared
 
     var body: some View {
         VStack(spacing: 0) {
@@ -33,6 +34,9 @@ struct SettingsView: View {
             }
             .frame(width: 600)
             .fixedSize(horizontal: true, vertical: true)
+        }
+        .sheet(isPresented: $migrationManager.showMigrationPrompt) {
+            MigrationAlertView()
         }
     }
 }
