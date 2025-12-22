@@ -274,3 +274,9 @@
 "update_check_failed" = "检查更新失败";
 "error_rate_limit" = "请求过于频繁（GitHub API 频率限制），请稍后再试。";
 "ok" = "确定";
+
+/* Migration Refactor */
+"migration_found_vendors" = "发现：%d 个供应商";
+"migration_default_vendor_label" = "默认供应商：%@";
+"migration_dont_show_again_checkbox" = "不再提示（仅针对此配置文件）";
+"migration_view_vendor_list" = "查看供应商列表 (%d)";

@@ -271,3 +271,9 @@
 "update_check_failed" = "Update Check Failed";
 "error_rate_limit" = "Request too frequent (GitHub API rate limit exceeded). Please try again later.";
 "ok" = "OK";
+
+/* Migration Refactor */
+"migration_found_vendors" = "Found: %d vendors";
+"migration_default_vendor_label" = "Default vendor: %@";
+"migration_dont_show_again_checkbox" = "Don't ask again (for this config file)";
+"migration_view_vendor_list" = "View vendor list (%d)";
