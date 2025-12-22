@@ -1,5 +1,9 @@
 # CCSwitch for macOS
 
+[![GitHub Release](https://img.shields.io/github/v/release/huangdijia/ccswitch-app)](https://github.com/huangdijia/ccswitch-app/releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/huangdijia/ccswitch-app/total)](https://github.com/huangdijia/ccswitch-app/releases)
+[![GitHub License](https://img.shields.io/github/license/huangdijia/ccswitch-app)](LICENSE)
+
 一个用于快速切换 Claude Code 供应商的 macOS 状态栏工具。
 
 ## 功能特性
