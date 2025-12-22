@@ -83,6 +83,7 @@
 "confirm_reset_msg" = "这将清除应用的缓存状态，但不会删除您的配置文件。继续？";
 "reset_button" = "重置";
 "success" = "成功";
+"reset_success_msg" = "应用状态已重置。";
 "restore_success_msg" = "配置已成功恢复。";
 "error" = "错误";
 "reloaded" = "已重新加载";

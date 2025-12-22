@@ -7,6 +7,7 @@ struct AdvancedSettingsView: View {
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
     @State private var showingReloadSuccess = false
+    @State private var showingResetSuccess = false
     
     var body: some View {
         Form {
@@ -98,6 +99,13 @@ struct AdvancedSettingsView: View {
                 dismissButton: .default(Text("ok"))
             )
         }
+        .alert(isPresented: $showingResetSuccess) {
+            Alert(
+                title: Text("success"),
+                message: Text("reset_success_msg"),
+                dismissButton: .default(Text("ok"))
+            )
+        }
     }
 
     private func reloadConfiguration() {
@@ -116,8 +124,7 @@ struct AdvancedSettingsView: View {
         ConfigManager.shared.cleanup()
         ConfigManager.shared.initialize()
         
-        // Note: In a real app, you might want to force restart or notify the user 
-        // that defaults have been restored.
+        showingResetSuccess = true
     }
 }
 

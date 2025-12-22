@@ -83,6 +83,7 @@
 "confirm_reset_msg" = "This will clear the app's cached state but will NOT delete your configuration files. Continue?";
 "reset_button" = "Reset";
 "success" = "Success";
+"reset_success_msg" = "Application state has been reset.";
 "restore_success_msg" = "Configuration restored successfully.";
 "error" = "Error";
 "reloaded" = "Reloaded";
