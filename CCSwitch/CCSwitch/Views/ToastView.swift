@@ -39,7 +39,7 @@ struct ToastView: View {
         .background(Material.ultraThin)
         .cornerRadius(20)
         .shadow(radius: 4)
-        .padding(.bottom, 20)
+        .padding(.top, 20)
     }
 }
 
@@ -49,12 +49,12 @@ struct ToastModifier: ViewModifier {
     let type: ToastView.ToastType
     
     func body(content: Content) -> some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             content
             
             if isPresented {
                 ToastView(message: message, type: type)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(.move(edge: .top).combined(with: .opacity))
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             withAnimation {
