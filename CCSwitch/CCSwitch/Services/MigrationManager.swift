@@ -55,10 +55,11 @@ class MigrationManager: ObservableObject {
             // 1. Create Backup
             try backupLegacyConfig()
             
-            // 2. Perform migration via ConfigManager
-            let count = try ConfigManager.shared.migrateFromLegacy()
-            
-            // 3. Mark as migrated
+                    // 2. Perform migration via ConfigManager
+                    let count = try await Task { @MainActor in
+                        try ConfigManager.shared.migrateFromLegacy()
+                    }.value
+                        // 3. Mark as migrated
             UserDefaults.standard.set(true, forKey: migrationKey)
             
             DispatchQueue.main.async {

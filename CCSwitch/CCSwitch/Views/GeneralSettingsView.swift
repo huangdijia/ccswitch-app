@@ -54,22 +54,24 @@ struct GeneralSettingsView: View {
                 .padding(.top, 4)
 
                 // Legacy Migration
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("legacy_migration_title")
-                            .font(.body)
-                        Text("legacy_migration_desc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                VStack(spacing: 0) {
+                    Divider().padding(.vertical, 8)
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("legacy_migration_title")
+                                .font(.body)
+                            Text("legacy_migration_desc")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button("migrate_now") {
+                            MigrationManager.shared.checkMigration(force: true)
+                        }
+                        .controlSize(.small)
+                        .disabled(!ConfigManager.shared.hasLegacyConfig)
                     }
-                    Spacer()
-                    Button("migrate_now") {
-                        MigrationManager.shared.checkMigration(force: true)
-                    }
-                    .controlSize(.small)
-                    .disabled(!ConfigManager.shared.hasLegacyConfig)
                 }
-                .padding(.top, 8)
             } header: {
                 Text("config_management")
             }
