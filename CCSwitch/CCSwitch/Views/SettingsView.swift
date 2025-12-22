@@ -3,6 +3,11 @@ import SwiftUI
 struct SettingsView: View {
     @State private var selectedTab: SettingsTab = .general
     @ObservedObject var migrationManager = MigrationManager.shared
+    
+    // Toast State
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastType: ToastView.ToastType = .success
 
     var body: some View {
         VStack(spacing: 0) {
@@ -36,8 +41,13 @@ struct SettingsView: View {
             .fixedSize(horizontal: true, vertical: true)
         }
         .sheet(isPresented: $migrationManager.showMigrationPrompt) {
-            MigrationAlertView()
+            MigrationAlertView(
+                showToast: $showToast,
+                toastMessage: $toastMessage,
+                toastType: $toastType
+            )
         }
+        .toast(isPresented: $showToast, message: toastMessage, type: toastType)
     }
 }
 
@@ -93,16 +103,21 @@ struct MigrationAlertView: View {
     @State private var migrationFinished = false
     @State private var isSuccess = false
     @State private var dontShowAgain = false
+    
+    // Toast Bindings
+    @Binding var showToast: Bool
+    @Binding var toastMessage: String
+    @Binding var toastType: ToastView.ToastType
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            if migrationFinished {
-                // Success/Error State
+            if migrationFinished && !isSuccess {
+                // Error State (Keep error message in sheet)
                 VStack(spacing: 20) {
-                    Image(systemName: isSuccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 48))
-                        .foregroundColor(isSuccess ? .green : .red)
+                        .foregroundColor(.red)
                     
                     Text(resultMessage ?? "")
                         .multilineTextAlignment(.center)
@@ -202,11 +217,18 @@ struct MigrationAlertView: View {
         switch result {
         case .success(let count):
             isSuccess = true
-            resultMessage = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
+            // Show toast and close sheet immediately for success
+            toastMessage = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
+            toastType = .success
+            withAnimation {
+                showToast = true
+            }
+            manager.showMigrationPrompt = false
+            
         case .failure(let errorMessage):
             isSuccess = false
             resultMessage = String(format: NSLocalizedString("migration_failure_msg", comment: "迁移失败: %@"), errorMessage)
+            migrationFinished = true
         }
-        migrationFinished = true
     }
 }
