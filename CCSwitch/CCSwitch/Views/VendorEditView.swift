@@ -206,9 +206,9 @@ struct VendorEditView: View {
         name = v.name
         let env = v.env
         
-        baseURL = env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? env["baseURL"] ?? ""
-        authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? env["apiKeyEnv"] ?? ""
-        defaultModel = env["ANTHROPIC_MODEL"] ?? env["model"] ?? ""
+        baseURL = env["ANTHROPIC_BASE_URL"] ?? ""
+        authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? ""
+        defaultModel = env["ANTHROPIC_MODEL"] ?? ""
         timeout = env["API_TIMEOUT_MS"] ?? ""
         opusModel = env["ANTHROPIC_DEFAULT_OPUS_MODEL"] ?? ""
         sonnetModel = env["ANTHROPIC_DEFAULT_SONNET_MODEL"] ?? ""
@@ -247,10 +247,7 @@ struct VendorEditView: View {
             }
         }
         
-        setOrRemove("NTHROPIC_BASE_URL", baseURL) // Legacy
-        if !baseURL.isEmpty {
-             env["ANTHROPIC_BASE_URL"] = baseURL
-        }
+        setOrRemove("ANTHROPIC_BASE_URL", baseURL)
         
         setOrRemove("ANTHROPIC_AUTH_TOKEN", authToken)
         setOrRemove("API_TIMEOUT_MS", timeout)

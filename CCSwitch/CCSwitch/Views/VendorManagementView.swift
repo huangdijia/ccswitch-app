@@ -286,7 +286,7 @@ struct VendorDetailView: View {
         self.vendor = vendor; self.isActive = isActive; self._isDirtyBinding = isDirtyBinding; self.onSave = onSave
         _originalVendor = State(initialValue: vendor); _name = State(initialValue: vendor.name)
         let env = vendor.env
-        _baseURL = State(initialValue: env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? "")
+        _baseURL = State(initialValue: env["ANTHROPIC_BASE_URL"] ?? "")
         _authToken = State(initialValue: env["ANTHROPIC_AUTH_TOKEN"] ?? "")
         _timeout = State(initialValue: env["API_TIMEOUT_MS"] ?? "")
         _defaultModel = State(initialValue: env["ANTHROPIC_MODEL"] ?? "")
@@ -298,7 +298,7 @@ struct VendorDetailView: View {
     
     private var isDirty: Bool {
         name != originalVendor.name ||
-        baseURL != (originalVendor.env["ANTHROPIC_BASE_URL"] ?? originalVendor.env["NTHROPIC_BASE_URL"] ?? "") ||
+        baseURL != (originalVendor.env["ANTHROPIC_BASE_URL"] ?? "") ||
         authToken != (originalVendor.env["ANTHROPIC_AUTH_TOKEN"] ?? "") ||
         timeout != (originalVendor.env["API_TIMEOUT_MS"] ?? "") ||
         defaultModel != (originalVendor.env["ANTHROPIC_MODEL"] ?? "") ||
@@ -389,7 +389,7 @@ struct VendorDetailView: View {
     
     private func revertChanges() {
         name = originalVendor.name; let env = originalVendor.env
-        baseURL = env["ANTHROPIC_BASE_URL"] ?? env["NTHROPIC_BASE_URL"] ?? ""
+        baseURL = env["ANTHROPIC_BASE_URL"] ?? ""
         authToken = env["ANTHROPIC_AUTH_TOKEN"] ?? ""; timeout = env["API_TIMEOUT_MS"] ?? ""
         defaultModel = env["ANTHROPIC_MODEL"] ?? ""; opusModel = env["ANTHROPIC_DEFAULT_OPUS_MODEL"] ?? ""
         sonnetModel = env["ANTHROPIC_DEFAULT_SONNET_MODEL"] ?? ""; haikuModel = env["ANTHROPIC_DEFAULT_HAIKU_MODEL"] ?? ""
@@ -418,7 +418,7 @@ struct VendorDetailView: View {
             if value.trimmingCharacters(in: .whitespaces).isEmpty { env.removeValue(forKey: key) }
             else { env[key] = value.trimmingCharacters(in: .whitespaces) }
         }
-        update("ANTHROPIC_BASE_URL", baseURL); update("NTHROPIC_BASE_URL", baseURL) 
+        update("ANTHROPIC_BASE_URL", baseURL)
         update("ANTHROPIC_AUTH_TOKEN", authToken); update("API_TIMEOUT_MS", timeout)
         update("ANTHROPIC_MODEL", defaultModel); update("ANTHROPIC_DEFAULT_OPUS_MODEL", opusModel)
         update("ANTHROPIC_DEFAULT_SONNET_MODEL", sonnetModel); update("ANTHROPIC_DEFAULT_HAIKU_MODEL", haikuModel)
@@ -468,7 +468,7 @@ struct VendorRowView: View {
                             .cornerRadius(6)
                     }
                 }
-                if let url = vendor.env["ANTHROPIC_BASE_URL"] ?? vendor.env["NTHROPIC_BASE_URL"],
+                if let url = vendor.env["ANTHROPIC_BASE_URL"],
                    let host = URL(string: url)?.host {
                     Text(host).font(.caption).foregroundColor(.secondary).lineLimit(1)
                 }
