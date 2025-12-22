@@ -172,12 +172,19 @@ class FileConfigurationRepository: ConfigurationRepository {
 
 /// Errors related to configuration operations
 enum ConfigurationError: Error, LocalizedError {
+    /// Failed to load configuration from storage
     case loadFailed
+    /// Configuration has not been loaded yet
     case configNotLoaded
+    /// The specified vendor was not found
     case vendorNotFound
+    /// The vendor already exists
     case vendorAlreadyExists
+    /// Cannot remove the last remaining vendor
     case cannotRemoveLastVendor
+    /// Failed to save configuration to storage
     case saveFailed
+    /// The requested operation is not supported
     case operationNotSupported
     
     var errorDescription: String? {

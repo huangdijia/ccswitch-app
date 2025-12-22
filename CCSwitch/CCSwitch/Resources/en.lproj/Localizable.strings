@@ -219,6 +219,7 @@
 "vendor_already_exists" = "Vendor already exists.";
 "cannot_remove_last_vendor" = "Cannot remove the last vendor.";
 "config_save_failed" = "Failed to save configuration.";
+"operation_not_supported" = "Operation not supported";
 "advanced_model_mapping_desc" = "Specific models used for shortcuts or specialized tasks.";
 "connection_and_auth" = "Connection & Auth";
 "network_settings" = "Network";

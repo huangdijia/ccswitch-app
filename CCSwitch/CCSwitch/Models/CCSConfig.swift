@@ -46,6 +46,8 @@ struct CCSConfig: Codable {
     }
 
     // 从 Bundle 加载预设配置
+    /// Load preset vendors from the app bundle
+    /// - Returns: An array of `Vendor` objects loaded from `presets.json` or fallback
     static func loadPresets() -> [Vendor] {
         // Hardcoded fallback in case the file is missing from Bundle Resources
         let fallbackPresets = [
