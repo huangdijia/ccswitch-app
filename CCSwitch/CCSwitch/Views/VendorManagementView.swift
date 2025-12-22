@@ -204,12 +204,14 @@ struct VendorManagementView: View {
             try ConfigManager.shared.addVendor(newVendor)
             // UI reloads via notification
             attemptSelectionChange(to: newVendor.id)
+            ToastManager.shared.show(message: NSLocalizedString("vendor_added_success", comment: ""), type: .success)
         } catch { activeAlert = .error(error.localizedDescription) }
     }
     
     private func handleSave(_ updatedVendor: Vendor) {
         do {
             try ConfigManager.shared.updateVendor(updatedVendor)
+            ToastManager.shared.show(message: NSLocalizedString("vendor_updated_success", comment: ""), type: .success)
         } catch { activeAlert = .error(error.localizedDescription) }
     }
     
@@ -222,6 +224,7 @@ struct VendorManagementView: View {
                     isDetailDirty = false
                 }
             }
+            ToastManager.shared.show(message: NSLocalizedString("vendor_deleted_success", comment: ""), type: .success)
         } catch {
             DispatchQueue.main.async { self.activeAlert = .error(error.localizedDescription) }
         }
@@ -233,6 +236,7 @@ struct VendorManagementView: View {
         do {
             try ConfigManager.shared.addVendor(newVendor)
             attemptSelectionChange(to: newId)
+            ToastManager.shared.show(message: NSLocalizedString("vendor_duplicated_success", comment: ""), type: .success)
         } catch { activeAlert = .error(error.localizedDescription) }
     }
     

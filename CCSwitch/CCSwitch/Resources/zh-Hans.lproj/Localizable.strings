@@ -281,3 +281,9 @@
 "migration_default_vendor_label" = "默认供应商：%@";
 "migration_dont_show_again_checkbox" = "不再提示（仅针对此配置文件）";
 "migration_view_vendor_list" = "查看供应商列表 (%d)";
+
+/* Toast Messages */
+"vendor_added_success" = "供应商添加成功。";
+"vendor_updated_success" = "供应商更新成功。";
+"vendor_deleted_success" = "供应商删除成功。";
+"vendor_duplicated_success" = "供应商复制成功。";

@@ -278,3 +278,9 @@
 "migration_default_vendor_label" = "Default vendor: %@";
 "migration_dont_show_again_checkbox" = "Don't ask again (for this config file)";
 "migration_view_vendor_list" = "View vendor list (%d)";
+
+/* Toast Messages */
+"vendor_added_success" = "Vendor added successfully.";
+"vendor_updated_success" = "Vendor updated successfully.";
+"vendor_deleted_success" = "Vendor deleted successfully.";
+"vendor_duplicated_success" = "Vendor duplicated successfully.";
