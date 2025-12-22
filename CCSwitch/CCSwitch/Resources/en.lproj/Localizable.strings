@@ -284,3 +284,8 @@
 "vendor_updated_success" = "Vendor updated successfully.";
 "vendor_deleted_success" = "Vendor deleted successfully.";
 "vendor_duplicated_success" = "Vendor duplicated successfully.";
+
+/* Additional Toast Messages */
+"backup_deleted_success" = "Backup deleted successfully.";
+"added_to_favorites_msg" = "Added to favorites.";
+"removed_from_favorites_msg" = "Removed from favorites.";

@@ -224,8 +224,9 @@ struct BackupListView: View {
         do {
             try BackupManager.shared.restoreFromBackup(backup)
             loadBackups()
+            ToastManager.shared.show(message: NSLocalizedString("restore_success_msg", comment: ""), type: .success)
         } catch {
-            print("Error restoring backup: \(error)")
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
         }
     }
 
@@ -233,8 +234,9 @@ struct BackupListView: View {
         do {
             try BackupManager.shared.deleteBackup(backup)
             loadBackups()
+            ToastManager.shared.show(message: NSLocalizedString("backup_deleted_success", comment: ""), type: .success)
         } catch {
-            print("Error deleting backup: \(error)")
+            ToastManager.shared.show(message: error.localizedDescription, type: .error)
         }
     }
 }

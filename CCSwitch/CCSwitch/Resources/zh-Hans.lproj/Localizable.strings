@@ -287,3 +287,8 @@
 "vendor_updated_success" = "供应商更新成功。";
 "vendor_deleted_success" = "供应商删除成功。";
 "vendor_duplicated_success" = "供应商复制成功。";
+
+/* Additional Toast Messages */
+"backup_deleted_success" = "备份已删除。";
+"added_to_favorites_msg" = "已添加到收藏。";
+"removed_from_favorites_msg" = "已取消收藏。";

@@ -61,7 +61,7 @@ struct VendorManagementView: View {
                                     isActive: vendor.id == currentVendorId,
                                     isFavorite: true,
                                     onToggleFavorite: {
-                                        ConfigManager.shared.toggleFavorite(vendor.id)
+                                        toggleFavorite(for: vendor.id)
                                     }
                                 )
                                 .tag(vendor.id)
@@ -77,7 +77,7 @@ struct VendorManagementView: View {
                                 isActive: vendor.id == currentVendorId,
                                 isFavorite: false,
                                 onToggleFavorite: {
-                                    ConfigManager.shared.toggleFavorite(vendor.id)
+                                    toggleFavorite(for: vendor.id)
                                 }
                             )
                             .tag(vendor.id)
@@ -254,12 +254,20 @@ struct VendorManagementView: View {
     @ViewBuilder
     private func vendorContextMenu(_ vendor: Vendor) -> some View {
         Button {
-            ConfigManager.shared.toggleFavorite(vendor.id)
+            toggleFavorite(for: vendor.id)
         } label: { Text(favoriteIds.contains(vendor.id) ? "remove_from_favorites" : "add_to_favorites") }
         Button { duplicateVendor(vendor) } label: { Text("duplicate_vendor") }
         Divider()
         Button { activeAlert = .deleteConfirmation(vendor) } label: { Text("delete") }
         .disabled(vendor.id == currentVendorId)
+    }
+
+    private func toggleFavorite(for vendorId: String) {
+        let wasFavorite = favoriteIds.contains(vendorId)
+        ConfigManager.shared.toggleFavorite(vendorId)
+        
+        let msgKey = wasFavorite ? "removed_from_favorites_msg" : "added_to_favorites_msg"
+        ToastManager.shared.show(message: NSLocalizedString(msgKey, comment: ""), type: .info)
     }
 }
 
