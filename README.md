@@ -4,137 +4,139 @@
 [![GitHub Downloads](https://img.shields.io/github/downloads/huangdijia/ccswitch-app/total)](https://github.com/huangdijia/ccswitch-app/releases)
 [![GitHub License](https://img.shields.io/github/license/huangdijia/ccswitch-app)](LICENSE)
 
-一个用于快速切换 Claude Code 供应商的 macOS 状态栏工具。
+A macOS menu bar tool for quickly switching Claude Code providers.
+
+[简体中文](README_CN.md)
 
 ![CCSwitch Screenshot](Screenshots/01.jpg)
 
-## 功能特性
+## Features
 
-### ✅ 已实现功能
+### ✅ Implemented Features
 
-1. **状态栏集成**
-   - macOS 状态栏图标显示
-   - 当前供应商简称显示（可选）
-   - 工具提示显示当前供应商信息
+1. **Menu Bar Integration**
+   - macOS menu bar icon display
+   - Current provider abbreviation display (optional)
+   - Tooltip showing current provider information
 
-2. **供应商切换**
-   - 一键切换 Claude Code 供应商
-   - 支持多个供应商配置
-   - 当前供应商标记（✓）
-   - 预置供应商模板（Anthropic、DeepSeek、OpenAI等）
+2. **Provider Switching**
+   - One-click Claude Code provider switching
+   - Support for multiple provider configurations
+   - Current provider indicator (✓)
+   - Preset provider templates (Anthropic, DeepSeek, OpenAI, etc.)
 
-3. **配置管理**
-   - 自动读取和写入 `~/.claude/settings.json`
-   - 集中管理供应商配置（`~/.ccswitch/vendors.json`）
-   - 配置自动备份机制
-   - 支持配置模板复用
+3. **Configuration Management**
+   - Automatic read/write of `~/.claude/settings.json`
+   - Centralized provider configuration management (`~/.ccswitch/vendors.json`)
+   - Automatic configuration backup mechanism
+   - Configuration template reuse support
 
-4. **设置界面**
-   - General：通用设置、路径显示、通知权限管理、软件更新 🆕
-   - 供应商管理：增删改查供应商，支持从旧配置导入
-   - Advanced：备份管理、高级操作
+4. **Settings Interface**
+   - General: General settings, path display, notification permission management, software updates 🆕
+   - Provider Management: Add/edit/delete providers, import from old configurations
+   - Advanced: Backup management, advanced operations
 
-5. **安全特性**
-   - 切换前自动备份当前配置
-   - 配置文件损坏保护
-   - 权限检查和错误处理
+5. **Security Features**
+   - Automatic backup before switching
+   - Configuration file corruption protection
+   - Permission checks and error handling
 
-6. **用户体验**
-   - 状态栏联动切换
-   - 切换成功通知（需授予通知权限）
-   - 通知权限检测和引导
-   - 详细的错误提示
-   - 日志记录和问题报告
-   - 多语言支持（简体中文、繁体中文、英文）
+6. **User Experience**
+   - Menu bar synchronized switching
+   - Switch success notifications (requires notification permission)
+   - Notification permission detection and guidance
+   - Detailed error messages
+   - Logging and issue reporting
+   - Multi-language support (Simplified Chinese, Traditional Chinese, English)
 
-7. **架构优化** 🆕
-   - 协议导向架构（Protocol-Oriented Architecture）
-   - 依赖注入模式提升可测试性
-   - 清晰的关注点分离
-   - 易于扩展的模块化设计
+7. **Architecture Optimization** 🆕
+   - Protocol-Oriented Architecture
+   - Dependency injection pattern for improved testability
+   - Clear separation of concerns
+   - Easy-to-extend modular design
 
-8. **自动更新** 🆕
-   - 基于 GitHub Releases 的自动更新检查
-   - 自动下载和安装更新选项
-   - 手动检查更新功能
-   - 更新进度显示
+8. **Auto Update** 🆕
+   - Automatic update checking based on GitHub Releases
+   - Automatic download and install update options
+   - Manual check for updates functionality
+   - Update progress display
 
-## 安装使用
+## Installation and Usage
 
-### 下载安装
+### Download and Install
 
-1. 从 GitHub Releases 下载最新的 `CCSwitch.dmg`。
-2. 将 `CCSwitch.app` 拖入 `Applications` 文件夹。
-3. **重要提示**：由于应用未进行 Apple 开发者签名，首次安装后需在终端执行以下命令以解决“应用已损坏”或“无法验证开发者”的问题：
+1. Download the latest `CCSwitch.dmg` from GitHub Releases.
+2. Drag `CCSwitch.app` into the `Applications` folder.
+3. **Important**: Since the app is not signed with an Apple Developer certificate, you need to run the following command in Terminal after first installation to resolve the "app is damaged" or "unable to verify developer" issue:
 
    ```bash
    xattr -rd com.apple.quarantine /Applications/CCSwitch.app/
    ```
 
-### 源码构建 (开发用)
+### Build from Source (For Development)
 
-#### 构建要求
+#### Build Requirements
 
 - macOS 14.6+
 - Xcode 15.0+
 - Swift 5.9+
 
-### 构建步骤
+### Build Steps
 
-1. 克隆项目：
+1. Clone the project:
 
 ```bash
 git clone https://github.com/huangdijia/ccswitch-app.git
 cd ccswitch-app
 ```
 
-1. 运行构建脚本（多种方式）：
+2. Run build script (multiple options):
 
-使用 Makefile（推荐）：
+Using Makefile (recommended):
 
 ```bash
-make build      # 完整构建（需要 Xcode）
-make fast-build # 快速构建（仅需 Swift 命令行工具）
-make run        # 构建并运行
-make test       # 运行单元测试（需要 Xcode）
+make build      # Full build (requires Xcode)
+make fast-build # Fast build (only requires Swift command line tools)
+make run        # Build and run
+make test       # Run unit tests (requires Xcode)
 ```
 
-或使用 shell 脚本：
+Or use shell script:
 
 ```bash
 ./build.sh
 ```
 
-#### 开发构建和调试
+#### Development Build and Debug
 
-项目提供了多个辅助脚本用于开发：
+The project provides several helper scripts for development:
 
-- **compile_swift.sh** - 使用 Swift 编译器直接编译（无需 Xcode）
-- **run_dev.sh** - 开发模式运行（自动解除安全限制）
-- **test_app.sh** - 测试应用基本功能
-- **fix_and_run.sh** - 修复并运行应用（适用于首次运行）
+- **compile_swift.sh** - Compile directly with Swift compiler (no Xcode required)
+- **run_dev.sh** - Run in development mode (automatically removes security restrictions)
+- **test_app.sh** - Test basic app functionality
+- **fix_and_run.sh** - Fix and run the app (for first run)
 
-快速开发运行：
+Quick development run:
 
 ```bash
 ./run_dev.sh
 ```
 
-### 配置供应商
+### Configure Providers
 
-1. 在状态栏点击 CCSwitch 图标
-2. 选择"设置..."
-3. 在"供应商管理"标签页添加、编辑或导入供应商
+1. Click the CCSwitch icon in the menu bar
+2. Select "Settings..."
+3. Add, edit, or import providers in the "Provider Management" tab
 
-### 切换供应商
+### Switch Providers
 
-1. 点击状态栏图标
-2. 选择要切换到的供应商，或者在设置界面的供应商列表中切换开关
-3. 配置将自动更新
+1. Click the menu bar icon
+2. Select the provider you want to switch to, or toggle the switch in the provider list in the settings interface
+3. Configuration will be updated automatically
 
-## 配置文件格式
+## Configuration File Format
 
-### CCSwitch 配置 (~/.ccswitch/vendors.json)
+### CCSwitch Configuration (~/.ccswitch/vendors.json)
 
 ```json
 {
@@ -160,142 +162,143 @@ make test       # 运行单元测试（需要 Xcode）
 }
 ```
 
-> **注意**：配置文件路径为 `~/.ccswitch/vendors.json`，参考示例文件 `CCSwitch/vendors.json.example`
+> **Note**: Configuration file path is `~/.ccswitch/vendors.json`, refer to example file `CCSwitch/vendors.json.example`
 
-### Claude 配置 (~/.claude/settings.json)
+### Claude Configuration (~/.claude/settings.json)
 
-应用会自动更新此文件的 `env` 字段，保留其他现有字段。
+The app will automatically update the `env` field of this file while preserving other existing fields.
 
-## 项目结构
+## Project Structure
 
 ```
 ccswitch-app/
-├── build.sh                          # 主构建脚本
-├── compile_swift.sh                  # Swift 编译脚本
-├── run_dev.sh                        # 开发运行脚本
-├── test_app.sh                       # 应用测试脚本
-├── fix_and_run.sh                    # 修复并运行脚本
-├── Makefile                          # Make 构建系统 🆕
-├── README.md                         # 项目说明
-├── README_XCODE.md                   # Xcode 使用指南
-├── ARCHITECTURE.md                   # 架构文档 🆕
-├── EXTENSION_GUIDE.md                # 扩展指南 🆕
-├── CONTRIBUTING.md                   # 贡献指南 🆕
-├── BUILD_REQUIREMENTS.md             # 构建要求说明 🆕
+├── build.sh                          # Main build script
+├── compile_swift.sh                  # Swift compilation script
+├── run_dev.sh                        # Development run script
+├── test_app.sh                       # Application test script
+├── fix_and_run.sh                    # Fix and run script
+├── Makefile                          # Make build system 🆕
+├── README.md                         # Project documentation
+├── README_CN.md                      # Chinese documentation
+├── README_XCODE.md                   # Xcode usage guide
+├── ARCHITECTURE.md                   # Architecture documentation 🆕
+├── EXTENSION_GUIDE.md                # Extension guide 🆕
+├── CONTRIBUTING.md                   # Contributing guide 🆕
+├── BUILD_REQUIREMENTS.md             # Build requirements documentation 🆕
 └── CCSwitch/
-    ├── CCSwitch.xcodeproj            # Xcode 项目文件
-    ├── CCSwitch.xcworkspace          # Xcode 工作空间
-    ├── vendors.json.example         # 配置文件示例
+    ├── CCSwitch.xcodeproj            # Xcode project file
+    ├── CCSwitch.xcworkspace          # Xcode workspace
+    ├── vendors.json.example         # Configuration file example
     ├── CCSwitch/
     │   ├── App/
-    │   │   ├── CCSwitchApp.swift        # 应用入口
-    │   │   ├── MenuBarController.swift  # 状态栏控制器
-    │   │   └── AppInfo.swift            # 应用版本信息 🆕
+    │   │   ├── CCSwitchApp.swift        # App entry point
+    │   │   ├── MenuBarController.swift  # Menu bar controller
+    │   │   └── AppInfo.swift            # App version information 🆕
     │   ├── Models/
-    │   │   ├── Vendor.swift             # 供应商模型
-    │   │   ├── VendorTemplate.swift     # 供应商模板 🆕
-    │   │   ├── CCSConfig.swift          # CCSwitch 配置
-    │   │   └── ClaudeSettings.swift     # Claude 配置模型
-    │   ├── Protocols/                   # 协议定义 🆕
-    │   │   ├── VendorSwitcher.swift        # 供应商切换协议
-    │   │   ├── ConfigurationRepository.swift # 配置仓库协议
-    │   │   ├── SettingsWriter.swift        # 设置写入协议
-    │   │   ├── BackupService.swift         # 备份服务协议
-    │   │   ├── NotificationService.swift   # 通知服务协议
-    │   │   └── SettingsRepository.swift    # 设置仓库协议
+    │   │   ├── Vendor.swift             # Provider model
+    │   │   ├── VendorTemplate.swift     # Provider template 🆕
+    │   │   ├── CCSConfig.swift          # CCSwitch configuration
+    │   │   └── ClaudeSettings.swift     # Claude configuration model
+    │   ├── Protocols/                   # Protocol definitions 🆕
+    │   │   ├── VendorSwitcher.swift        # Provider switching protocol
+    │   │   ├── ConfigurationRepository.swift # Configuration repository protocol
+    │   │   ├── SettingsWriter.swift        # Settings writer protocol
+    │   │   ├── BackupService.swift         # Backup service protocol
+    │   │   ├── NotificationService.swift   # Notification service protocol
+    │   │   └── SettingsRepository.swift    # Settings repository protocol
     │   ├── Services/
-    │   │   ├── ConfigManager.swift      # 配置管理服务（重构）
-    │   │   ├── ServiceContainer.swift   # 依赖注入容器 🆕
-    │   │   ├── UpdateManager.swift      # 自动更新管理器 🆕
-    │   │   ├── BackupManager.swift      # 备份管理
-    │   │   ├── Logger.swift            # 日志系统
-    │   │   └── ErrorHandler.swift      # 错误处理
+    │   │   ├── ConfigManager.swift      # Configuration management service (refactored)
+    │   │   ├── ServiceContainer.swift   # Dependency injection container 🆕
+    │   │   ├── UpdateManager.swift      # Auto update manager 🆕
+    │   │   ├── BackupManager.swift      # Backup management
+    │   │   ├── Logger.swift            # Logging system
+    │   │   └── ErrorHandler.swift      # Error handling
     │   ├── Views/
-    │   │   ├── SettingsView.swift       # 设置窗口主视图
-    │   │   ├── GeneralSettingsView.swift    # 通用设置（含通知权限）
-    │   │   ├── VendorManagementView.swift   # 供应商管理
-    │   │   ├── VendorEditView.swift         # 供应商编辑
-    │   │   └── AdvancedSettingsView.swift   # 高级设置
+    │   │   ├── SettingsView.swift       # Settings window main view
+    │   │   ├── GeneralSettingsView.swift    # General settings (with notification permissions)
+    │   │   ├── VendorManagementView.swift   # Provider management
+    │   │   ├── VendorEditView.swift         # Provider editing
+    │   │   └── AdvancedSettingsView.swift   # Advanced settings
     │   └── Resources/
     │       ├── Info.plist
     │       ├── AppIcon.icns
-    │       ├── en.lproj/                # 英文本地化
-    │       ├── zh-Hans.lproj/           # 简体中文本地化
-    │       └── zh-Hant.lproj/           # 繁体中文本地化
+    │       ├── en.lproj/                # English localization
+    │       ├── zh-Hans.lproj/           # Simplified Chinese localization
+    │       └── zh-Hant.lproj/           # Traditional Chinese localization
     └── CCSwitchTests/
-        ├── ConfigManagerTests.swift     # 配置管理测试 🆕
-        ├── ModelTests.swift             # 模型测试 🆕
-        └── Mocks/                       # Mock对象 🆕
+        ├── ConfigManagerTests.swift     # Configuration management tests 🆕
+        ├── ModelTests.swift             # Model tests 🆕
+        └── Mocks/                       # Mock objects 🆕
             ├── MockConfigurationRepository.swift
             └── MockServices.swift
 ```
 
-## 测试
+## Testing
 
-运行单元测试：
+Run unit tests:
 
-使用 Makefile：
+Using Makefile:
 
 ```bash
-make test       # 运行单元测试（需要 Xcode）
-make test-app   # 运行手动测试脚本
+make test       # Run unit tests (requires Xcode)
+make test-app   # Run manual test script
 ```
 
-或使用命令行：
+Or using command line:
 
 ```bash
 cd CCSwitch
 xcodebuild test -project CCSwitch.xcodeproj -scheme CCSwitch -destination 'platform=macOS'
 ```
 
-或使用测试脚本：
+Or using test script:
 
 ```bash
 ./test_app.sh
 ```
 
-## 架构
+## Architecture
 
-CCSwitch 采用**协议导向架构**（Protocol-Oriented Architecture）配合**依赖注入**模式：
+CCSwitch uses **Protocol-Oriented Architecture** with **Dependency Injection** pattern:
 
-- ✅ **高可测试性**：所有核心组件都有协议定义和 Mock 实现
-- ✅ **高复用性**：通过协议抽象和依赖注入实现组件复用
-- ✅ **低耦合**：清晰的关注点分离，各层职责明确
-- ✅ **易扩展**：新增供应商、存储后端、通知渠道等无需修改核心代码
+- ✅ **High Testability**: All core components have protocol definitions and Mock implementations
+- ✅ **High Reusability**: Component reuse through protocol abstraction and dependency injection
+- ✅ **Low Coupling**: Clear separation of concerns, well-defined responsibilities for each layer
+- ✅ **Easy Extension**: Add new providers, storage backends, notification channels without modifying core code
 
-详细架构文档请参考：
+For detailed architecture documentation, please refer to:
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) - 架构设计详解
-- [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - 扩展开发指南
-- [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture design details
+- [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - Extension development guide
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contributing guide
 
-## 贡献
+## Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome!
 
-在贡献之前，请阅读：
+Before contributing, please read:
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) - 贡献指南
-- [ARCHITECTURE.md](ARCHITECTURE.md) - 了解项目架构
-- [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - 学习如何扩展功能
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contributing guide
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Understand project architecture
+- [EXTENSION_GUIDE.md](EXTENSION_GUIDE.md) - Learn how to extend features
 
-## 许可证
+## License
 
 MIT License
 
-## 更新日志
+## Changelog
 
 ### v0.1.7 (2025-12-21)
 
-- ✨ 新增自动更新功能（基于 GitHub Releases）
-- ✨ 新增软件更新设置界面
-- ✨ 新增 AppInfo 工具类用于获取版本信息
-- 🔧 添加 Makefile 支持多种构建方式
-- 🔧 完善本地化字符串
-- 📝 更新文档和架构说明
-- 🎉 初始版本发布
-- 🎯 实现所有核心功能
-- ✅ 支持供应商切换和配置管理
-- ✅ 支持通知权限检测和引导
-- ✅ 多语言支持（简体中文、繁体中文、英文）
-- 🛠️ 提供多个开发辅助脚本
+- ✨ Added auto-update feature (based on GitHub Releases)
+- ✨ Added software update settings interface
+- ✨ Added AppInfo utility class for version information
+- 🔧 Added Makefile support for multiple build methods
+- 🔧 Improved localization strings
+- 📝 Updated documentation and architecture description
+- 🎉 Initial release
+- 🎯 Implemented all core features
+- ✅ Support for provider switching and configuration management
+- ✅ Support for notification permission detection and guidance
+- ✅ Multi-language support (Simplified Chinese, Traditional Chinese, English)
+- 🛠️ Provided multiple development helper scripts
