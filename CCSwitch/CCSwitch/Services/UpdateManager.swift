@@ -29,7 +29,7 @@ class UpdateManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
     @AppStorage("SULastCheckDate") private var lastCheckDateValue: Double = 0
     @AppStorage("SULastCheckETag") private var lastCheckETag: String = ""
     
-    private let githubRepo = "huangdijia/ccswitch-mac"
+    private let githubRepo = "huangdijia/ccswitch-app"
     private let checkInterval: TimeInterval = 3600 // 1 hour
     
     override private init() {
@@ -182,60 +182,81 @@ class UpdateManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
             }
             
             // 保存新的 ETag
-            if let etag = httpResponse?.allHeaderFields["Etag"] as? String {
+            if let etag = httpResponse?.value(forHTTPHeaderField: "ETag") {
                 lastCheckETag = etag
             }
             
-            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                if let message = json["message"] as? String, httpResponse?.statusCode != 200 {
-                    let friendlyMessage: String
-                    if message.contains("rate limit exceeded") {
-                        friendlyMessage = NSLocalizedString("error_rate_limit", comment: "GitHub API rate limit exceeded")
-                    } else {
-                        friendlyMessage = message
-                    }
-                    
-                    let error = NSError(domain: "UpdateManager", code: httpResponse?.statusCode ?? -1, userInfo: [NSLocalizedDescriptionKey: friendlyMessage])
-                    self.lastError = error
-                    Logger.shared.error("Update check API error: \(message)")
-                    return
+            // 处理非 200 状态码
+            if let httpResponse = httpResponse, httpResponse.statusCode != 200 {
+                let message: String
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let msg = json["message"] as? String {
+                    message = msg
+                } else {
+                    message = "HTTP \(httpResponse.statusCode)"
                 }
                 
-                guard let tagName = json["tag_name"] as? String else {
-                    lastError = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No tag_name found in response"])
-                    return
+                let friendlyMessage: String
+                if message.contains("rate limit exceeded") {
+                    friendlyMessage = NSLocalizedString("error_rate_limit", comment: "GitHub API rate limit exceeded")
+                } else {
+                    friendlyMessage = message
                 }
                 
-                let version = tagName.replacingOccurrences(of: "v", with: "")
-                let currentVersion = AppInfo.version
+                let error = NSError(domain: "UpdateManager", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: friendlyMessage])
+                self.lastError = error
+                Logger.shared.error("Update check API error: \(message)")
+                return
+            }
+
+            // 解析 JSON
+            let json: [String: Any]
+            do {
+                guard let parsed = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                    throw NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])
+                }
+                json = parsed
+            } catch {
+                let error = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "\(NSLocalizedString("update_check_failed", comment: "")): Invalid data format"])
+                self.lastError = error
+                Logger.shared.error("Failed to parse update JSON", error: error)
+                return
+            }
+            
+            guard let tagName = json["tag_name"] as? String else {
+                lastError = NSError(domain: "UpdateManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No tag_name found in response"])
+                return
+            }
+            
+            let version = tagName.replacingOccurrences(of: "v", with: "")
+            let currentVersion = AppInfo.version
+            
+            if version.compare(currentVersion, options: .numeric) == .orderedDescending {
+                let body = json["body"] as? String ?? ""
+                let htmlUrl = json["html_url"] as? String ?? ""
                 
-                if version.compare(currentVersion, options: .numeric) == .orderedDescending {
-                    let body = json["body"] as? String ?? ""
-                    let htmlUrl = json["html_url"] as? String ?? ""
-                    
-                    var downloadUrlString = htmlUrl
-                    if let assets = json["assets"] as? [[String: Any]] {
-                        for asset in assets {
-                            if let name = asset["name"] as? String,
-                               (name.hasSuffix(".dmg") || name.hasSuffix(".zip")),
-                               let browserDownloadUrl = asset["browser_download_url"] as? String {
-                                downloadUrlString = browserDownloadUrl
-                                break
-                            }
+                var downloadUrlString = htmlUrl
+                if let assets = json["assets"] as? [[String: Any]] {
+                    for asset in assets {
+                        if let name = asset["name"] as? String,
+                           (name.hasSuffix(".dmg") || name.hasSuffix(".zip")),
+                           let browserDownloadUrl = asset["browser_download_url"] as? String {
+                            downloadUrlString = browserDownloadUrl
+                            break
                         }
                     }
-                    
-                    let downloadUrl = URL(string: downloadUrlString) ?? URL(string: htmlUrl)!
-                    
-                    latestRelease = UpdateInfo(
-                        version: version,
-                        releaseNotes: body,
-                        downloadUrl: downloadUrl,
-                        isPrerelease: json["prerelease"] as? Bool ?? false
-                    )
-                } else {
-                    latestRelease = nil
                 }
+                
+                let downloadUrl = URL(string: downloadUrlString) ?? URL(string: htmlUrl)!
+                
+                latestRelease = UpdateInfo(
+                    version: version,
+                    releaseNotes: body,
+                    downloadUrl: downloadUrl,
+                    isPrerelease: json["prerelease"] as? Bool ?? false
+                )
+            } else {
+                latestRelease = nil
             }
         } catch {
             self.lastError = error
