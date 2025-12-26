@@ -22,11 +22,6 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Building version: $VERSION"
 
-      - name: Update Info.plist
-        run: |
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" CCSwitch/CCSwitch/Resources/Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" CCSwitch/CCSwitch/Resources/Info.plist
-
       - name: Build
         run: |
           xcodebuild -resolvePackageDependencies -project CCSwitch/CCSwitch.xcodeproj
@@ -39,7 +34,20 @@ jobs:
             archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            MARKETING_VERSION=$VERSION \
+            CURRENT_PROJECT_VERSION=$VERSION
+
+      - name: Export Archive (Ad-hoc)
+        run: |
+          mkdir -p dist
+          cp -R "CCSwitch.xcarchive/Products/Applications/CCSwitch.app" dist/
+          
+      - name: Debug Info.plist
+        run: |
+          echo "Verifying Info.plist version..."
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" dist/CCSwitch.app/Contents/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" dist/CCSwitch.app/Contents/Info.plist
 
       - name: Export Archive (Ad-hoc)
         run: |
