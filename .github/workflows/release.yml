@@ -60,6 +60,9 @@ jobs:
           mkdir -p dist/CCSwitch.app/Contents/Resources/
           cp CCSwitch/CCSwitch/Resources/AppIcon.icns dist/CCSwitch.app/Contents/Resources/
           
+          # 修复本地化丢失问题：手动将 .lproj 文件夹复制到 Resources 目录
+          cp -R CCSwitch/CCSwitch/Resources/*.lproj dist/CCSwitch.app/Contents/Resources/
+          
       - name: Ad-hoc Sign App
         run: |
           # 使用 ad-hoc 签名 (-s -) 以通过 Sparkle 的基本检查
