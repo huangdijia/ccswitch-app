@@ -153,6 +153,7 @@
 "drag_favorite_hint" = "将您收藏的供应商拖动到下方区域以便快速访问。";
 "show_debug_logs" = "显示调试日志";
 "confirm_backup_deletion" = "删除备份时确认";
+"confirm_backup_deletion_desc" = "在删除历史备份文件前显示确认对话框。";
 "manage_backups" = "管理备份...";
 "done" = "完成";
 "restore" = "恢复";

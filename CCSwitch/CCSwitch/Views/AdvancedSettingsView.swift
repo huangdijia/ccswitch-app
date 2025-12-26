@@ -11,15 +11,39 @@ struct AdvancedSettingsView: View {
         Form {
             // MARK: - Section 1: System Behavior
             Section {
-                Toggle("show_debug_logs", isOn: $showDebugLogs)
-                Toggle("confirm_backup_deletion", isOn: $confirmBackupDeletion)
+                VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
+                    // Debug Logs
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("show_debug_logs")
+                                .font(.body)
+                            Text("debug_logs_desc")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $showDebugLogs)
+                            .labelsHidden()
+                    }
+                    
+                    Divider().padding(.vertical, 4)
+                    
+                    // Confirm Backup Deletion
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("confirm_backup_deletion")
+                                .font(.body)
+                            Text("confirm_backup_deletion_desc")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: $confirmBackupDeletion)
+                            .labelsHidden()
+                    }
+                }
             } header: {
                 Text("system_behavior")
-            } footer: {
-                Text("debug_logs_desc")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             
             // MARK: - Section 2: Data & Maintenance

@@ -334,21 +334,27 @@ struct VendorDetailView: View {
             Form {
                 Section("basic_info") {
                     TextField("name_label", text: $name)
-                    VStack(alignment: .leading, spacing: 4) {
-                        TextField("base_url_label", text: $baseURL).textContentType(.URL)
-                        if let error = validationErrors["baseURL"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
+                    LabeledContent("base_url_label") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            TextField("base_url_label", text: $baseURL)
+                                .labelsHidden()
+                                .textContentType(.URL)
+                            if let error = validationErrors["baseURL"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
+                        }
                     }
                 }
                 Section("auth_section") {
-                    HStack {
-                        ZStack(alignment: .trailing) {
-                            if showToken { TextField("auth_token_label", text: $authToken) }
-                            else { SecureField("auth_token_label", text: $authToken) }
+                    LabeledContent("auth_token_label") {
+                        HStack {
+                            ZStack(alignment: .trailing) {
+                                if showToken { TextField("auth_token_label", text: $authToken).labelsHidden() }
+                                else { SecureField("auth_token_label", text: $authToken).labelsHidden() }
+                            }
+                            if showToken {
+                                Button { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(authToken, forType: .string) } label: { Image(systemName: "doc.on.doc").foregroundColor(.secondary) }.buttonStyle(.plain).padding(.trailing, 4)
+                            }
+                            Button { showToken.toggle() } label: { Image(systemName: showToken ? "eye.slash" : "eye").foregroundColor(.secondary) }.buttonStyle(.plain)
                         }
-                        if showToken {
-                            Button { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(authToken, forType: .string) } label: { Image(systemName: "doc.on.doc").foregroundColor(.secondary) }.buttonStyle(.plain).padding(.trailing, 4)
-                        }
-                        Button { showToken.toggle() } label: { Image(systemName: showToken ? "eye.slash" : "eye").foregroundColor(.secondary) }.buttonStyle(.plain)
                     }
                     Text("auth_token_helper").font(.caption).foregroundColor(.secondary)
                 }
@@ -362,9 +368,11 @@ struct VendorDetailView: View {
                     }
                 }
                 Section("connection_section") {
-                    VStack(alignment: .leading, spacing: 4) {
-                        TextField("timeout_label", text: $timeout)
-                        if let error = validationErrors["timeout"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
+                    LabeledContent("timeout_label") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            TextField("timeout_label", text: $timeout).labelsHidden()
+                            if let error = validationErrors["timeout"] { Text(LocalizedStringKey(error)).font(.caption).foregroundColor(.red) }
+                        }
                     }
                 }
             }

@@ -72,31 +72,40 @@ struct VendorEditView: View {
 
                 // MARK: - Section 2: Connection & Auth
                 Section {
-                    TextField("base_url_label", text: $baseURL)
-                        .textContentType(.URL)
-                        .onChange(of: baseURL) { _, _ in validate() }
-                    
-                    if let error = errors["baseURL"] {
-                        Text(LocalizedStringKey(error))
-                            .font(.caption)
-                            .foregroundColor(.red)
-                    }
-
-                    HStack {
-                        ZStack(alignment: .trailing) {
-                            if showToken {
-                                TextField("auth_token_label", text: $authToken)
-                            } else {
-                                SecureField("auth_token_label", text: $authToken)
+                    LabeledContent("base_url_label") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            TextField("base_url_label", text: $baseURL)
+                                .labelsHidden()
+                                .textContentType(.URL)
+                                .onChange(of: baseURL) { _, _ in validate() }
+                            
+                            if let error = errors["baseURL"] {
+                                Text(LocalizedStringKey(error))
+                                    .font(.caption)
+                                    .foregroundColor(.red)
                             }
                         }
-                        
-                        Button(action: { showToken.toggle() }) {
-                            Image(systemName: showToken ? "eye.slash" : "eye")
-                                .foregroundColor(.secondary)
+                    }
+
+                    LabeledContent("auth_token_label") {
+                        HStack {
+                            ZStack(alignment: .trailing) {
+                                if showToken {
+                                    TextField("auth_token_label", text: $authToken)
+                                        .labelsHidden()
+                                } else {
+                                    SecureField("auth_token_label", text: $authToken)
+                                        .labelsHidden()
+                                }
+                            }
+                            
+                            Button(action: { showToken.toggle() }) {
+                                Image(systemName: showToken ? "eye.slash" : "eye")
+                                    .foregroundColor(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Toggle visibility")
                         }
-                        .buttonStyle(.plain)
-                        .help("Toggle visibility")
                     }
                     Text("auth_token_hint")
                         .font(.caption)
@@ -139,12 +148,17 @@ struct VendorEditView: View {
 
                 // MARK: - Section 4: Network
                 Section {
-                    TextField("timeout_label", text: $timeout)
-                        .onChange(of: timeout) { _, _ in validate() }
-                    if let error = errors["timeout"] {
-                         Text(LocalizedStringKey(error))
-                            .font(.caption)
-                            .foregroundColor(.red)
+                    LabeledContent("timeout_label") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            TextField("timeout_label", text: $timeout)
+                                .labelsHidden()
+                                .onChange(of: timeout) { _, _ in validate() }
+                            if let error = errors["timeout"] {
+                                 Text(LocalizedStringKey(error))
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                            }
+                        }
                     }
                 } header: {
                     Text("network_settings")

@@ -157,6 +157,7 @@
 "drag_favorite_hint" = "將您常用的供應商拖曳到下方區域以便快速存取。";
 "show_debug_logs" = "顯示除錯日誌";
 "confirm_backup_deletion" = "刪除備份時確認";
+"confirm_backup_deletion_desc" = "在刪除歷史備份檔案前顯示確認對話方塊。";
 "manage_backups" = "管理備份...";
 "done" = "完成";
 "restore" = "恢復";
