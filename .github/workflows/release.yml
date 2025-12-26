@@ -66,6 +66,16 @@ jobs:
           zip -r CCSwitch.zip CCSwitch.app
           echo "ZIP_PATH=$(pwd)/CCSwitch.zip" >> $GITHUB_ENV
 
+      - name: Create DMG
+        run: |
+          # 准备 DMG 源目录
+          mkdir -p dmg_source
+          cp -R dist/CCSwitch.app dmg_source/
+          ln -s /Applications dmg_source/Applications
+          
+          # 生成 DMG
+          hdiutil create -volname "CCSwitch" -srcfolder dmg_source -ov -format UDZO dist/CCSwitch.dmg
+
       - name: Install Sparkle Tools
         run: |
           curl -L -o sparkle.tar.xz https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz
@@ -128,6 +138,7 @@ jobs:
         with:
           files: |
             dist/CCSwitch.zip
+            dist/CCSwitch.dmg
             appcast.xml
           draft: false
           prerelease: false
