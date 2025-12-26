@@ -72,15 +72,32 @@ jobs:
           tar -xf sparkle.tar.xz
           mv bin sparkle-bin
 
-      - name: Generate Appcast
+      - name: Import Sparkle Key to Keychain
         env:
-          # Sparkle 工具支持通过环境变量读取私钥
-          SUPrivateEDKey: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          # 创建临时 Keychain
+          KEYCHAIN_PATH=$RUNNER_TEMP/sparkle.keychain-db
+          security create-keychain -p "" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "" "$KEYCHAIN_PATH"
+          
+          # 将其设为默认搜索列表的一部分，以便 generate_appcast 能找到
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed 's/"//g')
+
+          # 添加私钥到 Keychain (Sparkle 标准位置)
+          # -a Account: ed25519
+          # -s Service: https://sparkle-project.org
+          # -w Password: 私钥内容
+          # -A 允许所有程序访问
+          security add-generic-password -a "ed25519" -s "https://sparkle-project.org" -w "$SPARKLE_PRIVATE_KEY" -A "$KEYCHAIN_PATH"
+
+      - name: Generate Appcast
         run: |
           mkdir -p sparkle_feed
           cp dist/CCSwitch.zip sparkle_feed/
           
-          # 不再需要写入临时文件或使用 -s 参数
+          # 自动从 Keychain 读取私钥
           ./sparkle-bin/generate_appcast sparkle_feed/ \
             --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/"
             
