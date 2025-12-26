@@ -61,22 +61,17 @@ jobs:
 
       - name: Generate Appcast
         env:
-          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          # Sparkle 工具支持通过环境变量读取私钥
+          SUPrivateEDKey: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
-          # 将私钥写入文件供 generate_appcast 使用
-          echo "$SPARKLE_PRIVATE_KEY" > sparkle_key.pem
-
           mkdir -p sparkle_feed
           cp dist/CCSwitch.zip sparkle_feed/
           
-          # 使用 --download-url-prefix 指定 Release 的 URL 前缀
-          # 使用 -s 指定私钥文件
+          # 不再需要写入临时文件或使用 -s 参数
           ./sparkle-bin/generate_appcast sparkle_feed/ \
-            -s sparkle_key.pem \
             --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/"
             
           cp sparkle_feed/appcast.xml .
-          rm sparkle_key.pem
 
       - name: Update appcast.xml in Repo
         run: |
