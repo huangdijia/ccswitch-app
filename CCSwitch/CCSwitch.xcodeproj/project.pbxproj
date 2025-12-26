@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,8 +14,6 @@
 		01000005 /* ClaudeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000005 /* ClaudeSettings.swift */; };
 		01000006 /* ConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000006 /* ConfigManager.swift */; };
 		01000007 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000007 /* BackupManager.swift */; };
-		01000030 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000030 /* ToastManager.swift */; };
-		01000031 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000031 /* ToastView.swift */; };
 		01000008 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000008 /* Logger.swift */; };
 		01000009 /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000009 /* ErrorHandler.swift */; };
 		01000010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000010 /* SettingsView.swift */; };
@@ -26,6 +24,8 @@
 		01000015 /* ConfigManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000015 /* ConfigManagerTests.swift */; };
 		01000016 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000016 /* ModelTests.swift */; };
 		01000020 /* UpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000020 /* UpdateManager.swift */; };
+		01000030 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000030 /* ToastManager.swift */; };
+		01000031 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02000031 /* ToastView.swift */; };
 		15000001 /* VendorSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000001 /* VendorSwitcher.swift */; };
 		15000002 /* ConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000002 /* ConfigurationRepository.swift */; };
 		15000003 /* SettingsWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000003 /* SettingsWriter.swift */; };
@@ -36,6 +36,7 @@
 		15000008 /* VendorTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000008 /* VendorTemplate.swift */; };
 		15000009 /* MockConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000009 /* MockConfigurationRepository.swift */; };
 		15000010 /* MockServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000010 /* MockServices.swift */; };
+		43822D7D2EFECE98003A8D84 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 43822D7C2EFECE98003A8D84 /* Sparkle */; };
 		849F600A2D169F9900000001 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849F60092D169F9900000001 /* AppInfo.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,14 +51,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-                02000001 /* CCSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSwitchApp.swift; sourceTree = "<group>"; };
-                02000002 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
-                02000003 /* Vendor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vendor.swift; sourceTree = "<group>"; };		02000004 /* CCSConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSConfig.swift; sourceTree = "<group>"; };
+		02000001 /* CCSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSwitchApp.swift; sourceTree = "<group>"; };
+		02000002 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		02000003 /* Vendor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vendor.swift; sourceTree = "<group>"; };
+		02000004 /* CCSConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSConfig.swift; sourceTree = "<group>"; };
 		02000005 /* ClaudeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeSettings.swift; sourceTree = "<group>"; };
 		02000006 /* ConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManager.swift; sourceTree = "<group>"; };
 		02000007 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
-		02000030 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
-		02000031 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		02000008 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		02000009 /* ErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		02000010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -68,6 +68,8 @@
 		02000015 /* ConfigManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManagerTests.swift; sourceTree = "<group>"; };
 		02000016 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		02000020 /* UpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateManager.swift; sourceTree = "<group>"; };
+		02000030 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
+		02000031 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		03000001 /* CCSwitch.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CCSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04000001 /* CCSwitchTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CCSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		16000001 /* VendorSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorSwitcher.swift; sourceTree = "<group>"; };
@@ -79,14 +81,16 @@
 		16000007 /* ServiceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceContainer.swift; sourceTree = "<group>"; };
 		16000008 /* VendorTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorTemplate.swift; sourceTree = "<group>"; };
 		16000009 /* MockConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationRepository.swift; sourceTree = "<group>"; };
-		                16000010 /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
-		                849F60092D169F9900000001 /* AppInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
-		/* End PBXFileReference section */
+		16000010 /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
+		849F60092D169F9900000001 /* AppInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		05000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43822D7D2EFECE98003A8D84 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +104,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		06000001 /* Root */ = {
+		06000001 = {
 			isa = PBXGroup;
 			children = (
 				06000002 /* CCSwitch */,
@@ -290,7 +294,10 @@
 				en,
 				Base,
 			);
-			mainGroup = 06000001 /* Root */;
+			mainGroup = 06000001;
+			packageReferences = (
+				43822D7B2EFECE98003A8D84 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			productRefGroup = 06000004 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -589,6 +596,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		43822D7B2EFECE98003A8D84 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		43822D7C2EFECE98003A8D84 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 43822D7B2EFECE98003A8D84 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 12000001 /* Project object */;
 }

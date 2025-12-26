@@ -13,12 +13,8 @@
     - 安装依赖（通过 SPM）。
     - 运行单元测试。
     - 使用 `xcodebuild` 编译 Release 版本。
-- **签名与公证**：
-    - 导入能够签署 "Developer ID Application" 的证书。
-    - 对 `.app` 进行代码签名。
-    - 将 `.app` 打包为 ZIP 或 DMG。
-    - 提交给 Apple 进行公证 (Notarize)。
-    - 必须给打包后的产物 Staple 公证票据。
+- **打包**：
+    - 将 `.app` 直接打包为 ZIP。
 - **发布产物**：
     - 创建 GitHub Release。
     - 上传打包好的文件（.zip/.dmg）到 Release Assets。

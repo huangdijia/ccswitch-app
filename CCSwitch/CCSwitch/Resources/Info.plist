@@ -30,5 +30,9 @@
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/huangdijia/ccswitch-app/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>E4OKxm5xzV6I/E/s/pbdyHCSyoAx6DWrnXSEuh4wbbY=</string>
 </dict>
 </plist>

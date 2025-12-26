@@ -6,102 +6,92 @@ on:
       - 'v*'
 
 jobs:
-  release:
-    name: Build and Release
+  build:
     runs-on: macos-latest
     permissions:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set Version
         run: |
-          # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
-          VERSION=${GITHUB_REF_NAME#v}
-          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "BUILD_NUMBER=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
-          echo "🏷️ Version set to $VERSION (Build $GITHUB_RUN_NUMBER)"
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Building version: $VERSION"
 
-      - name: Run Tests
+      - name: Build
         run: |
-          xcodebuild test \
+          xcodebuild -resolvePackageDependencies -project CCSwitch/CCSwitch.xcodeproj
+          
+          xcodebuild -scheme CCSwitch \
             -project CCSwitch/CCSwitch.xcodeproj \
-            -scheme CCSwitch \
-            -destination 'platform=macOS' \
-            MARKETING_VERSION=${{ env.APP_VERSION }} \
-            CURRENT_PROJECT_VERSION=${{ env.BUILD_NUMBER }} \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-
-      - name: Build App
-        run: |
-          xcodebuild build \
-            -project CCSwitch/CCSwitch.xcodeproj \
-            -scheme CCSwitch \
             -configuration Release \
             -derivedDataPath build \
-            MARKETING_VERSION=${{ env.APP_VERSION }} \
-            CURRENT_PROJECT_VERSION=${{ env.BUILD_NUMBER }} \
+            -archivePath CCSwitch.xcarchive \
+            archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-          # Define path
-          APP_PATH="build/Build/Products/Release/CCSwitch.app"
-          APP_RESOURCES_DIR="$APP_PATH/Contents/Resources"
-          
-          echo "📦 Patching resources..."
-          mkdir -p "$APP_RESOURCES_DIR"
-          
-          # Copy localization files
-          if [ -d CCSwitch/CCSwitch/Resources ]; then
-            cp -R CCSwitch/CCSwitch/Resources/*.lproj "$APP_RESOURCES_DIR/" || true
-            cp CCSwitch/CCSwitch/Resources/AppIcon.icns "$APP_RESOURCES_DIR/" || true
-          fi
-          
-          echo "✅ Resources patched."
-
-      - name: Create DMG
+      - name: Export Archive (Ad-hoc)
         run: |
-          # Ad-hoc sign the app (required for Apple Silicon execution)
-          codesign --force --deep --sign - build/Build/Products/Release/CCSwitch.app
-
-          mkdir -p dmg-source
-          cp -r build/Build/Products/Release/CCSwitch.app dmg-source/
-          ln -s /Applications dmg-source/Applications
+          mkdir -p dist
+          # 查找生成的 .app 路径，通常在 Products/Applications 下
+          cp -R "CCSwitch.xcarchive/Products/Applications/CCSwitch.app" dist/
           
-          # Use tag name for DMG filename if possible
-          VERSION=${GITHUB_REF#refs/tags/}
-          DMG_NAME="CCSwitch-${VERSION}.dmg"
-          
-          hdiutil create -volname "CCSwitch" -srcfolder dmg-source -ov -format UDZO "$DMG_NAME"
-          
-          # Save name for next step
-          echo "DMG_PATH=$DMG_NAME" >> $GITHUB_ENV
-
-      - name: Generate Changelog
-        id: changelog
+      - name: Zip App
         run: |
-          # Simple changelog from last tag
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -z "$PREV_TAG" ]; then
-            git log --pretty=format:"* %s" > changelog.txt
+          cd dist
+          zip -r CCSwitch.zip CCSwitch.app
+          echo "ZIP_PATH=$(pwd)/CCSwitch.zip" >> $GITHUB_ENV
+
+      - name: Install Sparkle Tools
+        run: |
+          curl -L -o sparkle.tar.xz https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz
+          tar -xf sparkle.tar.xz
+          mv bin sparkle-bin
+
+      - name: Generate Appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          mkdir -p sparkle_feed
+          cp dist/CCSwitch.zip sparkle_feed/
+          
+          # 使用 --download-url-prefix 指定 Release 的 URL 前缀
+          ./sparkle-bin/generate_appcast sparkle_feed/ \
+            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/"
+            
+          cp sparkle_feed/appcast.xml .
+
+      - name: Update appcast.xml in Repo
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # 切换到 main 分支（actions/checkout 默认是 detached head）
+          git fetch origin main
+          git checkout main
+          
+          # 添加生成的 appcast.xml
+          git add appcast.xml
+          
+          # 如果有变化则提交
+          if git diff --staged --quiet; then
+            echo "No changes to appcast.xml"
           else
-            git log ${PREV_TAG}..HEAD --pretty=format:"* %s" > changelog.txt
+            git commit -m "chore: update appcast.xml for v${VERSION}"
+            git push origin main
           fi
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
-          body_path: changelog.txt
           files: |
-            ${{ env.DMG_PATH }}
+            dist/CCSwitch.zip
+            appcast.xml
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

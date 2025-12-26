@@ -1,38 +1,27 @@
 # Implementation Plan: GitHub Actions 自动打包 + Sparkle 在线更新
 
 ## Phase 1: Sparkle 本地配置与验证
-- [ ] Task: 检查并配置 `Info.plist`
+- [x] Task: 检查并配置 `Info.plist`
     - 验证 `SUFeedURL` 是否指向预期的更新源（例如 GitHub Pages 或 Raw GitHub URL）。
     - 验证是否已生成并配置 Sparkle EdDSA 公钥 (`SUPublicEDKey`)。如果没有，需使用 Sparkle 的 `generate_keys` 工具生成。
-- [ ] Task: 确保 Sparkle 依赖正确集成
+- [x] Task: 确保 Sparkle 依赖正确集成
     - 验证 Package.swift 或 Xcode Project 中 Sparkle 库的链接状态。
 
-## Phase 2: 证书与密钥准备 (需用户配合)
-- [ ] Task: 导出 macOS 开发者证书
-    - 导出 "Developer ID Application" 证书为 `.p12` 文件。
-    - 获取证书密码。
-- [ ] Task: 获取公证所需的凭证
-    - 获取 Apple ID (email)。
-    - 生成 App-Specific Password。
-    - 获取 Team ID。
+## Phase 2: 密钥准备 (EdDSA)
+- [x] Task: 生成并配置 Sparkle EdDSA 密钥
+    - 用户已生成公钥并在 Info.plist 中配置。
 - [ ] Task: 配置 GitHub Secrets
     - 指导用户在仓库 Settings -> Secrets and variables -> Actions 中添加：
-        - `MACOS_CERTIFICATE` (Base64 encoded .p12)
-        - `MACOS_CERTIFICATE_PWD`
-        - `MACOS_NOTARIZATION_APPLE_ID`
-        - `MACOS_NOTARIZATION_APP_SPECIFIC_PWD`
-        - `MACOS_NOTARIZATION_TEAM_ID`
+        - `SPARKLE_PRIVATE_KEY` (生成密钥时得到的私钥，用于在 CI 中给更新包签名)
 
 ## Phase 3: 构建自动化脚本 (Workflow)
 - [ ] Task: 创建 `.github/workflows/release.yml`
     - [ ] Sub-task: 定义触发规则 (`on: push: tags: 'v*'`)。
     - [ ] Sub-task: 编写 Checkout 和依赖安装步骤。
-    - [ ] Sub-task: 编写 Build 步骤 (`xcodebuild archive ...`)。
-    - [ ] Sub-task: 编写 Code Signing 步骤 (解码证书 -> 导入 Keychain -> 签名)。
-    - [ ] Sub-task: 编写打包步骤 (生成 ZIP/DMG)。
-    - [ ] Sub-task: 编写 Notarization 步骤 (`xcrun notarytool ...` & `xcrun stapler ...`)。
-    - [ ] Sub-task: 编写 Sparkle Appcast 生成步骤 (使用 Sparkle 的 `generate_appcast` 工具或脚本生成)。
-    - [ ] Sub-task: 编写 Release 发布步骤 (使用 `softprops/action-gh-release` 等 Action 上传产物)。
+    - [ ] Sub-task: 编写 Build 步骤 (`xcodebuild build ...`)。
+    - [ ] Sub-task: 编写打包步骤 (生成 ZIP)。
+    - [ ] Sub-task: 编写 Sparkle Appcast 生成步骤 (使用私钥给 ZIP 签名并生成 xml)。
+    - [ ] Sub-task: 编写 Release 发布步骤。
 
 ## Phase 4: 测试与验收
 - [ ] Task: 推送测试 Tag (e.g., `v0.0.1-test`)

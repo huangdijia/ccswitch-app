@@ -133,10 +133,7 @@ struct GeneralSettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        Toggle("", isOn: Binding(
-                            get: { UpdateManager.shared.automaticallyChecksForUpdates },
-                            set: { UpdateManager.shared.automaticallyChecksForUpdates = $0 }
-                        ))
+                        Toggle("", isOn: $updateManager.automaticallyChecksForUpdates)
                         .labelsHidden()
                     }
                     
@@ -149,10 +146,7 @@ struct GeneralSettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        Toggle("", isOn: Binding(
-                            get: { UpdateManager.shared.automaticallyDownloadsAndInstallsUpdates },
-                            set: { UpdateManager.shared.automaticallyDownloadsAndInstallsUpdates = $0 }
-                        ))
+                        Toggle("", isOn: $updateManager.automaticallyDownloadsAndInstallsUpdates)
                         .labelsHidden()
                     }
                     
@@ -163,17 +157,9 @@ struct GeneralSettingsView: View {
                             Button {
                                 updateManager.checkForUpdates(isManual: true)
                             } label: {
-                                if updateManager.isChecking {
-                                    HStack(spacing: 4) {
-                                        ProgressView().controlSize(.small)
-                                        Text("check_for_updates_now")
-                                    }
-                                } else {
-                                    Text("check_for_updates_now")
-                                }
+                                Text("check_for_updates_now")
                             }
                             .buttonStyle(.bordered)
-                            .disabled(updateManager.isChecking || updateManager.isDownloading)
                             
                             if let lastDate = updateManager.lastUpdateCheckDate {
                                 Text(String(format: NSLocalizedString("last_checked_format", comment: ""), lastDate.formatted()))
@@ -187,23 +173,6 @@ struct GeneralSettingsView: View {
                         Text("\(NSLocalizedString("version_info", comment: "")) \(AppInfo.fullVersion)")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                    }
-
-                    if updateManager.isDownloading {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text(updateManager.installationStatus ?? "")
-                                    .font(.caption)
-                                Spacer()
-                                Text("\(Int(updateManager.downloadProgress * 100))%")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            ProgressView(value: updateManager.downloadProgress)
-                                .progressViewStyle(.linear)
-                                .controlSize(.small)
-                        }
-                        .padding(.top, 4)
                     }
                 }
                 .padding(.vertical, 4)
