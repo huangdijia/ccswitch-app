@@ -22,6 +22,11 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Building version: $VERSION"
 
+      - name: Update Info.plist
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" CCSwitch/CCSwitch/Resources/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" CCSwitch/CCSwitch/Resources/Info.plist
+
       - name: Build
         run: |
           xcodebuild -resolvePackageDependencies -project CCSwitch/CCSwitch.xcodeproj
