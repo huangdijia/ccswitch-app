@@ -55,6 +55,11 @@ jobs:
           # 查找生成的 .app 路径，通常在 Products/Applications 下
           cp -R "CCSwitch.xcarchive/Products/Applications/CCSwitch.app" dist/
           
+          # 修复图标丢失问题：手动将 .icns 复制到 Resources 目录
+          # 因为 Xcode 工程中可能未正确包含该资源
+          mkdir -p dist/CCSwitch.app/Contents/Resources/
+          cp CCSwitch/CCSwitch/Resources/AppIcon.icns dist/CCSwitch.app/Contents/Resources/
+          
       - name: Ad-hoc Sign App
         run: |
           # 使用 ad-hoc 签名 (-s -) 以通过 Sparkle 的基本检查
