@@ -126,6 +126,7 @@ Thumbs.db
 build/
 Build/
 DerivedData/
+build_output/
 
 # Application artifacts
 *.app
