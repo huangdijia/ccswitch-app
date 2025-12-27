@@ -45,7 +45,6 @@
 		18000005 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000005 /* SyncManager.swift */; };
 		18000006 /* SyncManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000006 /* SyncManagerTests.swift */; };
 		18000007 /* SyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000007 /* SyncStatusView.swift */; };
-		18000008 /* SyncSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000008 /* SyncSelectionView.swift */; };
 		18000009 /* SyncConflictResolverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000009 /* SyncConflictResolverView.swift */; };
 /* End PBXBuildFile section */
 
@@ -99,7 +98,6 @@
 		17000005 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		17000006 /* SyncManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManagerTests.swift; sourceTree = "<group>"; };
 		17000007 /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
-		17000008 /* SyncSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSelectionView.swift; sourceTree = "<group>"; };
 		17000009 /* SyncConflictResolverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncConflictResolverView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -213,7 +211,6 @@
 				02000013 /* VendorEditView.swift */,
 				02000014 /* AdvancedSettingsView.swift */,
 				17000007 /* SyncStatusView.swift */,
-				17000008 /* SyncSelectionView.swift */,
 				17000009 /* SyncConflictResolverView.swift */,
 			);
 			path = Views;
@@ -387,7 +384,6 @@
 				18000002 /* ICloudStorageService.swift in Sources */,
 				18000005 /* SyncManager.swift in Sources */,
 				18000007 /* SyncStatusView.swift in Sources */,
-				18000008 /* SyncSelectionView.swift in Sources */,
 				18000009 /* SyncConflictResolverView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

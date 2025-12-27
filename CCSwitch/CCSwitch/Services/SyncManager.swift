@@ -112,11 +112,16 @@ class SyncManager: ObservableObject {
         }
         
         syncStatus = .syncing
+        
+        // Always sync ALL vendors
         let vendors = configManager.allVendors
-        let toSync = vendors.filter { syncConfig.syncedVendorIds.contains($0.id) }
+        
+        // Update config to track all vendors
+        // We use map to get fresh IDs in case vendors were added/removed locally
+        syncConfig.syncedVendorIds = vendors.map { $0.id }
         
         do {
-            for vendor in toSync {
+            for vendor in vendors {
                 try cloudStorage.setCodable(vendor, forKey: "\(vendorsKeyPrefix)\(vendor.id)")
             }
             // Also sync the config itself

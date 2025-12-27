@@ -7,7 +7,6 @@ struct AdvancedSettingsView: View {
     
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
-    @State private var showingSyncSelectionSheet = false
     
     var body: some View {
         Form {
@@ -40,13 +39,7 @@ struct AdvancedSettingsView: View {
                             SyncStatusView(status: syncManager.syncStatus)
                         }
                         
-                        HStack(spacing: 12) {
-                            Button("manage_synced_items") {
-                                showingSyncSelectionSheet = true
-                            }
-                            .buttonStyle(.link)
-                            .font(.subheadline)
-                            
+                        HStack {
                             Spacer()
                             
                             Button("sync_now") {
@@ -154,9 +147,6 @@ struct AdvancedSettingsView: View {
         .padding()
         .sheet(isPresented: $showingBackupSheet) {
             BackupListView()
-        }
-        .sheet(isPresented: $showingSyncSelectionSheet) {
-            SyncSelectionView()
         }
         .sheet(isPresented: Binding(
             get: { !syncManager.pendingConflicts.isEmpty },
