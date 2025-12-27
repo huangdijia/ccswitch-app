@@ -47,9 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // 自动检查更新
         if UpdateManager.shared.automaticallyChecksForUpdates {
-            Task {
-                await UpdateManager.shared.checkForUpdates(isManual: false)
-            }
+            UpdateManager.shared.checkForUpdates(isManual: false)
         }
     }
 
