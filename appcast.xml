@@ -3,12 +3,12 @@
     <channel>
         <title>CCSwitch</title>
         <item>
-            <title>0.2.3</title>
-            <pubDate>Sat, 27 Dec 2025 03:49:57 +0000</pubDate>
-            <sparkle:version>0.2.3</sparkle:version>
-            <sparkle:shortVersionString>0.2.3</sparkle:shortVersionString>
+            <title>0.2.4</title>
+            <pubDate>Sat, 27 Dec 2025 12:40:15 +0000</pubDate>
+            <sparkle:version>0.2.4</sparkle:version>
+            <sparkle:shortVersionString>0.2.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.6</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/huangdijia/ccswitch-app/releases/download/v0.2.3/CCSwitch.zip" length="4573973" type="application/octet-stream" sparkle:edSignature="rGVb8ID3vbr22o4Nxn2EaagnpOToLoxJ2F+0cTebx/JJmk6QPwIiYbwIdwv9vh2ZnVo1brafJRqtmYP4DBYXCA=="/>
+            <enclosure url="https://github.com/huangdijia/ccswitch-app/releases/download/v0.2.4/CCSwitch.zip" length="4574316" type="application/octet-stream" sparkle:edSignature="lJLLkNOR0Hx4WlvFsiP4TK1/SurZxMRdro2ceCEdAouirTH6OoCLZr/klBbU5OJsVULds8WhMbMPlWW0dCrnBA=="/>
         </item>
     </channel>
 </rss>
