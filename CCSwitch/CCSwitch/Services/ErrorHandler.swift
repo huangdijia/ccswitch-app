@@ -119,6 +119,12 @@ class ErrorHandler {
     }
 
     private func showAlert(message: String, informativeText: String) {
+        // Detect if running unit tests to prevent blocking CI
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            Logger.shared.error("Blocked Alert in Test Mode: \(message) - \(informativeText)")
+            return
+        }
+
         DispatchQueue.main.async {
             let alert = NSAlert()
             alert.messageText = message

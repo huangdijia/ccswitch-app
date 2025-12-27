@@ -3,7 +3,14 @@ import Cocoa
 import UserNotifications
 
 // MARK: - Configuration Manager (Refactored to use Protocol-based Architecture)
-class ConfigManager: ObservableObject {
+
+protocol SyncConfigManagerProtocol {
+    var allVendors: [Vendor] { get }
+    func addVendor(_ vendor: Vendor) throws
+    func updateVendor(_ vendor: Vendor) throws
+}
+
+class ConfigManager: ObservableObject, SyncConfigManagerProtocol {
     static let shared = ConfigManager()
 
     private var observers: [ConfigObserver] = []

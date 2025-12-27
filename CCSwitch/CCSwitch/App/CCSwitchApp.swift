@@ -16,6 +16,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Detect if running unit tests
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            return
+        }
+
         // 注册默认设置
         UserDefaults.standard.register(defaults: [
             "autoBackup": true,

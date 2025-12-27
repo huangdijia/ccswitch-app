@@ -17,7 +17,7 @@ class SyncManager: ObservableObject {
     }
     
     private let cloudStorage: CloudStorageService
-    private let configManager: ConfigManager
+    private let configManager: SyncConfigManagerProtocol
     private let monitor = NWPathMonitor()
     private var cancellables = Set<AnyCancellable>()
     
@@ -29,7 +29,7 @@ class SyncManager: ObservableObject {
     
     init(
         cloudStorage: CloudStorageService? = nil,
-        configManager: ConfigManager = .shared
+        configManager: SyncConfigManagerProtocol = ConfigManager.shared
     ) {
         self.cloudStorage = cloudStorage ?? ICloudStorageService()
         self.configManager = configManager

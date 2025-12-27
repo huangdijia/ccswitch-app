@@ -3,13 +3,20 @@ import XCTest
 
 final class SyncManagerTests: XCTestCase {
     var mockCloud: MockCloudStorageService!
+    var mockConfigManager: MockConfigManager!
     var syncManager: SyncManager!
     
     override func setUp() {
         super.setUp()
         mockCloud = MockCloudStorageService()
-        // We use the default ConfigManager.shared for now, but with our mock cloud
-        syncManager = SyncManager(cloudStorage: mockCloud)
+        mockConfigManager = MockConfigManager()
+        // Pre-populate mock config with some vendors for testing
+        mockConfigManager.allVendors = [
+            Vendor(id: "v1", name: "Vendor 1", env: [:]),
+            Vendor(id: "v2", name: "Vendor 2", env: [:])
+        ]
+        
+        syncManager = SyncManager(cloudStorage: mockCloud, configManager: mockConfigManager)
     }
     
     func testToggleSync() {
@@ -32,12 +39,8 @@ final class SyncManagerTests: XCTestCase {
     }
     
     func testConflictDetection() throws {
-        let vendorId = "test_vendor"
-        let localVendor = Vendor(id: vendorId, name: "Local Name", env: [:])
+        let vendorId = "v1"
         let remoteVendor = Vendor(id: vendorId, name: "Remote Name", env: [:])
-        
-        // Mock ConfigManager behavior (it's hard to mock real ConfigManager, so we just assume it has the vendor)
-        // In a real test we would use DI for configRepository.
         
         // Setup cloud with a conflicting vendor
         try mockCloud.setCodable(remoteVendor, forKey: "vendor_\(vendorId)")
@@ -47,11 +50,31 @@ final class SyncManagerTests: XCTestCase {
         // Simulate remote change
         syncManager.downloadRemoteChanges()
         
-        // Since we can't easily set the local vendor in ConfigManager.shared for tests without affecting other tests,
-        // this test might be brittle if other tests are running.
-        // But for this project, let's assume we can.
+        // Check if conflicts are detected
+        // Note: MockConfigManager needs to return "v1" with different data for conflict to happen
+        // In setUp, v1 is "Vendor 1". Remote is "Remote Name". So they differ.
         
-        // Actually, let's skip checking real ConfigManager and just check if SyncManager detects differences 
-        // IF we could provide them.
+        XCTAssertEqual(syncManager.pendingConflicts.count, 1)
+        XCTAssertEqual(syncManager.pendingConflicts.first?.id, vendorId)
+    }
+}
+
+// MARK: - Mocks
+
+class MockConfigManager: SyncConfigManagerProtocol {
+    var allVendors: [Vendor] = []
+    var addedVendors: [Vendor] = []
+    var updatedVendors: [Vendor] = []
+    
+    func addVendor(_ vendor: Vendor) throws {
+        addedVendors.append(vendor)
+        allVendors.append(vendor)
+    }
+    
+    func updateVendor(_ vendor: Vendor) throws {
+        updatedVendors.append(vendor)
+        if let index = allVendors.firstIndex(where: { $0.id == vendor.id }) {
+            allVendors[index] = vendor
+        }
     }
 }
