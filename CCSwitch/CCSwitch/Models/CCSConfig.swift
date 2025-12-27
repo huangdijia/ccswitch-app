@@ -201,3 +201,14 @@ private struct AnyDecodable: Decodable, CustomStringConvertible {
         }
     }
 }
+
+// MARK: - Sync Configuration
+struct SyncConfiguration: Codable, Equatable {
+    var isSyncEnabled: Bool
+    var syncedVendorIds: [String]
+    
+    init(isSyncEnabled: Bool = false, syncedVendorIds: [String] = []) {
+        self.isSyncEnabled = isSyncEnabled
+        self.syncedVendorIds = syncedVendorIds
+    }
+}

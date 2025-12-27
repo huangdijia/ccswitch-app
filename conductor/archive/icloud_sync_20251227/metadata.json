@@ -1,0 +1,8 @@
+{
+  "track_id": "icloud_sync_20251227",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-12-27T10:07:00Z",
+  "updated_at": "2025-12-27T10:07:00Z",
+  "description": "实现iCloud同步配置，支持开启/关闭"
+}

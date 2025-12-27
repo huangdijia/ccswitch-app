@@ -37,6 +37,10 @@ class ServiceContainer {
         )
     }()
     
+    private(set) lazy var syncManager: SyncManager = {
+        return SyncManager.shared
+    }()
+    
     private init() {}
     
     // MARK: - Service Registration (for testing)

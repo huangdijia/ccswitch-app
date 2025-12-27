@@ -172,4 +172,33 @@ final class ModelTests: XCTestCase {
         XCTAssertTrue(jsonString.contains("otherField"))
         XCTAssertTrue(jsonString.contains("nestedObject"))
     }
+    
+    // MARK: - SyncConfiguration Tests
+    
+    func testSyncConfigurationCreation() {
+        let config = SyncConfiguration(isSyncEnabled: true, syncedVendorIds: ["v1", "v2"])
+        
+        XCTAssertTrue(config.isSyncEnabled)
+        XCTAssertEqual(config.syncedVendorIds, ["v1", "v2"])
+    }
+    
+    func testSyncConfigurationDefaults() {
+        let config = SyncConfiguration()
+        
+        XCTAssertFalse(config.isSyncEnabled)
+        XCTAssertTrue(config.syncedVendorIds.isEmpty)
+    }
+    
+    func testSyncConfigurationCodable() throws {
+        let config = SyncConfiguration(isSyncEnabled: true, syncedVendorIds: ["v1"])
+        
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(config)
+        
+        let decoder = JSONDecoder()
+        let decodedConfig = try decoder.decode(SyncConfiguration.self, from: data)
+        
+        XCTAssertEqual(decodedConfig.isSyncEnabled, config.isSyncEnabled)
+        XCTAssertEqual(decodedConfig.syncedVendorIds, config.syncedVendorIds)
+    }
 }

@@ -28,6 +28,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // 初始化配置管理器
         ConfigManager.shared.initialize()
         
+        // 初始化 iCloud 同步管理器
+        _ = ServiceContainer.shared.syncManager
+        
         // 记录启动信息
         Logger.shared.info("CCSwitch \(AppInfo.fullVersion) starting...")
 

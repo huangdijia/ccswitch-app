@@ -290,3 +290,24 @@
 "backup_deleted_success" = "Backup deleted successfully.";
 "added_to_favorites_msg" = "Added to favorites.";
 "removed_from_favorites_msg" = "Removed from favorites.";
+
+/* iCloud Sync */
+"icloud_sync" = "iCloud Synchronization";
+"icloud_sync_desc" = "Sync configuration across your devices using iCloud.";
+"icloud_settings" = "iCloud Settings";
+"sync_status" = "Status";
+"sync_now" = "Sync Now";
+"sync_idle" = "Idle";
+"sync_syncing" = "Syncing...";
+"sync_success" = "Synced";
+"sync_offline" = "Offline";
+"sync_error" = "Sync Error: %@";
+"sync_selection_title" = "Manage Synced Items";
+"manage_synced_items" = "Select Items to Sync...";
+"sync_conflict_title" = "Sync Conflict Detected";
+"local_version" = "Local Version";
+"remote_version" = "Cloud Version";
+"keep_local" = "Keep Local";
+"keep_remote" = "Keep Cloud";
+"env_vars_count" = "%d environment variables";
+"all_conflicts_resolved" = "All conflicts have been resolved.";

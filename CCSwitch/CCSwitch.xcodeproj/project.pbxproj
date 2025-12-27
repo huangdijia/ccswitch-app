@@ -38,6 +38,15 @@
 		15000010 /* MockServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16000010 /* MockServices.swift */; };
 		43822D7D2EFECE98003A8D84 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 43822D7C2EFECE98003A8D84 /* Sparkle */; };
 		849F600A2D169F9900000001 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849F60092D169F9900000001 /* AppInfo.swift */; };
+		18000001 /* CloudStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000001 /* CloudStorageService.swift */; };
+		18000002 /* ICloudStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000002 /* ICloudStorageService.swift */; };
+		18000003 /* CloudStorageServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000003 /* CloudStorageServiceTests.swift */; };
+		18000004 /* MockCloudStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000004 /* MockCloudStorageService.swift */; };
+		18000005 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000005 /* SyncManager.swift */; };
+		18000006 /* SyncManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000006 /* SyncManagerTests.swift */; };
+		18000007 /* SyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000007 /* SyncStatusView.swift */; };
+		18000008 /* SyncSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000008 /* SyncSelectionView.swift */; };
+		18000009 /* SyncConflictResolverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000009 /* SyncConflictResolverView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +92,15 @@
 		16000009 /* MockConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationRepository.swift; sourceTree = "<group>"; };
 		16000010 /* MockServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServices.swift; sourceTree = "<group>"; };
 		849F60092D169F9900000001 /* AppInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		17000001 /* CloudStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageService.swift; sourceTree = "<group>"; };
+		17000002 /* ICloudStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudStorageService.swift; sourceTree = "<group>"; };
+		17000003 /* CloudStorageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudStorageServiceTests.swift; sourceTree = "<group>"; };
+		17000004 /* MockCloudStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCloudStorageService.swift; sourceTree = "<group>"; };
+		17000005 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
+		17000006 /* SyncManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManagerTests.swift; sourceTree = "<group>"; };
+		17000007 /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
+		17000008 /* SyncSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSelectionView.swift; sourceTree = "<group>"; };
+		17000009 /* SyncConflictResolverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncConflictResolverView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +150,8 @@
 			children = (
 				02000015 /* ConfigManagerTests.swift */,
 				02000016 /* ModelTests.swift */,
+				17000003 /* CloudStorageServiceTests.swift */,
+				17000006 /* SyncManagerTests.swift */,
 				0600000C /* Mocks */,
 			);
 			path = CCSwitchTests;
@@ -177,6 +197,8 @@
 				02000020 /* UpdateManager.swift */,
 				02000009 /* ErrorHandler.swift */,
 				16000007 /* ServiceContainer.swift */,
+				17000002 /* ICloudStorageService.swift */,
+				17000005 /* SyncManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -190,6 +212,9 @@
 				02000012 /* VendorManagementView.swift */,
 				02000013 /* VendorEditView.swift */,
 				02000014 /* AdvancedSettingsView.swift */,
+				17000007 /* SyncStatusView.swift */,
+				17000008 /* SyncSelectionView.swift */,
+				17000009 /* SyncConflictResolverView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -203,6 +228,7 @@
 				16000004 /* BackupService.swift */,
 				16000005 /* NotificationService.swift */,
 				16000006 /* SettingsRepository.swift */,
+				17000001 /* CloudStorageService.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -226,6 +252,7 @@
 			children = (
 				16000009 /* MockConfigurationRepository.swift */,
 				16000010 /* MockServices.swift */,
+				17000004 /* MockCloudStorageService.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -356,6 +383,12 @@
 				15000007 /* ServiceContainer.swift in Sources */,
 				15000008 /* VendorTemplate.swift in Sources */,
 				01000020 /* UpdateManager.swift in Sources */,
+				18000001 /* CloudStorageService.swift in Sources */,
+				18000002 /* ICloudStorageService.swift in Sources */,
+				18000005 /* SyncManager.swift in Sources */,
+				18000007 /* SyncStatusView.swift in Sources */,
+				18000008 /* SyncSelectionView.swift in Sources */,
+				18000009 /* SyncConflictResolverView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +400,9 @@
 				01000016 /* ModelTests.swift in Sources */,
 				15000009 /* MockConfigurationRepository.swift in Sources */,
 				15000010 /* MockServices.swift in Sources */,
+				18000003 /* CloudStorageServiceTests.swift in Sources */,
+				18000004 /* MockCloudStorageService.swift in Sources */,
+				18000006 /* SyncManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

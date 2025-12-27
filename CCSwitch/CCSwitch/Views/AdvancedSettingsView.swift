@@ -1,14 +1,65 @@
 import SwiftUI
 
 struct AdvancedSettingsView: View {
+    @ObservedObject private var syncManager = SyncManager.shared
     @AppStorage("showDebugLogs") private var showDebugLogs = false
     @AppStorage("confirmBackupDeletion") private var confirmBackupDeletion = true
     
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
+    @State private var showingSyncSelectionSheet = false
     
     var body: some View {
         Form {
+            // MARK: - iCloud Sync
+            Section {
+                VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("icloud_sync")
+                                .font(.body)
+                            Text("icloud_sync_desc")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { syncManager.syncConfig.isSyncEnabled },
+                            set: { syncManager.toggleSync(enabled: $0) }
+                        ))
+                        .labelsHidden()
+                    }
+                    
+                    if syncManager.syncConfig.isSyncEnabled {
+                        Divider().padding(.vertical, 4)
+                        
+                        HStack {
+                            Text("sync_status")
+                                .font(.subheadline)
+                            Spacer()
+                            SyncStatusView(status: syncManager.syncStatus)
+                        }
+                        
+                        HStack(spacing: 12) {
+                            Button("manage_synced_items") {
+                                showingSyncSelectionSheet = true
+                            }
+                            .buttonStyle(.link)
+                            .font(.subheadline)
+                            
+                            Spacer()
+                            
+                            Button("sync_now") {
+                                syncManager.uploadSelectedVendors()
+                            }
+                            .controlSize(.small)
+                        }
+                    }
+                }
+            } header: {
+                Text("icloud_settings")
+            }
+
             // MARK: - Section 1: System Behavior
             Section {
                 VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
@@ -103,6 +154,15 @@ struct AdvancedSettingsView: View {
         .padding()
         .sheet(isPresented: $showingBackupSheet) {
             BackupListView()
+        }
+        .sheet(isPresented: $showingSyncSelectionSheet) {
+            SyncSelectionView()
+        }
+        .sheet(isPresented: Binding(
+            get: { !syncManager.pendingConflicts.isEmpty },
+            set: { _ in }
+        )) {
+            SyncConflictResolverView()
         }
         .alert(isPresented: $showingResetAlert) {
             Alert(

@@ -3,7 +3,7 @@ import Cocoa
 import UserNotifications
 
 // MARK: - Configuration Manager (Refactored to use Protocol-based Architecture)
-class ConfigManager {
+class ConfigManager: ObservableObject {
     static let shared = ConfigManager()
 
     private var observers: [ConfigObserver] = []

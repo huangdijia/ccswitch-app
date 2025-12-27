@@ -293,3 +293,24 @@
 "backup_deleted_success" = "备份已删除。";
 "added_to_favorites_msg" = "已添加到收藏。";
 "removed_from_favorites_msg" = "已取消收藏。";
+
+/* iCloud Sync */
+"icloud_sync" = "iCloud 同步";
+"icloud_sync_desc" = "使用 iCloud 在您的设备之间同步配置。";
+"icloud_settings" = "iCloud 设置";
+"sync_status" = "状态";
+"sync_now" = "立即同步";
+"sync_idle" = "闲置";
+"sync_syncing" = "正在同步...";
+"sync_success" = "已同步";
+"sync_offline" = "离线";
+"sync_error" = "同步错误：%@";
+"sync_selection_title" = "管理同步项目";
+"manage_synced_items" = "选择要同步的项目...";
+"sync_conflict_title" = "检测到同步冲突";
+"local_version" = "本地版本";
+"remote_version" = "云端版本";
+"keep_local" = "保留本地";
+"keep_remote" = "保留云端";
+"env_vars_count" = "%d 个环境变量";
+"all_conflicts_resolved" = "所有冲突已解决。";

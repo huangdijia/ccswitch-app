@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Vendor Model
-struct Vendor: Codable, Identifiable {
+struct Vendor: Codable, Identifiable, Equatable {
     let id: String
     let name: String
     let env: [String: String]
@@ -16,6 +16,10 @@ struct Vendor: Codable, Identifiable {
     
     enum CodingKeys: String, CodingKey {
         case id, name, env
+    }
+
+    static func == (lhs: Vendor, rhs: Vendor) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name && lhs.env == rhs.env
     }
 
     // Custom decoding to handle non-string values in env
