@@ -123,18 +123,19 @@ class SyncManager: ObservableObject {
             try cloudStorage.setCodable(syncConfig, forKey: syncConfigKey)
             
             let success = cloudStorage.synchronize()
-            if success {
-                syncStatus = .success
-                retryCount = 0
-                
-                // Reset to idle after a delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    if case .success = self.syncStatus {
-                        self.syncStatus = .idle
-                    }
+            if !success {
+                Logger.shared.warn("Cloud storage synchronization to disk returned false")
+            }
+            
+            // Treat as success regardless of disk sync status
+            syncStatus = .success
+            retryCount = 0
+            
+            // Reset to idle after a delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                if case .success = self.syncStatus {
+                    self.syncStatus = .idle
                 }
-            } else {
-                handleSyncFailure(error: "Cloud synchronization failed to initiate.")
             }
         } catch {
             handleSyncFailure(error: error.localizedDescription)
