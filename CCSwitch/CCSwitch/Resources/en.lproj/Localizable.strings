@@ -311,3 +311,11 @@
 "keep_remote" = "Keep Cloud";
 "env_vars_count" = "%d environment variables";
 "all_conflicts_resolved" = "All conflicts have been resolved.";
+
+/* Missing Code Keys */
+"menu_bar_tooltip" = "CCSwitch - Click to switch Claude provider";
+"menu_bar_tooltip_current" = "CCSwitch - Current: %@";
+"default_new_vendor_name" = "New Vendor";
+"untitled_vendor" = "Untitled";
+"connection_failed_simple" = "Failed";
+"connection_error_status" = "Error: %@";

@@ -199,7 +199,7 @@ struct VendorManagementView: View {
     }
     
     private func addNewVendor() {
-        let newVendor = Vendor(id: UUID().uuidString.prefix(8).lowercased(), name: "New Vendor", env: [:])
+        let newVendor = Vendor(id: UUID().uuidString.prefix(8).lowercased(), name: NSLocalizedString("default_new_vendor_name", comment: ""), env: [:])
         do {
             try ConfigManager.shared.addVendor(newVendor)
             // UI reloads via notification
@@ -312,7 +312,7 @@ struct VendorDetailView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(name.isEmpty ? "Untitled" : name).font(.title2).fontWeight(.bold)
+                    Text(name.isEmpty ? LocalizedStringKey("untitled_vendor") : LocalizedStringKey(name)).font(.title2).fontWeight(.bold)
                     if isDirty { Text("unsaved_changes").font(.caption).foregroundColor(.orange) }
                 }
                 Spacer()
@@ -388,7 +388,7 @@ struct VendorDetailView: View {
                 }.disabled(isTesting || baseURL.isEmpty)
                 if let result = testResult {
                     if result { Label("connection_success", systemImage: "checkmark").foregroundColor(.green) }
-                    else { Label(testMessage ?? "Failed", systemImage: "exclamationmark.triangle").foregroundColor(.red) }
+                    else { Label(testMessage ?? NSLocalizedString("connection_failed_simple", comment: ""), systemImage: "exclamationmark.triangle").foregroundColor(.red) }
                 }
                 Spacer()
             }.padding().background(Color(NSColor.windowBackgroundColor))
@@ -448,7 +448,7 @@ struct VendorDetailView: View {
                 if let error = error { testResult = false; testMessage = error.localizedDescription }
                 else if let httpResponse = response as? HTTPURLResponse {
                     if (200...299).contains(httpResponse.statusCode) { testResult = true }
-                    else { testResult = false; testMessage = "Error: \(httpResponse.statusCode)" }
+                    else { testResult = false; testMessage = String(format: NSLocalizedString("connection_error_status", comment: ""), String(httpResponse.statusCode)) }
                 }
             }
         }.resume()

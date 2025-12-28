@@ -25,7 +25,7 @@ class MenuBarController: NSObject, ConfigObserver {
             button.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .medium)
 
             // 设置工具提示
-            button.toolTip = "CCSwitch - Click to switch Claude provider"
+            button.toolTip = NSLocalizedString("menu_bar_tooltip", comment: "")
         }
     }
 
@@ -39,7 +39,7 @@ class MenuBarController: NSObject, ConfigObserver {
         menu.addItem(NSMenuItem.separator())
 
         // 2. Links
-        let githubItem = NSMenuItem(title: "GitHub", action: #selector(openGitHub), keyEquivalent: "")
+        let githubItem = NSMenuItem(title: NSLocalizedString("github", comment: ""), action: #selector(openGitHub), keyEquivalent: "")
         githubItem.target = self
         menu.addItem(githubItem)
 
@@ -177,7 +177,7 @@ class MenuBarController: NSObject, ConfigObserver {
         let abbreviations = ["anthropic": "A", "deepseek": "D", "openai": "O"]
         let abbreviation = abbreviations[currentVendor.id] ?? "CC"
         button.title = abbreviation
-        button.toolTip = "CCSwitch - Current: \(currentVendor.displayName)"
+        button.toolTip = String(format: NSLocalizedString("menu_bar_tooltip_current", comment: ""), currentVendor.displayName)
     }
 
     private func showErrorAlert(title: String, message: String) {

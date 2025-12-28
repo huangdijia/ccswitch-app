@@ -314,3 +314,11 @@
 "keep_remote" = "保留云端";
 "env_vars_count" = "%d 个环境变量";
 "all_conflicts_resolved" = "所有冲突已解决。";
+
+/* Missing Code Keys */
+"menu_bar_tooltip" = "CCSwitch - 点击切换 Claude 供应商";
+"menu_bar_tooltip_current" = "CCSwitch - 当前: %@";
+"default_new_vendor_name" = "新供应商";
+"untitled_vendor" = "未命名";
+"connection_failed_simple" = "失败";
+"connection_error_status" = "错误: %@";
