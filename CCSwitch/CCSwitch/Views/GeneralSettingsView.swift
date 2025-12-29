@@ -5,21 +5,21 @@ struct GeneralSettingsView: View {
     @AppStorage("showSwitchNotification") private var showSwitchNotification = true
     @AppStorage("autoLoadConfig") private var autoLoadConfig = true
     @AppStorage("autoBackup") private var autoBackup = true
-    
+
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @ObservedObject private var updateManager = UpdateManager.shared
 
     var body: some View {
         Form {
             // Section 1: Configuration Management
-            Section(header: Text("config_management")) {
+            Section(header: Text(LocalizedStringKey(LocalizationKey.configManagement))) {
                 VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
                     // Auto Reload Config
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("auto_reload_config")
+                            Text(LocalizedStringKey(LocalizationKey.autoReloadConfig))
                                 .font(.body)
-                            Text("auto_reload_config_desc")
+                            Text(LocalizedStringKey(LocalizationKey.autoReloadConfigDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -27,13 +27,13 @@ struct GeneralSettingsView: View {
                         Toggle("", isOn: $autoLoadConfig)
                             .labelsHidden()
                     }
-                    
+
                     // Auto Backup
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("auto_backup")
+                            Text(LocalizedStringKey(LocalizationKey.autoBackup))
                                 .font(.body)
-                            Text("auto_backup_desc_refined")
+                            Text(LocalizedStringKey(LocalizationKey.autoBackupDescRefined))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -41,13 +41,13 @@ struct GeneralSettingsView: View {
                         Toggle("", isOn: $autoBackup)
                             .labelsHidden()
                     }
-                    
+
                     Button {
                         openBackupFolder()
                     } label: {
                         HStack {
                             Image(systemName: "folder")
-                            Text("show_backup_files")
+                            Text(LocalizedStringKey(LocalizationKey.showBackupFiles))
                         }
                     }
                     .buttonStyle(.link)
@@ -58,14 +58,14 @@ struct GeneralSettingsView: View {
                             Divider().padding(.vertical, 8)
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("legacy_migration_title")
+                                    Text(LocalizedStringKey(LocalizationKey.legacyMigrationTitle))
                                         .font(.body)
-                                    Text("legacy_migration_desc")
+                                    Text(LocalizedStringKey(LocalizationKey.legacyMigrationDesc))
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                Button("migrate_now") {
+                                Button(LocalizedStringKey(LocalizationKey.migrateNow)) {
                                     // 在 MainActor 环境下触发
                                     Task { @MainActor in
                                         MigrationManager.shared.checkMigration(force: true)
@@ -82,9 +82,9 @@ struct GeneralSettingsView: View {
             Section {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("show_notifications")
+                        Text(LocalizedStringKey(LocalizationKey.showNotifications))
                             .font(.body)
-                        Text("show_notifications_desc")
+                        Text(LocalizedStringKey(LocalizationKey.showNotificationsDesc))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -93,16 +93,16 @@ struct GeneralSettingsView: View {
                         .labelsHidden()
                         .disabled(notificationStatus == .denied)
                 }
-                
+
                 if notificationStatus == .denied {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(.yellow)
-                        
+
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("notification_permission_disabled")
+                            Text(LocalizedStringKey(LocalizationKey.notificationPermissionDisabled))
                                 .font(.callout)
-                            Button("open_system_settings") {
+                            Button(LocalizedStringKey(LocalizationKey.openSystemSettings)) {
                                 openSystemSettings()
                             }
                             .buttonStyle(.link)
@@ -111,24 +111,24 @@ struct GeneralSettingsView: View {
                     }
                     .padding(.vertical, 4)
                 } else if notificationStatus == .notDetermined {
-                    Button("allow_notifications") {
+                    Button(LocalizedStringKey(LocalizationKey.allowNotifications)) {
                         requestNotificationPermission()
                     }
                     .buttonStyle(.link)
                     .font(.caption)
                 }
             } header: {
-                Text("notifications")
+                Text(LocalizedStringKey(LocalizationKey.notifications))
             }
-            
+
             // Section 3: Software Update
             Section {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("auto_check_updates")
+                            Text(LocalizedStringKey(LocalizationKey.autoCheckUpdates))
                                 .font(.body)
-                            Text("auto_check_updates_desc")
+                            Text(LocalizedStringKey(LocalizationKey.autoCheckUpdatesDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -136,12 +136,12 @@ struct GeneralSettingsView: View {
                         Toggle("", isOn: $updateManager.automaticallyChecksForUpdates)
                         .labelsHidden()
                     }
-                    
+
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("auto_install_updates")
+                            Text(LocalizedStringKey(LocalizationKey.autoInstallUpdates))
                                 .font(.body)
-                            Text("auto_install_updates_desc")
+                            Text(LocalizedStringKey(LocalizationKey.autoInstallUpdatesDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -149,35 +149,35 @@ struct GeneralSettingsView: View {
                         Toggle("", isOn: $updateManager.automaticallyDownloadsAndInstallsUpdates)
                         .labelsHidden()
                     }
-                    
+
                     Divider().padding(.vertical, 4)
-                    
+
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Button {
                                 updateManager.checkForUpdates(isManual: true)
                             } label: {
-                                Text("check_for_updates_now")
+                                Text(LocalizedStringKey(LocalizationKey.checkForUpdatesNow))
                             }
                             .buttonStyle(.bordered)
-                            
+
                             if let lastDate = updateManager.lastUpdateCheckDate {
-                                Text(String(format: NSLocalizedString("last_checked_format", comment: ""), lastDate.formatted()))
+                                Text(LocalizationKey.localized(LocalizationKey.lastCheckedFormat, lastDate.formatted()))
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
                         }
-                        
+
                         Spacer()
-                        
-                        Text("\(NSLocalizedString("version_info", comment: "")) \(AppInfo.fullVersion)")
+
+                        Text("\(LocalizationKey.localized(LocalizationKey.versionInfo)) \(AppInfo.fullVersion)")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
                 .padding(.vertical, 4)
             } header: {
-                Text("software_update")
+                Text(LocalizedStringKey(LocalizationKey.softwareUpdate))
             }
         }
         .formStyle(.grouped)
@@ -197,7 +197,7 @@ struct GeneralSettingsView: View {
             }
         }
     }
-    
+
     private func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
             checkNotificationPermission()
@@ -214,7 +214,7 @@ struct GeneralSettingsView: View {
             NSWorkspace.shared.open(url)
         }
     }
-    
+
     private func openBackupFolder() {
         let folderURL = ClaudeSettings.configDirectory
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: folderURL.path)

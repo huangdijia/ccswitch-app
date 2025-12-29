@@ -1,0 +1,8 @@
+{
+  "track_id": "localization_check_20251229",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2025-12-29T10:43:00Z",
+  "updated_at": "2025-12-29T10:43:00Z",
+  "description": "检查本地化功能，确保每个页面都正确支持"
+}

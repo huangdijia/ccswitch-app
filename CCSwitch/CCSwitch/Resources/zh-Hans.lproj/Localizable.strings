@@ -1,3 +1,11 @@
+/* Common Actions */
+"add" = "添加";
+"edit" = "编辑";
+"remove" = "移除";
+"info" = "信息";
+"loading" = "加载中...";
+"warning" = "警告";
+
 /* General */
 "app_name" = "CCSwitch";
 "settings" = "设置";
@@ -320,5 +328,33 @@
 "menu_bar_tooltip_current" = "CCSwitch - 当前: %@";
 "default_new_vendor_name" = "新供应商";
 "untitled_vendor" = "未命名";
+"copy_suffix" = " 副本";
 "connection_failed_simple" = "失败";
 "connection_error_status" = "错误: %@";
+
+/* Additional missing keys */
+"conflict_vendor_id" = "供应商 ID：%@";
+"conflict_name" = "名称：%@";
+"keep_both_versions" = "保留两个版本";
+"overwrite_local" = "覆盖本地";
+"overwrite_remote" = "覆盖云端";
+"sync_conflict_description" = "以下供应商在本地和云端之间存在冲突：";
+"sync_conflict_resolved" = "冲突已解决";
+"sync_has_conflicts" = "%d 个冲突";
+"switching_vendor" = "正在切换...";
+"vendor_switched_msg" = "已切换到 %@";
+"no_synced_vendors" = "尚未选择要同步的供应商";
+"select_vendors_to_sync" = "选择要同步的供应商";
+"sync_in_progress" = "正在同步...";
+"sync_completed" = "同步完成";
+"sync_failed" = "同步失败";
+
+/* Error Messages */
+"error_cannot_remove_current_vendor" = "无法删除当前正在使用的供应商。";
+"error_cannot_remove_last_vendor" = "无法删除最后一个供应商。";
+"error_invalid_vendor_name" = "无效的供应商名称。";
+"error_invalid_base_url" = "无效的 Base URL。";
+"error_invalid_timeout" = "无效的超时时间。";
+"error_vendor_not_found" = "未找到供应商。";
+"error_vendor_already_exists" = "供应商已存在。";
+"error_invalid_configuration" = "无效的配置。";

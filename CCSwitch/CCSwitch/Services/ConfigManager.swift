@@ -11,27 +11,31 @@ protocol SyncConfigManagerProtocol {
 }
 
 class ConfigManager: ObservableObject, SyncConfigManagerProtocol {
-    static let shared = ConfigManager()
+    static let shared = ConfigManager(
+        configRepository: ServiceContainer.shared.configRepository,
+        vendorSwitcher: ServiceContainer.shared.vendorSwitcher,
+        notificationService: ServiceContainer.shared.notificationService,
+        settingsRepository: ServiceContainer.shared.settingsRepository
+    )
 
     private var observers: [ConfigObserver] = []
-    
+
     // Service dependencies
     private let configRepository: ConfigurationRepository
     private let vendorSwitcher: VendorSwitcher
     private let notificationService: NotificationService
     private let settingsRepository: SettingsRepository
 
-    private init(
-        configRepository: ConfigurationRepository? = nil,
-        vendorSwitcher: VendorSwitcher? = nil,
-        notificationService: NotificationService? = nil,
-        settingsRepository: SettingsRepository? = nil
+    init(
+        configRepository: ConfigurationRepository,
+        vendorSwitcher: VendorSwitcher,
+        notificationService: NotificationService,
+        settingsRepository: SettingsRepository
     ) {
-        // Use dependency injection with fallback to ServiceContainer
-        self.configRepository = configRepository ?? ServiceContainer.shared.configRepository
-        self.vendorSwitcher = vendorSwitcher ?? ServiceContainer.shared.vendorSwitcher
-        self.notificationService = notificationService ?? ServiceContainer.shared.notificationService
-        self.settingsRepository = settingsRepository ?? ServiceContainer.shared.settingsRepository
+        self.configRepository = configRepository
+        self.vendorSwitcher = vendorSwitcher
+        self.notificationService = notificationService
+        self.settingsRepository = settingsRepository
     }
 
     // MARK: - Initialization

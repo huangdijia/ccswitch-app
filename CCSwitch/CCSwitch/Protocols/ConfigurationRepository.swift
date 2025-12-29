@@ -231,7 +231,9 @@ enum ConfigurationError: Error, LocalizedError {
     case saveFailed
     /// The requested operation is not supported
     case operationNotSupported
-    
+    /// Invalid configuration
+    case invalidConfiguration
+
     var errorDescription: String? {
         switch self {
         case .loadFailed:
@@ -248,6 +250,8 @@ enum ConfigurationError: Error, LocalizedError {
             return NSLocalizedString("config_save_failed", comment: "")
         case .operationNotSupported:
             return NSLocalizedString("operation_not_supported", comment: "")
+        case .invalidConfiguration:
+            return NSLocalizedString("error_invalid_configuration", comment: "")
         }
     }
 }

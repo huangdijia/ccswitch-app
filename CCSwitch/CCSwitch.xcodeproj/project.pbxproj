@@ -46,6 +46,19 @@
 		18000006 /* SyncManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000006 /* SyncManagerTests.swift */; };
 		18000007 /* SyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000007 /* SyncStatusView.swift */; };
 		18000009 /* SyncConflictResolverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000009 /* SyncConflictResolverView.swift */; };
+		18000010 /* SyncManagerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000010 /* SyncManagerProtocol.swift */; };
+		18000011 /* LocalizationKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000011 /* LocalizationKey.swift */; };
+		18000012 /* VendorManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000012 /* VendorManagementViewModel.swift */; };
+		18000013 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000013 /* SettingsViewModel.swift */; };
+		18000014 /* InMemoryConfigurationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000014 /* InMemoryConfigurationRepository.swift */; };
+		18000015 /* VendorDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000015 /* VendorDetailView.swift */; };
+		18000016 /* VendorListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000016 /* VendorListView.swift */; };
+		18000017 /* VendorRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000017 /* VendorRowView.swift */; };
+		18000018 /* VendorManagementViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000018 /* VendorManagementViewModelTests.swift */; };
+		18000019 /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17000019 /* SettingsViewModelTests.swift */; };
+		19000004 /* UITestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000001 /* UITestHelpers.swift */; };
+		19000005 /* ViewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000002 /* ViewSnapshotTests.swift */; };
+		19000006 /* IntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20000003 /* IntegrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +112,19 @@
 		17000006 /* SyncManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManagerTests.swift; sourceTree = "<group>"; };
 		17000007 /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
 		17000009 /* SyncConflictResolverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncConflictResolverView.swift; sourceTree = "<group>"; };
+		17000010 /* SyncManagerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManagerProtocol.swift; sourceTree = "<group>"; };
+		17000011 /* LocalizationKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationKey.swift; sourceTree = "<group>"; };
+		17000012 /* VendorManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorManagementViewModel.swift; sourceTree = "<group>"; };
+		17000013 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		17000014 /* InMemoryConfigurationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryConfigurationRepository.swift; sourceTree = "<group>"; };
+		17000015 /* VendorDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorDetailView.swift; sourceTree = "<group>"; };
+		17000016 /* VendorListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorListView.swift; sourceTree = "<group>"; };
+		17000017 /* VendorRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorRowView.swift; sourceTree = "<group>"; };
+		17000018 /* VendorManagementViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorManagementViewModelTests.swift; sourceTree = "<group>"; };
+		17000019 /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
+		20000001 /* UITestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestHelpers.swift; sourceTree = "<group>"; };
+		20000002 /* ViewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewSnapshotTests.swift; sourceTree = "<group>"; };
+		20000003 /* IntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +177,8 @@
 				17000003 /* CloudStorageServiceTests.swift */,
 				17000006 /* SyncManagerTests.swift */,
 				0600000C /* Mocks */,
+				20000005 /* ViewModels Tests */,
+				20000004 /* UITests */,
 			);
 			path = CCSwitchTests;
 			sourceTree = "<group>";
@@ -197,6 +225,8 @@
 				16000007 /* ServiceContainer.swift */,
 				17000002 /* ICloudStorageService.swift */,
 				17000005 /* SyncManager.swift */,
+				17000014 /* InMemoryConfigurationRepository.swift */,
+				19000001 /* ViewModels */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -212,6 +242,7 @@
 				02000014 /* AdvancedSettingsView.swift */,
 				17000007 /* SyncStatusView.swift */,
 				17000009 /* SyncConflictResolverView.swift */,
+				19000002 /* VendorManagement */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -226,6 +257,7 @@
 				16000005 /* NotificationService.swift */,
 				16000006 /* SettingsRepository.swift */,
 				17000001 /* CloudStorageService.swift */,
+				17000010 /* SyncManagerProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -233,6 +265,7 @@
 		0600000A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				17000011 /* LocalizationKey.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -252,6 +285,44 @@
 				17000004 /* MockCloudStorageService.swift */,
 			);
 			path = Mocks;
+			sourceTree = "<group>";
+		};
+		19000001 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				17000012 /* VendorManagementViewModel.swift */,
+				17000013 /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		20000005 /* ViewModels Tests */ = {
+			isa = PBXGroup;
+			children = (
+				17000018 /* VendorManagementViewModelTests.swift */,
+				17000019 /* SettingsViewModelTests.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		19000002 /* VendorManagement */ = {
+			isa = PBXGroup;
+			children = (
+				17000015 /* VendorDetailView.swift */,
+				17000016 /* VendorListView.swift */,
+				17000017 /* VendorRowView.swift */,
+			);
+			path = VendorManagement;
+			sourceTree = "<group>";
+		};
+		20000004 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				20000001 /* UITestHelpers.swift */,
+				20000002 /* ViewSnapshotTests.swift */,
+				20000003 /* IntegrationTests.swift */,
+			);
+			path = UITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -385,6 +456,14 @@
 				18000005 /* SyncManager.swift in Sources */,
 				18000007 /* SyncStatusView.swift in Sources */,
 				18000009 /* SyncConflictResolverView.swift in Sources */,
+				18000010 /* SyncManagerProtocol.swift in Sources */,
+				18000011 /* LocalizationKey.swift in Sources */,
+				18000012 /* VendorManagementViewModel.swift in Sources */,
+				18000013 /* SettingsViewModel.swift in Sources */,
+				18000014 /* InMemoryConfigurationRepository.swift in Sources */,
+				18000015 /* VendorDetailView.swift in Sources */,
+				18000016 /* VendorListView.swift in Sources */,
+				18000017 /* VendorRowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,6 +478,11 @@
 				18000003 /* CloudStorageServiceTests.swift in Sources */,
 				18000004 /* MockCloudStorageService.swift in Sources */,
 				18000006 /* SyncManagerTests.swift in Sources */,
+				18000018 /* VendorManagementViewModelTests.swift in Sources */,
+				18000019 /* SettingsViewModelTests.swift in Sources */,
+				19000004 /* UITestHelpers.swift in Sources */,
+				19000005 /* ViewSnapshotTests.swift in Sources */,
+				19000006 /* IntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

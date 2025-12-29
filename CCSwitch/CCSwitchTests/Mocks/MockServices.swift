@@ -6,7 +6,7 @@ class MockSettingsWriter: SettingsWriter {
     var lastWrittenSettings: [String: String]?
     var writeCallCount = 0
     var shouldThrowError = false
-    
+
     func writeSettings(_ env: [String: String]) throws {
         writeCallCount += 1
         if shouldThrowError {
@@ -22,35 +22,35 @@ class MockBackupService: BackupService {
     var restoreCallCount = 0
     var shouldThrowError = false
     var mockBackups: [URL] = []
-    
+
     func backupCurrentSettings() throws {
         backupCallCount += 1
         if shouldThrowError {
             throw BackupError.restoreFailed
         }
     }
-    
+
     func restoreFromBackup(_ backupURL: URL) throws {
         restoreCallCount += 1
         if shouldThrowError {
             throw BackupError.restoreFailed
         }
     }
-    
+
     func getAllBackups() throws -> [URL] {
         if shouldThrowError {
             throw BackupError.backupNotFound
         }
         return mockBackups
     }
-    
+
     func deleteBackup(_ backupURL: URL) throws {
         if shouldThrowError {
             throw BackupError.invalidBackupFile
         }
         mockBackups.removeAll { $0 == backupURL }
     }
-    
+
     func deleteAllBackups() throws {
         if shouldThrowError {
             throw BackupError.restoreFailed
@@ -58,3 +58,38 @@ class MockBackupService: BackupService {
         mockBackups.removeAll()
     }
 }
+
+/// Mock implementation of VendorSwitcher for testing
+class MockVendorSwitcher: VendorSwitcher {
+    var currentVendor: Vendor?
+    var switchCallCount = 0
+    var shouldThrowError = false
+    var errorToThrow: Error?
+
+    func switchToVendor(with vendorId: String) throws {
+        switchCallCount += 1
+        if shouldThrowError, let error = errorToThrow {
+            throw error
+        }
+        // In a real test, you'd set up a mock repository
+        // For now, just track the call
+    }
+
+    func getCurrentVendor() -> Vendor? {
+        return currentVendor
+    }
+
+    // MARK: - Test Helpers
+
+    func setCurrentVendor(_ vendor: Vendor) {
+        self.currentVendor = vendor
+    }
+
+    func reset() {
+        currentVendor = nil
+        switchCallCount = 0
+        shouldThrowError = false
+        errorToThrow = nil
+    }
+}
+

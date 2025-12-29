@@ -4,29 +4,29 @@ import Foundation
 /// This provides a centralized location for service creation and management
 class ServiceContainer {
     static let shared = ServiceContainer()
-    
+
     // MARK: - Service Instances
-    
+
     private(set) lazy var configRepository: ConfigurationRepository = {
         return FileConfigurationRepository()
     }()
-    
+
     private(set) lazy var settingsWriter: SettingsWriter = {
         return ClaudeSettingsWriter()
     }()
-    
+
     private(set) lazy var backupService: BackupService = {
         return BackupManager.shared
     }()
-    
+
     private(set) lazy var notificationService: NotificationService = {
         return UserNotificationService(settings: settingsRepository)
     }()
-    
+
     private(set) lazy var settingsRepository: SettingsRepository = {
         return UserDefaultsSettingsRepository()
     }()
-    
+
     private(set) lazy var vendorSwitcher: VendorSwitcher = {
         return DefaultVendorSwitcher(
             configRepository: configRepository,
@@ -36,37 +36,70 @@ class ServiceContainer {
             settingsRepository: settingsRepository
         )
     }()
-    
-    private(set) lazy var syncManager: SyncManager = {
+
+    private(set) lazy var syncManager: any SyncManagerProtocol = {
         return SyncManager.shared
     }()
-    
+
+    // MARK: - View Models
+
+    @MainActor
+    private(set) lazy var vendorManagementViewModel: any VendorManagementViewModelProtocol = {
+        return DefaultVendorManagementViewModel(
+            configManager: .shared,
+            notificationService: notificationService
+        )
+    }()
+
+    @MainActor
+    private(set) lazy var settingsViewModel: any SettingsViewModelProtocol = {
+        return DefaultSettingsViewModel(
+            settingsRepository: settingsRepository,
+            configManager: .shared,
+            syncManager: syncManager,
+            updateManager: UpdateManager.shared,
+            notificationService: notificationService
+        )
+    }()
+
     private init() {}
-    
+
     // MARK: - Service Registration (for testing)
-    
+
     /// Register a custom configuration repository (useful for testing)
     func register(configRepository: ConfigurationRepository) {
         self.configRepository = configRepository
     }
-    
+
     /// Register a custom settings writer (useful for testing)
     func register(settingsWriter: SettingsWriter) {
         self.settingsWriter = settingsWriter
     }
-    
+
     /// Register a custom backup service (useful for testing)
     func register(backupService: BackupService) {
         self.backupService = backupService
     }
-    
+
     /// Register a custom notification service (useful for testing)
     func register(notificationService: NotificationService) {
         self.notificationService = notificationService
     }
-    
+
     /// Register a custom settings repository (useful for testing)
     func register(settingsRepository: SettingsRepository) {
         self.settingsRepository = settingsRepository
+    }
+
+    /// Register a custom vendor management view model (useful for testing)
+    @MainActor
+    func register(vendorManagementViewModel: any VendorManagementViewModelProtocol) {
+        self.vendorManagementViewModel = vendorManagementViewModel
+    }
+
+    /// Register a custom settings view model (useful for testing)
+    @MainActor
+    func register(settingsViewModel: any SettingsViewModelProtocol) {
+        self.settingsViewModel = settingsViewModel
     }
 }

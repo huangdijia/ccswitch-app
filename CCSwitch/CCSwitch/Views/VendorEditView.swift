@@ -30,15 +30,15 @@ struct VendorEditView: View {
         VStack(spacing: 0) {
             // Header (Custom for Sheet)
             ZStack {
-                Text(vendor == nil ? "add_new_vendor" : "edit_vendor")
+                Text(LocalizedStringKey(vendor == nil ? LocalizationKey.addNewVendor : LocalizationKey.editVendor))
                     .font(.headline)
-                
+
                 HStack {
-                    Button("cancel") { onCancel() }
+                    Button(LocalizedStringKey(LocalizationKey.cancel)) { onCancel() }
                         .keyboardShortcut(.escape)
                         .controlSize(.small)
                     Spacer()
-                    Button("save") { save() }
+                    Button(LocalizedStringKey(LocalizationKey.save)) { save() }
                         .keyboardShortcut(.return)
                         .disabled(!isValid)
                         .controlSize(.small)
@@ -53,32 +53,32 @@ struct VendorEditView: View {
             Form {
                 // MARK: - Section 1: Basic Info
                 Section {
-                    TextField("name_label", text: $name)
+                    TextField(LocalizedStringKey(LocalizationKey.nameLabel), text: $name)
                         .onChange(of: name) { _, _ in validate() }
-                    
+
                     if vendor == nil { // Only show preset for new vendors
-                        Picker("preset_label", selection: $preset) {
-                            Text("preset_custom").tag(VendorPreset.custom)
-                            Text("preset_anthropic").tag(VendorPreset.anthropic)
-                            Text("preset_openai").tag(VendorPreset.openai)
+                        Picker(LocalizedStringKey(LocalizationKey.presetLabel), selection: $preset) {
+                            Text(LocalizedStringKey(LocalizationKey.presetCustom)).tag(VendorPreset.custom)
+                            Text(LocalizedStringKey(LocalizationKey.presetAnthropic)).tag(VendorPreset.anthropic)
+                            Text(LocalizedStringKey(LocalizationKey.presetOpenAI)).tag(VendorPreset.openai)
                         }
                         .onChange(of: preset) { _, newValue in
                             applyPreset(newValue)
                         }
                     }
                 } header: {
-                    Text("basic_info")
+                    Text(LocalizedStringKey(LocalizationKey.basicInfo))
                 }
 
                 // MARK: - Section 2: Connection & Auth
                 Section {
-                    LabeledContent("base_url_label") {
+                    LabeledContent(LocalizedStringKey(LocalizationKey.baseURLLabel)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            TextField("base_url_label", text: $baseURL)
+                            TextField(LocalizedStringKey(LocalizationKey.baseURLLabel), text: $baseURL)
                                 .labelsHidden()
                                 .textContentType(.URL)
                                 .onChange(of: baseURL) { _, _ in validate() }
-                            
+
                             if let error = errors["baseURL"] {
                                 Text(LocalizedStringKey(error))
                                     .font(.caption)
@@ -87,18 +87,18 @@ struct VendorEditView: View {
                         }
                     }
 
-                    LabeledContent("auth_token_label") {
+                    LabeledContent(LocalizedStringKey(LocalizationKey.authTokenLabel)) {
                         HStack {
                             ZStack(alignment: .trailing) {
                                 if showToken {
-                                    TextField("auth_token_label", text: $authToken)
+                                    TextField(LocalizedStringKey(LocalizationKey.authTokenLabel), text: $authToken)
                                         .labelsHidden()
                                 } else {
-                                    SecureField("auth_token_label", text: $authToken)
+                                    SecureField(LocalizedStringKey(LocalizationKey.authTokenLabel), text: $authToken)
                                         .labelsHidden()
                                 }
                             }
-                            
+
                             Button(action: { showToken.toggle() }) {
                                 Image(systemName: showToken ? "eye.slash" : "eye")
                                     .foregroundColor(.secondary)
@@ -107,7 +107,7 @@ struct VendorEditView: View {
                             .help("Toggle visibility")
                         }
                     }
-                    Text("auth_token_hint")
+                    Text(LocalizedStringKey(LocalizationKey.authTokenHint))
                         .font(.caption)
                         .foregroundColor(.secondary)
 
@@ -116,41 +116,41 @@ struct VendorEditView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                     }
-                    
+
                     // Test Connection
                     TestConnectionView(url: baseURL, token: authToken)
                         .padding(.top, 4)
-                    
+
                 } header: {
-                    Text("connection_and_auth")
+                    Text(LocalizedStringKey(LocalizationKey.connectionAndAuth))
                 }
 
                 // MARK: - Section 3: Models
                 Section {
-                    TextField("default_model_label", text: $defaultModel)
-                    
-                    DisclosureGroup("advanced_model_mapping", isExpanded: $isAdvancedModelsExpanded) {
+                    TextField(LocalizedStringKey(LocalizationKey.defaultModelLabel), text: $defaultModel)
+
+                    DisclosureGroup(LocalizedStringKey(LocalizationKey.modelMapping), isExpanded: $isAdvancedModelsExpanded) {
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("advanced_model_mapping_desc")
+                            Text(LocalizedStringKey(LocalizationKey.advancedModelMappingDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            
-                            TextField("opus_model_label", text: $opusModel)
-                            TextField("sonnet_model_label", text: $sonnetModel)
-                            TextField("haiku_model_label", text: $haikuModel)
-                            TextField("small_fast_model_label", text: $smallFastModel)
+
+                            TextField(LocalizedStringKey(LocalizationKey.opusModelLabel), text: $opusModel)
+                            TextField(LocalizedStringKey(LocalizationKey.sonnetModelLabel), text: $sonnetModel)
+                            TextField(LocalizedStringKey(LocalizationKey.haikuModelLabel), text: $haikuModel)
+                            TextField(LocalizedStringKey(LocalizationKey.smallFastModelLabel), text: $smallFastModel)
                         }
                         .padding(.vertical, 4)
                     }
                 } header: {
-                    Text("models_section")
+                    Text(LocalizedStringKey(LocalizationKey.modelsSection))
                 }
 
                 // MARK: - Section 4: Network
                 Section {
-                    LabeledContent("timeout_label") {
+                    LabeledContent(LocalizedStringKey(LocalizationKey.timeoutLabel)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            TextField("timeout_label", text: $timeout)
+                            TextField(LocalizedStringKey(LocalizationKey.timeoutLabel), text: $timeout)
                                 .labelsHidden()
                                 .onChange(of: timeout) { _, _ in validate() }
                             if let error = errors["timeout"] {
@@ -161,7 +161,7 @@ struct VendorEditView: View {
                         }
                     }
                 } header: {
-                    Text("network_settings")
+                    Text(LocalizedStringKey(LocalizationKey.networkSettings))
                 }
             }
             .formStyle(.grouped)
@@ -184,22 +184,22 @@ struct VendorEditView: View {
         var newErrors: [String: String] = [:]
 
         if name.isEmpty {
-            newErrors["name"] = "validation_name_required"
+            newErrors["name"] = LocalizationKey.validationNameRequired
         }
 
         if !baseURL.isEmpty {
             if !baseURL.lowercased().hasPrefix("http://") && !baseURL.lowercased().hasPrefix("https://") {
-                newErrors["baseURL"] = "validation_url_invalid"
+                newErrors["baseURL"] = LocalizationKey.validationURLInvalid
             }
         }
 
         if !timeout.isEmpty {
             if let val = Int(timeout) {
                 if val < 1000 || val > 300000 {
-                    newErrors["timeout"] = "validation_timeout_range"
+                    newErrors["timeout"] = LocalizationKey.validationTimeoutRange
                 }
             } else {
-                newErrors["timeout"] = "validation_timeout_number"
+                newErrors["timeout"] = LocalizationKey.validationTimeoutNumber
             }
         }
         
@@ -307,19 +307,19 @@ struct TestConnectionView: View {
                         .controlSize(.small)
                         .scaleEffect(0.8)
                 } else {
-                    Label("test_connection_btn", systemImage: "network")
+                    Label(LocalizedStringKey(LocalizationKey.testConnectionBtn), systemImage: "network")
                 }
             }
             .buttonStyle(.bordered)
             .disabled(url.isEmpty || isTesting)
-            
+
             Spacer()
-            
+
             if status == .success {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
-                    Text("status_success")
+                    Text(LocalizedStringKey(LocalizationKey.statusSuccess))
                         .font(.caption)
                         .foregroundColor(.green)
                 }
@@ -328,7 +328,7 @@ struct TestConnectionView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(.red)
-                    Text(LocalizedStringKey(errorMessage ?? "status_network_error"))
+                    Text(errorMessage ?? LocalizationKey.localized(LocalizationKey.statusNetworkError))
                         .font(.caption)
                         .foregroundColor(.red)
                         .lineLimit(1)
@@ -340,37 +340,37 @@ struct TestConnectionView: View {
     
     private func runTest() {
         guard let urlObj = URL(string: url) else { return }
-        
+
         isTesting = true
         status = .idle
         errorMessage = nil
-        
+
         var request = URLRequest(url: urlObj)
         // Heuristic: Append /v1/models if root URL is provided for common APIs
         if urlObj.path == "" || urlObj.path == "/" {
              request.url = urlObj.appendingPathComponent("v1/models")
         }
-        
+
         request.httpMethod = "GET"
         request.timeoutInterval = 5
-        
+
         if !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             request.setValue(token, forHTTPHeaderField: "x-api-key") // Anthropic specific
         }
-        
+
         URLSession.shared.dataTask(with: request) { _, response, error in
             DispatchQueue.main.async {
                 isTesting = false
-                
+
                 if let _ = error {
-                    // Distinguish strictly network error vs auth error if possible, 
+                    // Distinguish strictly network error vs auth error if possible,
                     // but for now generic network error
                     status = .failure
-                    errorMessage = "status_network_error"
+                    errorMessage = LocalizationKey.localized(LocalizationKey.statusNetworkError)
                     return
                 }
-                
+
                 if let httpResponse = response as? HTTPURLResponse {
                     if (200...299).contains(httpResponse.statusCode) {
                         status = .success
@@ -380,10 +380,10 @@ struct TestConnectionView: View {
                         }
                     } else if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
                         status = .failure
-                        errorMessage = "status_auth_failed"
+                        errorMessage = LocalizationKey.localized(LocalizationKey.statusAuthFailed)
                     } else {
                         status = .failure
-                        errorMessage = "Error: \(httpResponse.statusCode)"
+                        errorMessage = LocalizationKey.localized(LocalizationKey.connectionErrorStatus, String(httpResponse.statusCode))
                     }
                 }
             }

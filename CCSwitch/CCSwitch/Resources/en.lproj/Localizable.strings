@@ -1,3 +1,11 @@
+/* Common Actions */
+"add" = "Add";
+"edit" = "Edit";
+"remove" = "Remove";
+"info" = "Info";
+"loading" = "Loading...";
+"warning" = "Warning";
+
 /* General */
 "app_name" = "CCSwitch";
 "settings" = "Settings";
@@ -241,6 +249,10 @@
 
 /* Software Update */
 "software_update" = "Software Update";
+"auto_check_updates" = "Automatically check for updates";
+"auto_check_updates_desc" = "Periodically check GitHub for new versions.";
+"auto_install_updates" = "Automatically download and install";
+"auto_install_updates_desc" = "Install updates in background (requires restart).";
 "check_for_updates_now" = "Check for Updates...";
 "last_checked_format" = "Last checked: %@";
 "version_info" = "Version";
@@ -317,5 +329,33 @@
 "menu_bar_tooltip_current" = "CCSwitch - Current: %@";
 "default_new_vendor_name" = "New Vendor";
 "untitled_vendor" = "Untitled";
+"copy_suffix" = " Copy";
 "connection_failed_simple" = "Failed";
 "connection_error_status" = "Error: %@";
+
+/* Additional Keys */
+"conflict_vendor_id" = "Vendor ID: %@";
+"conflict_name" = "Name: %@";
+"keep_both_versions" = "Keep Both Versions";
+"overwrite_local" = "Overwrite Local";
+"overwrite_remote" = "Overwrite Cloud";
+"sync_conflict_description" = "The following vendors have conflicts between local and remote:";
+"sync_conflict_resolved" = "Conflict Resolved";
+"sync_has_conflicts" = "%d conflicts";
+"switching_vendor" = "Switching...";
+"vendor_switched_msg" = "Switched to %@";
+"no_synced_vendors" = "No vendors selected for sync";
+"select_vendors_to_sync" = "Select vendors to sync";
+"sync_in_progress" = "Syncing...";
+"sync_completed" = "Sync Completed";
+"sync_failed" = "Sync Failed";
+
+/* Error Messages */
+"error_cannot_remove_current_vendor" = "Cannot remove the currently active vendor.";
+"error_cannot_remove_last_vendor" = "Cannot remove the last vendor.";
+"error_invalid_vendor_name" = "Invalid vendor name.";
+"error_invalid_base_url" = "Invalid Base URL.";
+"error_invalid_timeout" = "Invalid timeout value.";
+"error_vendor_not_found" = "Vendor not found.";
+"error_vendor_already_exists" = "Vendor already exists.";
+"error_invalid_configuration" = "Invalid configuration.";

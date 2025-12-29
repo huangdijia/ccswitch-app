@@ -9,9 +9,9 @@ struct SettingsView: View {
         VStack(spacing: 0) {
             // 自定义标签栏 (类似 Finder 设置)
             HStack(spacing: 25) {
-                TabItemView(tab: .general, selection: $selectedTab, icon: "gearshape", title: "general")
-                TabItemView(tab: .vendors, selection: $selectedTab, icon: "tag", title: "vendors")
-                TabItemView(tab: .advanced, selection: $selectedTab, icon: "gearshape.2", title: "advanced")
+                TabItemView(tab: .general, selection: $selectedTab, icon: "gearshape", title: LocalizationKey.general)
+                TabItemView(tab: .vendors, selection: $selectedTab, icon: "tag", title: LocalizationKey.vendors)
+                TabItemView(tab: .advanced, selection: $selectedTab, icon: "gearshape.2", title: LocalizationKey.advanced)
             }
             .padding(.top, 12)
             .padding(.bottom, 8)
@@ -113,7 +113,7 @@ struct MigrationAlertView: View {
                     Button(action: {
                         manager.showMigrationPrompt = false
                     }) {
-                        Text(NSLocalizedString("ok", comment: "确定"))
+                        Text(LocalizationKey.localized(LocalizationKey.ok))
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(PrimaryButtonStyle())
@@ -126,20 +126,20 @@ struct MigrationAlertView: View {
                 // Migration Prompt State
                 
                 // 1. Title
-                Text(NSLocalizedString("migration_title", comment: "检测到旧版配置"))
+                Text(LocalizationKey.localized(LocalizationKey.migrationTitle))
                     .font(.headline)
                     .fontWeight(.bold)
                     .padding(.bottom, 12)
                 
                 // 2. Summary
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(String(format: NSLocalizedString("migration_found_vendors", comment: "发现：%d 个供应商"), manager.legacyVendorsCount))
+                    Text(String(format: LocalizationKey.localized(LocalizationKey.migrationFoundVendors), manager.legacyVendorsCount))
                         .font(.body)
                 }
                 .padding(.bottom, 16)
                 
                 // 3. Description
-                Text(NSLocalizedString("migration_note", comment: "迁移过程中会自动创建备份，不会影响旧版文件的使用。"))
+                Text(LocalizationKey.localized(LocalizationKey.migrationNote))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -150,7 +150,7 @@ struct MigrationAlertView: View {
                     HStack {
                         ProgressView()
                             .scaleEffect(0.8)
-                        Text(NSLocalizedString("migrating", comment: "正在迁移..."))
+                        Text(LocalizationKey.localized(LocalizationKey.migrating))
                             .font(.caption)
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -159,7 +159,7 @@ struct MigrationAlertView: View {
                     HStack(alignment: .center) {
                         // Checkbox
                         Toggle(isOn: $dontShowAgain) {
-                            Text(NSLocalizedString("migration_dont_show_again_checkbox", comment: "不再提示"))
+                            Text(LocalizationKey.localized(LocalizationKey.migrationDontShowAgainCheckbox))
                                 .font(.caption)
                         }
                         .toggleStyle(.checkbox)
@@ -173,7 +173,7 @@ struct MigrationAlertView: View {
                             }
                             manager.showMigrationPrompt = false
                         }) {
-                            Text(NSLocalizedString("migrate_later", comment: "稍后"))
+                            Text(LocalizationKey.localized(LocalizationKey.migrateLater))
                                 .frame(width: 80)
                         }
                         .keyboardShortcut(.cancelAction)
@@ -187,7 +187,7 @@ struct MigrationAlertView: View {
                                 }
                             }
                         }) {
-                            Text(NSLocalizedString("migrate_now", comment: "立即迁移"))
+                            Text(LocalizationKey.localized(LocalizationKey.migrateNowButton))
                                 .frame(width: 100)
                         }
                         .keyboardShortcut(.defaultAction)
@@ -205,13 +205,13 @@ struct MigrationAlertView: View {
         case .success(let count):
             isSuccess = true
             // Show toast and close sheet immediately for success
-            let msg = String(format: NSLocalizedString("migration_success_msg", comment: "成功迁移了 %d 个供应商。"), count)
+            let msg = String(format: LocalizationKey.localized(LocalizationKey.migrationSuccessMsg), count)
             ToastManager.shared.show(message: msg, type: .success)
             manager.showMigrationPrompt = false
             
         case .failure(let errorMessage):
             isSuccess = false
-            resultMessage = String(format: NSLocalizedString("migration_failure_msg", comment: "迁移失败: %@"), errorMessage)
+            resultMessage = String(format: LocalizationKey.localized(LocalizationKey.migrationFailureMsg), errorMessage)
             migrationFinished = true
         }
     }

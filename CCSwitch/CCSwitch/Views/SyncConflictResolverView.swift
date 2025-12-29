@@ -7,11 +7,11 @@ struct SyncConflictResolverView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(LocalizedStringKey("sync_conflict_title"))
+                Text(LocalizedStringKey(LocalizationKey.syncConflictTitle))
                     .font(.headline)
                 Spacer()
                 if syncManager.pendingConflicts.isEmpty {
-                    Button(LocalizedStringKey("done")) {
+                    Button(LocalizedStringKey(LocalizationKey.done)) {
                         presentationMode.wrappedValue.dismiss()
                     }
                     .controlSize(.small)
@@ -27,7 +27,7 @@ struct SyncConflictResolverView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.largeTitle)
                         .foregroundColor(.green)
-                    Text(LocalizedStringKey("all_conflicts_resolved"))
+                    Text(LocalizedStringKey(LocalizationKey.allConflictsResolved))
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -40,18 +40,18 @@ struct SyncConflictResolverView: View {
                             
                             HStack(alignment: .top, spacing: 24) {
                                 ConflictVersionView(
-                                    title: "local_version",
+                                    title: LocalizationKey.localVersion,
                                     vendor: conflict.local,
-                                    actionTitle: "keep_local",
+                                    actionTitle: LocalizationKey.keepLocal,
                                     color: .blue
                                 ) {
                                     syncManager.resolveConflict(vendorId: conflict.id, keepLocal: true)
                                 }
                                 
                                 ConflictVersionView(
-                                    title: "remote_version",
+                                    title: LocalizationKey.remoteVersion,
                                     vendor: conflict.remote,
-                                    actionTitle: "keep_remote",
+                                    actionTitle: LocalizationKey.keepRemote,
                                     color: .orange
                                 ) {
                                     syncManager.resolveConflict(vendorId: conflict.id, keepLocal: false)
@@ -84,7 +84,7 @@ struct ConflictVersionView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(vendor.name)
                     .font(.subheadline.weight(.medium))
-                Text(String(format: NSLocalizedString("env_vars_count", comment: ""), vendor.env.count))
+                Text(String(format: NSLocalizedString(LocalizationKey.envVarsCount, comment: ""), vendor.env.count))
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }

@@ -4,49 +4,35 @@ import Network
 
 class SyncManager: ObservableObject {
     static let shared = SyncManager()
-    
+
     @Published var syncConfig = SyncConfiguration()
     @Published var syncStatus: SyncStatus = .idle
     @Published var pendingConflicts: [SyncConflict] = []
     @Published var isOnline = true
-    
-    struct SyncConflict: Identifiable {
-        let id: String // Vendor ID
-        let local: Vendor
-        let remote: Vendor
-    }
-    
+
     private let cloudStorage: CloudStorageService
     private let configManager: SyncConfigManagerProtocol
     private let monitor = NWPathMonitor()
     private var cancellables = Set<AnyCancellable>()
-    
+
     private let syncConfigKey = "sync_configuration"
     private let vendorsKeyPrefix = "vendor_"
-    
+
     private var retryCount = 0
     private let maxRetries = 3
-    
+
     init(
         cloudStorage: CloudStorageService? = nil,
         configManager: SyncConfigManagerProtocol = ConfigManager.shared
     ) {
         self.cloudStorage = cloudStorage ?? ICloudStorageService()
         self.configManager = configManager
-        
+
         loadSyncConfig()
         setupObservers()
         setupNetworkMonitor()
     }
-    
-    enum SyncStatus: Equatable {
-        case idle
-        case syncing
-        case error(String)
-        case success
-        case offline
-    }
-    
+
     // MARK: - Initialization
     
     private func setupObservers() {

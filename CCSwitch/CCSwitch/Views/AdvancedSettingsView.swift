@@ -4,10 +4,10 @@ struct AdvancedSettingsView: View {
     @ObservedObject private var syncManager = SyncManager.shared
     @AppStorage("showDebugLogs") private var showDebugLogs = false
     @AppStorage("confirmBackupDeletion") private var confirmBackupDeletion = true
-    
+
     @State private var showingResetAlert = false
     @State private var showingBackupSheet = false
-    
+
     var body: some View {
         Form {
             // MARK: - iCloud Sync
@@ -15,9 +15,9 @@ struct AdvancedSettingsView: View {
                 VStack(alignment: .leading, spacing: DesignSystem.Spacing.small) {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("icloud_sync")
+                            Text(LocalizedStringKey(LocalizationKey.icloudSync))
                                 .font(.body)
-                            Text("icloud_sync_desc")
+                            Text(LocalizedStringKey(LocalizationKey.icloudSyncDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -28,21 +28,21 @@ struct AdvancedSettingsView: View {
                         ))
                         .labelsHidden()
                     }
-                    
+
                     if syncManager.syncConfig.isSyncEnabled {
                         Divider().padding(.vertical, 4)
-                        
+
                         HStack {
-                            Text("sync_status")
+                            Text(LocalizedStringKey(LocalizationKey.syncStatus))
                                 .font(.subheadline)
                             Spacer()
                             SyncStatusView(status: syncManager.syncStatus)
                         }
-                        
+
                         HStack {
                             Spacer()
-                            
-                            Button("sync_now") {
+
+                            Button(LocalizedStringKey(LocalizationKey.syncNow)) {
                                 syncManager.uploadSelectedVendors()
                             }
                             .controlSize(.small)
@@ -50,7 +50,7 @@ struct AdvancedSettingsView: View {
                     }
                 }
             } header: {
-                Text("icloud_settings")
+                Text(LocalizedStringKey(LocalizationKey.icloudSettings))
             }
 
             // MARK: - Section 1: System Behavior
@@ -59,9 +59,9 @@ struct AdvancedSettingsView: View {
                     // Debug Logs
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("show_debug_logs")
+                            Text(LocalizedStringKey(LocalizationKey.showDebugLogs))
                                 .font(.body)
-                            Text("debug_logs_desc")
+                            Text(LocalizedStringKey(LocalizationKey.debugLogsDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -69,15 +69,15 @@ struct AdvancedSettingsView: View {
                         Toggle("", isOn: $showDebugLogs)
                             .labelsHidden()
                     }
-                    
+
                     Divider().padding(.vertical, 4)
-                    
+
                     // Confirm Backup Deletion
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("confirm_backup_deletion")
+                            Text(LocalizedStringKey(LocalizationKey.confirmBackupDeletion))
                                 .font(.body)
-                            Text("confirm_backup_deletion_desc")
+                            Text(LocalizedStringKey(LocalizationKey.confirmBackupDeletionDesc))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -87,56 +87,56 @@ struct AdvancedSettingsView: View {
                     }
                 }
             } header: {
-                Text("system_behavior")
+                Text(LocalizedStringKey(LocalizationKey.systemBehavior))
             }
-            
+
             // MARK: - Section 2: Data & Maintenance
             Section {
                 HStack {
-                    Text("backups")
+                    Text(LocalizedStringKey(LocalizationKey.backups))
                     Spacer()
-                    Button("manage_backups") {
+                    Button(LocalizedStringKey(LocalizationKey.manageBackups)) {
                         showingBackupSheet = true
                     }
                 }
-                
+
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("config_file")
-                        Text("config_file_path")
+                        Text(LocalizedStringKey(LocalizationKey.configFile))
+                        Text(LocalizedStringKey(LocalizationKey.configFilePath))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
                     HStack(spacing: 12) {
-                        Button("show_in_finder") {
+                        Button(LocalizedStringKey(LocalizationKey.showInFinder)) {
                             openConfigFolder()
                         }
                         .buttonStyle(.link)
                         .font(.subheadline)
-                        
-                        Button("reload_config") {
+
+                        Button(LocalizedStringKey(LocalizationKey.reloadConfig)) {
                             reloadConfiguration()
                         }
                         .controlSize(.small)
                     }
                 }
             } header: {
-                Text("data_maintenance")
+                Text(LocalizedStringKey(LocalizationKey.dataMaintenance))
             }
-            
+
             // MARK: - Section 3: Danger Zone
             Section {
                 Button(role: .destructive) {
                     showingResetAlert = true
                 } label: {
-                    Text("reset_app_action")
+                    Text(LocalizedStringKey(LocalizationKey.resetAppAction))
                         .frame(maxWidth: .infinity)
                 }
             } header: {
-                Text("danger_zone")
+                Text(LocalizedStringKey(LocalizationKey.dangerZone))
             } footer: {
-                Text("reset_app_state_warning")
+                Text(LocalizedStringKey(LocalizationKey.resetAppStateWarning))
                     .font(.caption)
                     .foregroundColor(.red.opacity(0.8))
                     .multilineTextAlignment(.leading)
@@ -156,9 +156,9 @@ struct AdvancedSettingsView: View {
         }
         .alert(isPresented: $showingResetAlert) {
             Alert(
-                title: Text("reset_app_state_confirm_title"),
-                message: Text("reset_app_state_confirm_msg"),
-                primaryButton: .destructive(Text("reset_button")) {
+                title: Text(LocalizedStringKey(LocalizationKey.resetAppStateConfirmTitle)),
+                message: Text(LocalizedStringKey(LocalizationKey.resetAppStateConfirmMsg)),
+                primaryButton: .destructive(Text(LocalizedStringKey(LocalizationKey.resetButton))) {
                     resetAppState()
                 },
                 secondaryButton: .cancel()
@@ -168,7 +168,7 @@ struct AdvancedSettingsView: View {
 
     private func reloadConfiguration() {
         ConfigManager.shared.initialize()
-        let msg = NSLocalizedString("reload_success_msg", comment: "Configuration reloaded.")
+        let msg = LocalizationKey.localized(LocalizationKey.reloadSuccessMsg)
         ToastManager.shared.show(message: msg, type: .success)
     }
 
@@ -182,10 +182,10 @@ struct AdvancedSettingsView: View {
         UserDefaults.standard.removePersistentDomain(forName: domain)
         ConfigManager.shared.cleanup()
         ConfigManager.shared.initialize()
-        
+
         // Defer the state update to ensure the previous alert is fully dismissed
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            let msg = NSLocalizedString("reset_success_msg", comment: "App state reset.")
+            let msg = LocalizationKey.localized(LocalizationKey.resetSuccessMsg)
             ToastManager.shared.show(message: msg, type: .success)
         }
     }
@@ -196,23 +196,23 @@ struct BackupListView: View {
     @State private var showingRestoreAlert = false
     @State private var backupToRestore: URL?
     @Environment(\.presentationMode) var presentationMode
-    
+
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("backups")
+                Text(LocalizedStringKey(LocalizationKey.backups))
                     .font(.headline)
                 Spacer()
-                Button("done") {
+                Button(LocalizedStringKey(LocalizationKey.done)) {
                     presentationMode.wrappedValue.dismiss()
                 }
                 .controlSize(.small)
             }
             .padding()
             .background(Color(NSColor.windowBackgroundColor))
-            
+
             Divider()
-            
+
             List {
                 if backups.isEmpty {
                     HStack {
@@ -221,7 +221,7 @@ struct BackupListView: View {
                             Image(systemName: "archivebox")
                                 .font(.largeTitle)
                                 .foregroundColor(.secondary)
-                            Text("no_backups")
+                            Text(LocalizedStringKey(LocalizationKey.noBackups))
                                 .foregroundColor(.secondary)
                         }
                         .padding()
@@ -229,7 +229,7 @@ struct BackupListView: View {
                     }
                     .listRowBackground(Color.clear)
                 } else {
-                    ForEach(backups, id: \.self) { backup in
+                    ForEach(Array(backups.enumerated()), id: \.element.path) { _, backup in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(backup.lastPathComponent)
@@ -239,12 +239,12 @@ struct BackupListView: View {
                                     .foregroundColor(.secondary)
                             }
                             Spacer()
-                            Button("restore") {
+                            Button(LocalizedStringKey(LocalizationKey.restore)) {
                                 backupToRestore = backup
                                 showingRestoreAlert = true
                             }
                             .buttonStyle(.link)
-                            
+
                             Button(action: { deleteBackup(backup) }) {
                                 Image(systemName: "trash")
                                     .foregroundColor(.red)
@@ -261,9 +261,9 @@ struct BackupListView: View {
         }
         .alert(isPresented: $showingRestoreAlert) {
             Alert(
-                title: Text("confirm_restore_title"),
-                message: Text("confirm_restore_msg"),
-                primaryButton: .default(Text("restore_button")) {
+                title: Text(LocalizedStringKey(LocalizationKey.confirmRestoreTitle)),
+                message: Text(LocalizedStringKey(LocalizationKey.confirmRestoreMsg)),
+                primaryButton: .default(Text(LocalizedStringKey(LocalizationKey.restoreButton))) {
                     if let backup = backupToRestore {
                         restoreBackup(backup)
                     }
@@ -272,7 +272,7 @@ struct BackupListView: View {
             )
         }
     }
-    
+
     private func loadBackups() {
         do {
             backups = try BackupManager.shared.getAllBackups()
@@ -298,7 +298,7 @@ struct BackupListView: View {
         do {
             try BackupManager.shared.restoreFromBackup(backup)
             loadBackups()
-            ToastManager.shared.show(message: NSLocalizedString("restore_success_msg", comment: ""), type: .success)
+            ToastManager.shared.show(message: LocalizationKey.localized(LocalizationKey.restoreSuccessMsg), type: .success)
         } catch {
             ToastManager.shared.show(message: error.localizedDescription, type: .error)
         }
@@ -308,7 +308,7 @@ struct BackupListView: View {
         do {
             try BackupManager.shared.deleteBackup(backup)
             loadBackups()
-            ToastManager.shared.show(message: NSLocalizedString("backup_deleted_success", comment: ""), type: .success)
+            ToastManager.shared.show(message: LocalizationKey.localized(LocalizationKey.backupDeletedSuccess), type: .success)
         } catch {
             ToastManager.shared.show(message: error.localizedDescription, type: .error)
         }

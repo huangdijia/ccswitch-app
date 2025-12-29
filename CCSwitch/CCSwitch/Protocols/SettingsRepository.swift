@@ -5,6 +5,9 @@ enum SettingsKey: String {
     case autoBackup
     case showSwitchNotification
     case statusBarDisplayMode
+    case autoLoadConfig
+    case showDebugLogs
+    case confirmBackupDeletion
 }
 
 /// Protocol for user preferences storage
